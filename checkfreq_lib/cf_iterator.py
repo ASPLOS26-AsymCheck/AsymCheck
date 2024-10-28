@@ -112,7 +112,6 @@ class CFIterator:
 		self.in_recovery = False
 		self.recovery_start_time = time.time()
 		self.recovery_load_time = 0
-		self.last_dataloader = None
   
 		# If AUTO mode, fetch values from cache if present
 		if self._worker_id == 0:
@@ -195,10 +194,6 @@ class CFIterator:
 		return self
 
 	def __next__(self):
-		# self._profile_done = True
-		# self._start_monitor = True
-		# self._avg_iter_dur = 0.662923
-		
 		if self._worker_id == 0 and self._chk_mode == CFMode.AUTO and not self._profile_done and self._adaptive_tune:
 				self._profile_iter_count += 1
 				dev = max(0, torch.cuda.current_device())
@@ -226,20 +221,16 @@ class CFIterator:
 		elif self._worker_id == 0 and self._chk_freq > 0 and self._steps_since_chk == self._chk_freq and self._profile_done:
 		#elif self._worker_id == 0 and self._chk_freq > 0 and self._total_steps % self._chk_freq == 0 and self._steps_since_chk == self._chk_freq:
 			print("MUST CHECKPOINT NOW AT ITER {}, steps {}".format(self._steps_this_epoch, self._steps_since_chk))
-			if self.recovery:
-				self.last_dataloader = self._dataloader
 			if self._chk_mode == CFMode.MANUAL:
 				chk_s = time.time()
     
 				if self._baseline:
-					print("target1")
 					self._cf_manager.save(synchronous=True, additional_snapshot=self.state_dict(), persist=self._persist)
 					#self._cf_manager.save(synchronous=True, additional_snapshot=self.state_dict(), persist=False)
 					with open("./stall.csv", "a+") as fp_stall:
 						fp_stall.write("{}\n".format(time.time() - chk_s))
       
 				elif self._IOpipeline: 
-					print("target2")
 					self._cf_manager.save_cpu(synchronous=True, additional_snapshot=self.state_dict(), use_thread=self._use_thread)
 					with open("./stall.csv", "a+") as fp_stall:
 						fp_stall.write("{}\n".format(time.time() - chk_s))

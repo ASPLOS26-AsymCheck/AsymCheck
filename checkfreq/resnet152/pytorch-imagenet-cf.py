@@ -751,7 +751,7 @@ def train(train_loader, model, criterion, optimizer, epoch, df, cf_manager, data
             extra_state = train_loader._cf_manager.restore()
             if args.local_rank == 0:
                 load_time = time.time()
-                print("Load time：{}\n".format(load_time - last_recovery_time))
+                print("Load time:{}\n".format(load_time - last_recovery_time))
                 
             
             if args.cf_iterator:
