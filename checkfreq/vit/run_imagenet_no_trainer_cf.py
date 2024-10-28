@@ -55,7 +55,7 @@ from transformers.utils.versions import require_version
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
 # check_min_version("4.43.0.dev0")
 
-# CheckFreq相关的import
+
 import sys
 sys.path.append('./')
 sys.path.append('./src')
@@ -241,7 +241,7 @@ def parse_args():
                     default=-1,
                     help="local_rank for distributed training on gpus")
     
-    # 添加CheckFreq相关内容
+    
     parser.add_argument('--arch', '-a', metavar='ARCH', default='resnet18')
     parser.add_argument('--dynamic', action='store_true', default=False)
     parser.add_argument('--chk-freq', default=0, type=int,metavar='N', help='checkpoint frequency')

@@ -1,5 +1,3 @@
-#目标：在使用torch.dataloader的情况下实现检查点的恢复
-
 import argparse
 import os
 import shutil
@@ -737,7 +735,7 @@ def train(train_loader, model, criterion, optimizer, epoch, df, cf_manager, data
             in_recovery = True
             last_recovery_time = time.time()
             recovery_iters = train_loader._steps_this_epoch
-            print("恢复的Iteration:{}, rank{}\n".format(recovery_iters, args.local_rank))
+            print("Recovery Iteration:{}, rank{}\n".format(recovery_iters, args.local_rank))
             
             
             # if args.distributed:
@@ -753,9 +751,9 @@ def train(train_loader, model, criterion, optimizer, epoch, df, cf_manager, data
             extra_state = train_loader._cf_manager.restore()
             if args.local_rank == 0:
                 load_time = time.time()
-                print("加载时间为：{}\n".format(load_time - last_recovery_time))
+                print("Load time：{}\n".format(load_time - last_recovery_time))
                 
-            # 重新加载Dataloader
+            
             if args.cf_iterator:
                 train_loader.__iter__()    
             
@@ -885,7 +883,7 @@ def train(train_loader, model, criterion, optimizer, epoch, df, cf_manager, data
             break
         
         if stop_iteration != 0 and train_loader._total_steps == stop_iteration:
-            print("停止：{}".format(train_loader._total_steps))
+            print("Stop :{}".format(train_loader._total_steps))
             break
     
 

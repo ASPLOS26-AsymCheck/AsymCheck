@@ -179,7 +179,7 @@ def _save_checkpoint_in_memory(queue):
                     }
             torch.save(save_data, output_model_file)
             
-            # Snapshot.take checkpoint保存技术, 并行IO操作
+            
             # app_state: Dict[str, Stateful] = {
             #     "rng_state": torchsnapshot.RNGState(),
             #     # "model": self._model,
@@ -198,7 +198,7 @@ def _save_checkpoint_in_memory(queue):
             #                                        # this pattern treats all states as replicated
             #                                     )
 
-            # # # # 异步写入IO 
+            
             # # snapshot = torchsnapshot.Snapshot.async_take(f"{self.checkpoint_save_work_dir}/run-{uuid.uuid4()}-epoch-{epoch}-iteration-{idx}",
             # #                                        app_state, replicated=["**"],
             # # # this pattern treats all states as replicated
@@ -424,7 +424,7 @@ class DeepSpeedEngine(Module):
         
         
         # 
-        # 配置具体的优化器, 
+        # Configure the specific optimizer 
         if has_optimizer:
             self._configure_optimizer(optimizer, model_parameters)
             self._configure_lr_scheduler()
@@ -1766,7 +1766,7 @@ class DeepSpeedEngine(Module):
                 
                 from oteacheck_lib.stage3 import DeepSpeedZeroOptimizer_Stage3
                 
-                # 基于Zero-3进行训练, 
+                
                 print('Initialization Zero-3!!!')
                 print('self.zero_reduce_bucket_size() = ', self.zero_reduce_bucket_size())
 
@@ -2114,13 +2114,13 @@ class DeepSpeedEngine(Module):
         # ZeRO stage >= 2 communicates during non gradient accumulation boundaries as well
         if self.zero_optimization_partition_gradients():
 
-            # 表示采用Zero-3的梯度Allreduce操作
+            
             # print('self.zero_optimization_partition_gradients()')
 
             self.optimizer.overlapping_partition_gradients_reduce_epilogue()
 
         # Communicate only at gradient accumulation boundaries, 
-        # 仅在梯度累积边界进行通信, 
+        # Communicate only at gradient accumulation boundaries 
         # ZeRO stage <= 1, 
         elif self.is_gradient_accumulation_boundary():
 
@@ -2208,7 +2208,7 @@ class DeepSpeedEngine(Module):
             else:
                 loss.backward(retain_graph=retain_graph)
 
-        # 表示反向传播的内部执行时间, 
+        # Represents the internal execution time of backpropagation 
         self._stop_timers(self.engine_timers.backward_inner_timers)
         
         b_time = time.time()
@@ -2218,7 +2218,7 @@ class DeepSpeedEngine(Module):
         self._start_timers(self.engine_timers.backward_reduce_timers)
         if allreduce_gradients and self.enable_backward_allreduce:
             # Traditional code path that allreduces the module parameter grads, 
-            # DeepSpeed大部分都是在完成反向传播结束后执行Allreduce操作, 
+            # DeepSpeed mostly performs the Allreduce operation after completing backpropagation
             self.allreduce_gradients()
 
 
@@ -2599,7 +2599,7 @@ class DeepSpeedEngine(Module):
     def allreduce_and_copy(self, small_bucket, dp_group, dp_world_size=None):
         allreduced = self.allreduce_bucket(small_bucket, dp_group, dp_world_size)
         
-        # 同步完成, 将同步结果加入到Buffer
+        # Synchronization complete, add the synchronization result to the Buffer
         for buf, synced in zip(small_bucket, self.unflatten(allreduced, small_bucket)):
             buf.copy_(synced)
     
@@ -2609,7 +2609,7 @@ class DeepSpeedEngine(Module):
         small_bucket = []
         numel = 0
         
-        # 将bucket中的元素划分Small Buffer执行Allreduce操作, 
+        # Divide elements in the bucket into Small Buffers to perform Allreduce operation 
         for tensor in bucket:
             small_bucket.append(tensor)
             numel = numel + tensor.numel()
@@ -2618,7 +2618,7 @@ class DeepSpeedEngine(Module):
                 small_bucket = []
                 numel = 0
         
-        # 将剩下的梯度元素执行Allreduce操作, 
+        # Perform Allreduce operation on the remaining gradient elements 
         if len(small_bucket) > 0:
             self.allreduce_and_copy(small_bucket, dp_group, dp_world_size)
 
@@ -2664,17 +2664,13 @@ class DeepSpeedEngine(Module):
         # print('--------------_reduce_non_expert_gradients----------------')
         
         
-        # 判断grads的组成成分
-        
-        
-        
-        # 因为他的通信是异步的
+
         
         
 
         split_sparse_tensor_buckets, split_dense_tensor_buckets = split_half_float_double_sparse(grads)
 
-        # 判断是否采用流水线并行的方法
+        # Determine whether to use pipeline parallelism
         if self.pipeline_parallelism:
             dp_group = self.mpu.get_data_parallel_group()
             dp_world_size = dist.get_world_size(dp_group)
@@ -2755,10 +2751,10 @@ class DeepSpeedEngine(Module):
             non_expert_grads = grads
 
 
-        # Non-Expert表示的是非混合专家模型的梯度同步策略, 20240820, 
+        # Non-Expert represents the gradient synchronization strategy for non-mixture of experts models 
         self._reduce_non_expert_gradients(non_expert_grads, elements_per_buffer)
 
-        # MoE操作, 混合转机模型的梯度同步策略, 20240820
+        # MoE operation, gradient synchronization strategy for mixture of experts models
         if self.has_moe_layers:
             self._reduce_expert_gradients(expert_grads, elements_per_buffer)
         

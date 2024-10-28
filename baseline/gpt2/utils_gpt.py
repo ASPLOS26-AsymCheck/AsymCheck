@@ -461,7 +461,7 @@ def get_argument_parser():
     parser.add_argument('--asc', action='store_true', default=False, help='Use MG-WFBP')
     parser.add_argument('--nstreams', type=int, default=1, help='Number of communication streams')
 
-    # 设置合并的阈值大小, default=23705252为ResNet-50所有层梯度元素数量的总和
+    
     parser.add_argument('--threshold', type=int, default=34015396, help='Set threshold if mgwfbp is False')
     parser.add_argument('--rdma', action='store_true', default=False, help='Use RDMA')
 

@@ -51,7 +51,7 @@ from typing import Dict, Optional
 # import torchsnapshot
 # from torchsnapshot import Snapshot, Stateful
 
-# CheckFreq相关的import
+
 import sys
 sys.path.append('./')
 sys.path.append('../../checkfreq_lib')
@@ -780,7 +780,7 @@ class GradientClipper:
             multi_tensor_applier(self.multi_tensor_scale, self._overflow_buf,
                                  [l, l], clip_coef)
 
-# 清空文件夹内容
+# Delete folder contents
 def delete_folder_contents(folder):
     # filenames = os.listdir(folder)
     # if len(filenames) < 1000:
@@ -799,13 +799,13 @@ def delete_folder_contents(folder):
 
 def delete_file(path):
     import os
-    if os.path.exists(path):  # 如果文件存在
+    if os.path.exists(path):  
         # os.remove(path) 
         #os.unlink(path)
         # folder_path = 'textFiles/subTexts'
         shutil.rmtree(path)
     else:
-        print('no such file')  # 则返回文件不存在
+        print('no such file')  
     
     
 

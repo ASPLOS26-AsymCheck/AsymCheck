@@ -57,8 +57,7 @@ import math
 from tqdm import tqdm
 
 # from utils_model import get_network
-# 环境变量HOROVOD_FUSION_THRESHOLD实际上以字节为单位.
-# 然而, 当使用horovodrun时, 有一个--fusion-threshold-mb以MB为单位的参数.
+
 
 # os.environ['HOROVOD_FUSION_THRESHOLD'] = '0'
 # os.environ['HOROVOD_CACHE_CAPACITY'] = '0'
@@ -187,7 +186,7 @@ def parse_args():
         help="If passed, will use a slow tokenizer (not backed by the 🤗 Tokenizers library).",
     )
     
-    # 调整训练Batch-Size能够
+    
     parser.add_argument(
         "--per_device_train_batch_size",
         type=int,
@@ -355,7 +354,7 @@ def parse_args():
     parser.add_argument('--asc', action='store_true', default=False, help='Use MG-WFBP')
     parser.add_argument('--nstreams', type=int, default=1, help='Number of communication streams')
 
-    # 设置合并的阈值大小, default=23705252为ResNet-50所有层梯度元素数量的总和
+    
     parser.add_argument('--threshold', type=int, default=34015396, help='Set threshold if mgwfbp is False')
     parser.add_argument('--rdma', action='store_true', default=False, help='Use RDMA')
 
@@ -406,7 +405,7 @@ def parse_args():
 #     def avg(self):
 #         return self.sum / self.n
 
-# 从cifar100中添加的类用来记录Iteartion的平均时间
+
 from enum import Enum
 class Summary(Enum):
     NONE = 0
@@ -744,7 +743,7 @@ def full_train():
                         # accelerator.save_state(output_dir)                        
                         # save_checkpoint(epoch, completed_steps, output_dir)
                         
-                        # 保存检查点Snapshot
+                        # Save checkpoint Snapshot
                         # save_checkpoint_in_disk_snapshot()
 
                         print('save_checkpoint_time = ', time.time() - save_checkpoint_time)
@@ -783,7 +782,7 @@ def full_train():
             # losses.append(accelerator.gather_for_metrics(loss.repeat(args.per_device_eval_batch_size)))
             losses.append(loss)
 
-        # 将losses中的零维标量转换为1维张量
+        # Convert 0-dimensional scalars in losses to 1-dimensional tensors
         losses = [loss.unsqueeze(0) for loss in losses]
         losses = torch.cat(losses)
         try:
@@ -841,7 +840,7 @@ def full_train():
 #     return
 
 
-# 清空文件夹内容
+# Delete folder contents
 def delete_folder_contents(folder):
     # filenames = os.listdir(folder)
     # if len(filenames) < 1000:
@@ -863,7 +862,6 @@ def delete_folder_contents(folder):
 #         # Save a trained model and the associated configuration
 #         model_to_save = model.module if hasattr(model, 'module') else model  # Only save the model it-self
 #         output_model_file = os.path.join(args.output_dir, modeling.WEIGHTS_NAME)
-#         # 保存模型参数状态和优化器状态
 #         torch.save({"model":model_to_save.state_dict()}, output_model_file)
 #         output_config_file = os.path.join(args.output_dir, modeling.CONFIG_NAME)
 #         with open(output_config_file, 'w') as f:
@@ -898,12 +896,9 @@ def end_epoch(state):
     state.commit()
 
 
-# # 采用Snapshot写入Checkpoint
 # def save_checkpoint_in_disk_snapshot():
-#     # 首先清空Checkpoint文件夹
 #     if torch.distributed.get_rank() == 0:
 #         delete_folder_contents(checkpoint_save_work_dir)
-#         # 快照先写入CPU内存再写入本地磁盘
 #         # torchsnapshot: take snapshot
 #         progress["current_epoch"] += 1
 #         snapshot = torchsnapshot.Snapshot.take(
@@ -940,22 +935,20 @@ def end_epoch(state):
 
 # def save_checkpoint_in_disk(epoch):
 #     if torch.distributed.get_rank() == 0:
-#         filepath = args.checkpoint_format.format(epoch=epoch + 1)
-                
-#         # 模型状态和优化器状态的大小相同
+#         filepath = args.checkpoint_format.format(epoch=epoch + 1)                
 #         state = {
 #             'model': model.state_dict(),
 #             'optimizer': optimizer.state_dict(),
 #         }
 #         torch.save(state, filepath)
 
-# 采用Snapshot写入Checkpoint
+# Write Checkpoint using Snapshot
 def save_checkpoint_in_disk_snapshot(progress_save, app_state, checkpoint_save_work_dir):
-    # 首先清空Checkpoint文件夹
+    # First, clear the Checkpoint folder
     # if torch.distributed.get_rank() == 0:
     if 0 == 0:
         # delete_folder_contents(checkpoint_save_work_dir)
-        # 快照先写入CPU内存再写入本地磁盘
+        # First write the snapshot to CPU memory, then to local disk
         # torchsnapshot: take snapshot
         progress_save["current_epoch"] += 1
         snapshot = torchsnapshot.Snapshot.take(
@@ -984,7 +977,7 @@ def save_checkpoint_async_model(model, optimizer_state, epoch, idx):
     pass
 
 
-# 采用传统In-Memory写入Checkpoint
+# Write Checkpoint using traditional In-Memory method
 def save_checkpoint_c(epoch):
     if torch.distributed.get_rank() == 0:
         # _state_dict_cpu = {}
@@ -1006,13 +999,12 @@ def save_checkpoint_c(epoch):
     return
 
 
-# 采用传统on-disk写入Checkpoint
+# Write Checkpoint using traditional on-disk method
 def save_checkpoint_in_disk(epoch, iteration):
     global ckpt_path
     if torch.distributed.get_rank() == 0:
         filepath = args.checkpoint_format.format(epoch=epoch + 1, iteration=iteration + 1)
                 
-        # 模型状态和优化器状态的大小相同
         state = {
             'model': model.state_dict(),
             'optimizer': optimizer.state_dict(),
@@ -1286,7 +1278,7 @@ if __name__ == "__main__":
     #         desc="Running tokenizer on dataset",
     #     )
 
-    # 生成Token的过程非常耗时, 在弹性GPU中恢复单个, 很耗时！！！
+    
     tokenized_datasets = raw_datasets.map(
             tokenize_function,
             batched=True,
@@ -1351,7 +1343,7 @@ if __name__ == "__main__":
     #         desc=f"Grouping texts in chunks of {block_size}",
     # )
 
-    # 将文本分组为块, 很耗时;
+    
     lm_datasets = tokenized_datasets.map(
             group_texts,
             batched=True,
@@ -1478,7 +1470,7 @@ if __name__ == "__main__":
 
 
 
-        # 创建一个 NumPy 数组并将其存储在共享内存中
+        # Create a NumPy array and store it in shared memory
         # array = np.ndarray((10,), dtype=np.float32, buffer=shm.buf)
         # array[:] = np.arange(10)
 
@@ -1514,7 +1506,7 @@ if __name__ == "__main__":
     #                                epoch=resume_from_epoch,
     #                                batch=0)
 
-    # 传递模型训练状态到optimizer
+    
     # optimizer._state = state
     
     

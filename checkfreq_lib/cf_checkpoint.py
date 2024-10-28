@@ -250,7 +250,7 @@ class CFCheckpoint:
 
 		if isinstance(additional_state, Mapping):
 			snapshot.update(additional_state)
-		print("额外状态{}".format(additional_state))
+		print("Additional State{}".format(additional_state))
 		if profile:
 			with lock:
 				active_snapshot.value = 0

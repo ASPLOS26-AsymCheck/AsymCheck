@@ -246,7 +246,7 @@ class CFIterator:
       
 				elif self._fullpipeline: 
 					self._cf_manager.save_cpu(additional_snapshot=self.state_dict(), use_thread=self._use_thread)
-					#stall 在cf_manager中的函数中写入stall.csv
+					# Write stall to stall.csv in the function in cf_manager
 				else:
 					self._cf_manager.save_cpu(synchronous=True, additional_snapshot=self.state_dict(), use_thread=self._use_thread)
 					with open("./stall.csv", "a+") as fp_stall:

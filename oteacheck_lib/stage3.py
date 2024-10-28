@@ -109,7 +109,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
 
         
         
-        # 预取bucket大小
+        # Prefetch bucket size
         prefetch_bucket_size=50000000,
         
         max_reuse_distance=1000000000,
@@ -347,7 +347,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         # Parameters = 340000000
 
         # 
-        # 单位时间处理的Samples样本数越多, 吞吐量越大,  
+        # The more Samples processed per unit time, the greater the throughput  
         # 8GPU, BERT-large, 33.063=Samples/s, model.backward_time=3.60,model.allreduce_time=0.22
         # self.reduce_bucket_size = 1000000
 
@@ -1214,7 +1214,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
                     i, param_group, partition_id)
     
     
-    # 独立梯度分割后记, 
+     
     @instrument_w_nvtx
     def independent_gradient_partition_epilogue(self):
         
@@ -1250,7 +1250,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         # TODO. make this less error prone
         self.micro_step_id += 1
         
-    # Zero-3 Gradient Allreduce操作
+    # Zero-3 Gradient Allreduc operation
     
     def overlapping_partition_gradients_reduce_epilogue(self):
         self.independent_gradient_partition_epilogue()
@@ -1292,7 +1292,6 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
                     param.partition()
 
         # We delay reduce-scatter for all gradients in the leaf modules until the backward pass of the leaf module is done
-        # 我们会延迟叶模块中所有梯度的reduce-scatter，直到叶模块的后向传递完成为止
         for leaf_module, leaf_parameters in self.leaf_parameters.items():
 
             def wrapper_pre_hook(params):
@@ -1381,13 +1380,13 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
             self.reduce_and_partition_stream.wait_stream(get_accelerator().default_stream())
         
         # self.reduce_bucket_size = 500000000, 
-        # self.elements_in_ipg_bucket 当前Bucket的elements的数量, 
+        # self.elements_in_ipg_bucket The number of elements in the current Bucket 
         if self.contiguous_gradients and self.elements_in_ipg_bucket + param.grad.numel() <= self.reduce_bucket_size:
             # move the gradient to a contiguous buffer
-            # 将梯度移动到连续的缓冲区中
+            # Move gradients to a contiguous buffer
             with get_accelerator().stream(self.reduce_and_partition_stream):
                 # move the parameter's gradient to the contiguous flat buffer
-                # 将参数的梯度移动到连续的平面缓冲区中
+                # Move the gradients of the parameters to a contiguous flat buffer
                 new_grad_tensor = self.__ipg_bucket_flat_buffer.narrow(0, self.elements_in_ipg_bucket,
                                                                        param.grad.numel()).view_as(param.grad)
                 new_grad_tensor.copy_(param.grad, non_blocking=True)
@@ -1419,11 +1418,11 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
     def __reduce_and_partition_ipg_grads(self, safe_mode: bool = False) -> None:
         
         # print('__reduce_and_partition_ipg_grads')
-        # params_in_ipg_bucket 表示为空的时候Return不做Allreduce操作
+        # When params_in_ipg_bucket is empty, return without performing Allreduce operation
         if not self.params_in_ipg_bucket:
             return
         
-        # params_in_ipg_bucket 不为空判断梯度的元素和参数的元素数量是否一致
+        # When params_in_ipg_bucket is not empty, check if the number of gradient elements matches the number of parameter elements
         for param in self.params_in_ipg_bucket:
             if param.grad.numel() != param.ds_numel:
                 raise RuntimeError(f"{param.grad.numel()} != {param.ds_numel} Cannot reduce scatter "
@@ -1439,7 +1438,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         # 
         # Copy the fragmented checkpoints to the host memory
         def save_ckpt_to_memory(parameter_bucket):
-            # 缓冲区的长度跟实际复制梯度的长度不一致,
+            # The length of the buffer does not match the actual length of the copied gradients
             # self.__ipg_parameter_bucket_flat_buffer_cpu = self.__ipg_parameter_bucket_flat_buffer_cpu[:parameter_bucket.numel()]
                 
             self.__ipg_parameter_bucket_flat_buffer_cpu[:parameter_bucket.numel()].copy_(parameter_bucket, non_blocking=True)
@@ -1530,7 +1529,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
 
 
 
-            # 对梯度进行分区并卸载到本地CPU内存或磁盘, 
+            # Partition gradients and offload to local CPU memory or disk 
             # 
             self.partition_grads(self.params_in_ipg_bucket, grad_partitions)
 
@@ -1541,7 +1540,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
                 event.record()
                 self.param_reduce_events.append(event)
                 
-    # 基于梯度合并的Allreduce
+    # Allreduce based on gradient merging
     
     @instrument_w_nvtx
     def __avg_scatter_contiguous_grads(self, buffer_to_reduce: Tensor) -> List[Tensor]:
@@ -1555,7 +1554,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         rank = dist.get_rank(self.dp_process_group)
         buffer_to_reduce.div_(world_sz / float(self.sequence_parallel_size))
         
-        # 梯度同步
+        # Gradient synchronization
         dist.all_reduce(buffer_to_reduce, group=self.dp_process_group)
 
         if self.postscale_gradients and self.gradient_predivide_factor != world_sz:
@@ -1564,7 +1563,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         if self.communication_data_type != self.dtype:
             buffer_to_reduce = buffer_to_reduce.to(self.dtype)
             
-        # 聚合平均
+        # Aggregate averaging
         grad_partitions = []
         grad_offset_in_buffer = 0
         for param in self.params_in_ipg_bucket:
@@ -1584,11 +1583,11 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
                 grad_partitions.append(partition)
             grad_offset_in_buffer += grad.numel()
         
-        # 返回还原之后的梯度数组
+        # Return the restored gradient array
         return grad_partitions
     
     
-    # 基于梯度分层的Allreduce
+    # Allreduce based on gradient partitioning
     
     @instrument_w_nvtx
     def __avg_scatter_grads(self, params_to_reduce: List[Parameter]) -> List[Tensor]:

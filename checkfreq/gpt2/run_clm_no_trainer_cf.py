@@ -79,7 +79,7 @@ import timeit
 import numpy as np
 # from adtopk_lib.profiling import benchmark
 
-# CheckFreq相关的import
+
 import sys
 sys.path.append('./')
 sys.path.append('../../checkfreq_lib')
@@ -89,8 +89,7 @@ from cf_iterator import CFIterator
 import time
 
 
-# 环境变量HOROVOD_FUSION_THRESHOLD实际上以字节为单位.
-# 然而, 当使用horovodrun时, 有一个--fusion-threshold-mb以MB为单位的参数.
+
 # os.environ['HOROVOD_FUSION_THRESHOLD'] = '0'
 # os.environ['HOROVOD_CYCLE_TIME']       = '0'
 # os.environ['HOROVOD_CACHE_CAPACITY']   = '0'
@@ -333,7 +332,7 @@ def parse_args():
     parser.add_argument('--asc', action='store_true', default=False, help='Use MG-WFBP')
     parser.add_argument('--nstreams', type=int, default=1, help='Number of communication streams')
 
-    # 设置合并的阈值大小, default=23705252为ResNet-50所有层梯度元素数量的总和
+    
     parser.add_argument('--threshold', type=int, default=34015396, help='Set threshold if mgwfbp is False')
     parser.add_argument('--rdma', action='store_true', default=False, help='Use RDMA')
 
@@ -637,7 +636,7 @@ def main():
     #         desc="Running tokenizer on dataset",
     #     )
     
-    # 生成Token的过程非常耗时, 在弹性GPU中恢复单个, 很耗时！！！
+    
     tokenized_datasets = raw_datasets.map(
             tokenize_function,
             batched=True,
@@ -697,7 +696,7 @@ def main():
     #         desc=f"Grouping texts in chunks of {block_size}",
     #     )
     
-    # 将文本分组为块, 很耗时
+    
     lm_datasets = tokenized_datasets.map(
             group_texts,
             batched=True,
@@ -816,12 +815,12 @@ def main():
     #     }
 
     # Horovod: wrap optimizer with DistributedOptimizer.
-    # 得到一个分布式的SGD优化器
+    
 
     # import zxjdnn_lib
 
     # Horovod: wrap optimizer with DistributedOptimizer.
-    # 得到一个分布式的SGD优化器
+    
     # optimizer = zxjdnn_lib.DistributedOptimizer(
     #     optimizer, comm_params=comm_params, named_parameters=model.named_parameters())
 
@@ -977,12 +976,12 @@ def main():
         # Extract `epoch_{i}` or `step_{i}`
         training_difference = os.path.splitext(path)[0]
         
-        # 基于Epoch的检查点
+        # Epoch-based checkpoint
         if "epoch" in training_difference:
             starting_epoch = int(training_difference.replace("epoch_", "")) + 1
             resume_step = None
             completed_steps = starting_epoch * num_update_steps_per_epoch
-        # 基于Iteration的检查点
+        # Iteration-based checkpoint
         else:
             # need to multiply `gradient_accumulation_steps` to reflect real steps
             resume_step = int(training_difference.replace("step_", "")) * args.gradient_accumulation_steps
@@ -1073,7 +1072,7 @@ def main():
             # losses.append(accelerator.gather_for_metrics(loss.repeat(args.per_device_eval_batch_size)))
             losses.append(loss)
 
-        # 将losses中的零维标量转换为1维张量
+        # Convert 0-dimensional scalars in losses to 1-dimensional tensors
         losses = [loss.unsqueeze(0) for loss in losses]
         losses = torch.cat(losses)
         try:

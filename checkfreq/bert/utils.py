@@ -222,7 +222,7 @@ def get_argument_parser():
         help="The config json file corresponding to the non-DeepSpeed pre-trained BERT model."
     )
     
-    # 添加CheckFreq相关内容
+    
     parser.add_argument('--arch', '-a', metavar='ARCH', default='resnet18')
     parser.add_argument('--dynamic', action='store_true', default=False)
     parser.add_argument('--chk-freq', default=0, type=int,metavar='N', help='checkpoint frequency')

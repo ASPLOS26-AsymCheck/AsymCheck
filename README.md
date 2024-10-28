@@ -1,6 +1,6 @@
 # OTeacheck
 
-**One-iTeration-ahead Checkpointing**, called **OTeacheck**, is an iteration-level checkpointing solution that minimizes the impact on the training process, including in-memory checkpointing and on-disk checkpointing. OTeaCheck partitions the checkpoints based on a gradient merging strategy and fills them into pipeline bubbles within an iteration to avoid training blocking and allocates only a small GPU buffer for all partition checkpoints and stores them sequentially to avoid GPU out-of-memory. This repository contains **OTeacheck**’s source code, as well as a set of benchmarking scripts for some existing state-of-the-art checkpointing solutions.
+**One-iTeration-ahead Checkpointing**, called **OTeacheck**, is an iteration-level checkpointing solution that minimizes the impact on the training process, including in-memory checkpointing and on-disk checkpointing. OTeaCheck partitions the checkpoints based on a gradient merging strategy and fills them into pipeline bubbles within an iteration to avoid training blocking and allocates only a small GPU buffer for all partition checkpoints and stores them sequentially to avoid GPU out-of-memory. This repository contains **OTeacheck**'s source code, as well as a set of benchmarking scripts for some existing state-of-the-art checkpointing solutions.
 
 # Implementation
 

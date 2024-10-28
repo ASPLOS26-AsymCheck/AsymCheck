@@ -770,13 +770,13 @@ def set_optimizer_params_grad(named_params_optimizer,
             param_opti.grad = None
     return is_nan
 
-# 采用Snapshot写入Checkpoint
+# Write Checkpoint using Snapshot
 def save_checkpoint_in_disk_snapshot(progress_save, app_state, checkpoint_save_work_dir):
-    # 首先清空Checkpoint文件夹
+    # First, clear the Checkpoint folder
     # if torch.distributed.get_rank() == 0:
     if 0 == 0:
         # delete_folder_contents(checkpoint_save_work_dir)
-        # 快照先写入CPU内存再写入本地磁盘
+        # First write the snapshot to CPU memory, then to local disk
         # torchsnapshot: take snapshot
         progress_save["current_epoch"] += 1
         snapshot = torchsnapshot.Snapshot.take(
@@ -876,7 +876,7 @@ def main():
         model = BertForQuestionAnswering(bert_config, args)
 
     print("VOCAB SIZE:", bert_config.vocab_size)
-    # 不加载Checkpoint
+    # not load Checkpoint
     if args.model_file is not "0" and False:
         logger.info(f"Loading Pretrained Bert Encoder from: {args.model_file}")
 
@@ -927,8 +927,7 @@ def main():
     
     
     # 
-    # 创建内存共享缓冲区用于保存CPU内的检查点, 
-    # 共享缓冲区的创建可以由节点内的其他进程完成, 这些进程可以异步地执行, 而不需要
+    # Create a shared memory buffer to save the checkpoint in CPU
     # if dist.get_rank() == 0:
     if (dist.get_rank()) % torch.cuda.device_count() == 0:
         _name = 'parameter_buffer'
@@ -938,7 +937,7 @@ def main():
         # _name_backup = 'parameter_buffer_backup'
         # shm_backup = shared_memory.SharedMemory(create=True, size=1024*1024*1024*100, name =_name_backup)
 
-        # 创建一个 NumPy 数组并将其存储在共享内存中
+        # Create a NumPy array and store it in shared memory
         # array = np.ndarray((10,), dtype=np.float32, buffer=shm.buf)
         # array[:] = np.arange(10)
 
@@ -1157,7 +1156,7 @@ def main():
                 
                 backward_time = time.time()
                 # print('model.backward(loss)')
-                # 在反向传播的时候执行Allreduce操作, 
+                # Perform Allreduce operation during backpropagation
                 model.backward(loss)
                 
                 iteration_backward_time_array.append(time.time()- backward_time)
@@ -1199,7 +1198,7 @@ def main():
                                              summary_events)
                         args.summary_writer.flush()
 
-                    # 打印输出日志
+                    
                     if torch.distributed.get_rank() == 0 and (
                             step + 1) % args.print_steps == 0:
                         
@@ -1389,7 +1388,7 @@ def main():
                           args.do_lower_case, output_prediction_file,
                           output_nbest_file, args.verbose_logging)
 
-# 从cifar100中添加的类用来记录Iteartion的平均时间
+
 from enum import Enum
 class Summary(Enum):
     NONE = 0

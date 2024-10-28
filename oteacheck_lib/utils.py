@@ -39,14 +39,14 @@ def calculate_in_memory_ckpt_time(model , optimizer,  idx):
     in_memory_time = time.time()
     _model_state_dict_cpu = {}
     numel_count = 0
-    # 构建参数状态In-Memory Checkpoint方案, 
+    # Construct parameter state In-Memory Checkpoint scheme 
     
     for key, value in model.state_dict().items():
         t_cpu = torch.zeros(value.numel(), device='cpu', dtype=value.dtype, requires_grad=False)
         _model_state_dict_cpu[key] = t_cpu                    
-        # 克隆张量
+        # Clone tensor
         value_clone = value.clone()
-        # 基于copy_保存到CPU内存,  
+        # Save to CPU memory based on copy_
         _model_state_dict_cpu[key].copy_(value_clone.view(value.numel()), non_blocking=False)
         # _state_dict_cpu[key] = value_clone.cpu()
         numel_count += value.numel()
@@ -59,7 +59,7 @@ def calculate_in_memory_ckpt_time(model , optimizer,  idx):
 
 
     in_memory_time = time.time()
-    # 构建优化器状态In-Memory Checkpoint方案, 
+    # Construct optimizer state In-Memory Checkpoint scheme 
     if optimizer.state_dict()['optimizer_state_dict']['state']!={} and True:
         exp_avg_0_numel = optimizer.state_dict()['optimizer_state_dict']['state'][0]['exp_avg'].numel()
         exp_avg_sq_0_numel = optimizer.state_dict()['optimizer_state_dict']['state'][0]['exp_avg_sq'].numel()
@@ -77,7 +77,7 @@ def calculate_in_memory_ckpt_time(model , optimizer,  idx):
         # _optimizer_state_dict_exp_avg_sq_cpu = 
                     
         
-        # # Zero-3的fp32_flat_groups也需要写入CPU内存
+        
         # if 'zero-3' is True:
         #     fp32_flat_groups_0_numel = optimizer.state_dict()['fp32_flat_groups'][0].numel()
 
@@ -113,7 +113,7 @@ def calculate_in_memory_ckpt_time(model , optimizer,  idx):
             # print('optimizer.state_dict().optimizer_state_dict[state][1][exp_avg_sq].numel() = ', optimizer.state_dict()['optimizer_state_dict']['state'][1]['exp_avg_sq'].numel())
 
             # 
-            # fp32_flat_groups只有Zero-3才会出现, Zero-0只包含['state', 'param_groups'], 
+             
             # 
             # print('optimizer.state_dict().fp32_flat_groups = ', optimizer.state_dict()['fp32_flat_groups'])
             # print('optimizer.state_dict().fp32_flat_groups[0].numel() = ', optimizer.state_dict()['fp32_flat_groups'][0].numel())

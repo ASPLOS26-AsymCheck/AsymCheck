@@ -57,8 +57,7 @@ import math
 from tqdm import tqdm
 
 # from utils_model import get_network
-# 环境变量HOROVOD_FUSION_THRESHOLD实际上以字节为单位.
-# 然而, 当使用horovodrun时, 有一个--fusion-threshold-mb以MB为单位的参数.
+
 
 # os.environ['HOROVOD_FUSION_THRESHOLD'] = '0'
 # os.environ['HOROVOD_CACHE_CAPACITY'] = '0'
@@ -187,7 +186,7 @@ def parse_args():
         help="If passed, will use a slow tokenizer (not backed by the 🤗 Tokenizers library).",
     )
     
-    # 调整训练Batch-Size能够
+    
     parser.add_argument(
         "--per_device_train_batch_size",
         type=int,
@@ -355,7 +354,7 @@ def parse_args():
     parser.add_argument('--asc', action='store_true', default=False, help='Use MG-WFBP')
     parser.add_argument('--nstreams', type=int, default=1, help='Number of communication streams')
 
-    # 设置合并的阈值大小, default=23705252为ResNet-50所有层梯度元素数量的总和
+    
     parser.add_argument('--threshold', type=int, default=34015396, help='Set threshold if mgwfbp is False')
     parser.add_argument('--rdma', action='store_true', default=False, help='Use RDMA')
 
@@ -407,7 +406,7 @@ def parse_args():
 #     def avg(self):
 #         return self.sum / self.n
 
-# 从cifar100中添加的类用来记录Iteartion的平均时间
+
 from enum import Enum
 class Summary(Enum):
     NONE = 0
@@ -473,21 +472,21 @@ def evaluation():
 
 
 # 
-# 计算In-Memory Checkpoint时间, 
+# Calculate In-Memory Checkpoint time
 # 
 def calculate_in_memory_ckpt_time(model , optimizer,  idx):
 
     in_memory_time = time.time()
     _model_state_dict_cpu = {}
     numel_count = 0
-    # 构建参数状态In-Memory Checkpoint方案, 
+    # Construct parameter state In-Memory Checkpoint scheme 
 
     for key, value in model.state_dict().items():
         t_cpu = torch.zeros(value.numel(), device='cpu', dtype=value.dtype, requires_grad=False)
         _model_state_dict_cpu[key] = t_cpu                    
-        # 克隆张量
+        # Clone tensor
         value_clone = value.clone()
-        # 基于copy_保存到CPU内存,  
+        # Save to CPU memory based on copy_
         _model_state_dict_cpu[key].copy_(value_clone.view(value.numel()), non_blocking=False)
         # _state_dict_cpu[key] = value_clone.cpu()
         numel_count += value.numel()
@@ -500,7 +499,7 @@ def calculate_in_memory_ckpt_time(model , optimizer,  idx):
 
 
     in_memory_time = time.time()
-    # 构建优化器状态In-Memory Checkpoint方案, 
+    # Construct optimizer state In-Memory Checkpoint scheme 
     if optimizer.state_dict()['optimizer_state_dict']['state']!={} and True:
         exp_avg_0_numel = optimizer.state_dict()['optimizer_state_dict']['state'][0]['exp_avg'].numel()
         exp_avg_sq_0_numel = optimizer.state_dict()['optimizer_state_dict']['state'][0]['exp_avg_sq'].numel()
@@ -518,7 +517,7 @@ def calculate_in_memory_ckpt_time(model , optimizer,  idx):
         # _optimizer_state_dict_exp_avg_sq_cpu = 
                     
         
-        # # Zero-3的fp32_flat_groups也需要写入CPU内存
+        
         # if 'zero-3' is True:
         #     fp32_flat_groups_0_numel = optimizer.state_dict()['fp32_flat_groups'][0].numel()
 
@@ -554,7 +553,7 @@ def calculate_in_memory_ckpt_time(model , optimizer,  idx):
             # print('optimizer.state_dict().optimizer_state_dict[state][1][exp_avg_sq].numel() = ', optimizer.state_dict()['optimizer_state_dict']['state'][1]['exp_avg_sq'].numel())
 
             # 
-            # fp32_flat_groups只有Zero-3才会出现, Zero-0只包含['state', 'param_groups'], 
+             
             # 
             # print('optimizer.state_dict().fp32_flat_groups = ', optimizer.state_dict()['fp32_flat_groups'])
             # print('optimizer.state_dict().fp32_flat_groups[0].numel() = ', optimizer.state_dict()['fp32_flat_groups'][0].numel())
@@ -817,7 +816,7 @@ def full_train():
                         # accelerator.save_state(output_dir)                        
                         # save_checkpoint(epoch, completed_steps, output_dir)
                         
-                        # 保存检查点Snapshot
+                        # Save checkpoint Snapshot
                         # save_checkpoint_in_disk_snapshot()
 
                         print('save_checkpoint_time = ', time.time() - save_checkpoint_time)
@@ -856,7 +855,7 @@ def full_train():
             # losses.append(accelerator.gather_for_metrics(loss.repeat(args.per_device_eval_batch_size)))
             losses.append(loss)
 
-        # 将losses中的零维标量转换为1维张量
+        # Convert 0-dimensional scalars in losses to 1-dimensional tensors
         losses = [loss.unsqueeze(0) for loss in losses]
         losses = torch.cat(losses)
         try:
@@ -903,7 +902,7 @@ def full_train():
 
 
 
-# 清空文件夹内容
+# Delete folder contents
 def delete_folder_contents(folder):
     # filenames = os.listdir(folder)
     # if len(filenames) < 1000:
@@ -1187,7 +1186,7 @@ if __name__ == "__main__":
     #         desc="Running tokenizer on dataset",
     #     )
 
-    # 生成Token的过程非常耗时, 在弹性GPU中恢复单个, 很耗时！！！
+    
     tokenized_datasets = raw_datasets.map(
             tokenize_function,
             batched=True,
@@ -1252,7 +1251,7 @@ if __name__ == "__main__":
     #         desc=f"Grouping texts in chunks of {block_size}",
     # )
 
-    # 将文本分组为块, 很耗时;
+    
     lm_datasets = tokenized_datasets.map(
             group_texts,
             batched=True,
@@ -1340,8 +1339,7 @@ if __name__ == "__main__":
     #     model_parameters=optimizer_grouped_parameters,
     #     dist_init_required=True)
     
-    # 创建内存共享缓冲区用于保存CPU内的检查点, 
-    # 共享缓冲区的创建可以由节点内的其他进程完成, 这些进程可以异步地执行, 而不需要在本地创建, 
+    # Create a shared memory buffer to save the checkpoint in CPU 
     # if dist.get_rank() == 0:
     if (dist.get_rank()) % torch.cuda.device_count() == 0 and False:
         # 
@@ -1361,7 +1359,7 @@ if __name__ == "__main__":
 
 
 
-        # 创建一个 NumPy 数组并将其存储在共享内存中
+        # Create a NumPy array and store it in shared memory
         # array = np.ndarray((10,), dtype=np.float32, buffer=shm.buf)
         # array[:] = np.arange(10)
 
@@ -1397,7 +1395,7 @@ if __name__ == "__main__":
     #                                epoch=resume_from_epoch,
     #                                batch=0)
 
-    # 传递模型训练状态到optimizer
+    
     # optimizer._state = state
     
     

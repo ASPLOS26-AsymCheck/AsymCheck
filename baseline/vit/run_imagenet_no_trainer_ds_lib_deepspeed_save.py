@@ -75,8 +75,7 @@ import oteacheck_lib.utils
 
 
 # from utils_model import get_network
-# 环境变量HOROVOD_FUSION_THRESHOLD实际上以字节为单位.
-# 然而, 当使用horovodrun时, 有一个--fusion-threshold-mb以MB为单位的参数.
+
 
 # os.environ['HOROVOD_FUSION_THRESHOLD'] = '0'
 # os.environ['HOROVOD_CACHE_CAPACITY'] = '0'
@@ -371,7 +370,7 @@ def parse_args():
     parser.add_argument('--asc', action='store_true', default=False, help='Use MG-WFBP')
     parser.add_argument('--nstreams', type=int, default=1, help='Number of communication streams')
 
-    # 设置合并的阈值大小, default=23705252为ResNet-50所有层梯度元素数量的总和
+    
     parser.add_argument('--threshold', type=int, default=34015396, help='Set threshold if mgwfbp is False')
     parser.add_argument('--rdma', action='store_true', default=False, help='Use RDMA')
 
@@ -559,8 +558,8 @@ def main():
         # See more about loading custom images at
         # https://huggingface.co/docs/datasets/v2.0.0/en/image_process#imagefolder.
 
-    # 加载数据集耗费很长的时间,
-    # 需要Downloading data,1281167/1281167
+    
+    # Downloading data,1281167/1281167
     # Computing checksums:1281167/1281167
     # Downloading data:50000/50000
     # Generating train split: 
@@ -761,8 +760,7 @@ def main():
     )
     
      # 
-    # 创建内存共享缓冲区用于保存CPU内的检查点, 
-    # 共享缓冲区的创建可以由节点内的其他进程完成, 这些进程可以异步地执行, 而不需要
+    # Create a shared memory buffer to save the checkpoint in CPU
     if dist.get_rank() % torch.cuda.device_count() == 0:
 
         print('parameter_buffer')
@@ -773,7 +771,7 @@ def main():
         # _name_backup = 'parameter_buffer_backup'
         # shm_backup = shared_memory.SharedMemory(create=True, size=1024*1024*1024*100, name =_name_backup)
 
-        # 创建一个 NumPy 数组并将其存储在共享内存中
+        # Create a NumPy array and store it in shared memory
         # array = np.ndarray((10,), dtype=np.float32, buffer=shm.buf)
         # array[:] = np.arange(10)
 
@@ -823,7 +821,7 @@ def main():
     #                                epoch=resume_from_epoch,
     #                                batch=0)
 
-    # 传递模型训练状态到optimizer
+    
     # optimizer._state = state
     
     if torch.distributed.get_rank()==0:
@@ -1084,7 +1082,7 @@ def main():
                     print('batch_time = ', batch_time)
                     print('Avg_Iteration_Time = ', iteration_time.avg)
                     
-                    # 开始修改
+                    
                     batch_time_end = time.time() - batch_time_start
 
                     # print('model.engine_timers.backward_inner_timers = ', backward_time)
@@ -1172,7 +1170,7 @@ def main():
 
         # eval_metric = metric.compute()
 
-        # 将losses中的零维标量转换为1维张量
+        # Convert 0-dimensional scalars in losses to 1-dimensional tensors
         losses = [loss.unsqueeze(0) for loss in losses]
         losses = torch.cat(losses)
         try:
@@ -1246,7 +1244,7 @@ def main():
 
 
 
-# 从cifar100中添加的类用来记录Iteartion的平均时间
+
 from enum import Enum
 class Summary(Enum):
     NONE = 0
