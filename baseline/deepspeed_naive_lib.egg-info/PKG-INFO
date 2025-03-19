@@ -1,0 +1,5 @@
+Metadata-Version: 2.1
+Name: deepspeed_naive_lib
+Version: 1.0
+Summary: Reconstructing the DeepSpeed training framework
+Author: Zhangqiang Ming

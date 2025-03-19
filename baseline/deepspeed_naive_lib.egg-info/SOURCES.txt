@@ -1,0 +1,15 @@
+setup.py
+deepspeed_naive_lib/__init__.py
+deepspeed_naive_lib/engine.py
+deepspeed_naive_lib/engine_naive.py
+deepspeed_naive_lib/stage3.py
+deepspeed_naive_lib/stage3_naive.py
+deepspeed_naive_lib/utils.py
+deepspeed_naive_lib.egg-info/PKG-INFO
+deepspeed_naive_lib.egg-info/SOURCES.txt
+deepspeed_naive_lib.egg-info/dependency_links.txt
+deepspeed_naive_lib.egg-info/top_level.txt
+deepspeed_naive_lib/back_base/__init__.py
+deepspeed_naive_lib/back_base/engine.py
+deepspeed_naive_lib/back_base/engine_baseline.py
+deepspeed_naive_lib/back_base/stage3.py
