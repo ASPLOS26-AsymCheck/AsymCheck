@@ -1,6 +1,6 @@
 # DelayCheck
 
-**One-iTeration-ahead Checkpointing**, called **DelayCheck**, is an iteration-level checkpointing solution that minimizes the impact on the training process, including in-memory checkpointing and on-disk checkpointing. DelayCheck partitions the checkpoints based on a gradient merging strategy and fills them into pipeline bubbles within an iteration to avoid training blocking and allocates only a small GPU buffer for all partition checkpoints and stores them sequentially to avoid GPU out-of-memory. This repository contains **DelayCheck**'s source code, as well as a set of benchmarking scripts for some existing state-of-the-art checkpointing solutions.
+**Delaying Checkpointing**, called **DelayCheck**, is a new checkpointing mechanism that delays the checkpointing operation until the forward pass ends and the backward pass begins, so as to reduce the training stalls for efficient modern distributed training. Further, we also propose an optimized on-disk checkpointing scheme and a fast failure recovery scheme to enhance the performance of DelayCheck.
 
 # Implementation
 
@@ -8,7 +8,7 @@
 **DelayCheck** employs a decoupled and hierarchical storage design for checkpointing and consists of three modules:   
 
 1. an in-memory checkpoint creation module
-2.  an on-disk checkpoint creation module 
+2. an on-disk checkpoint creation module 
 3. a failure recovery module
 
 The system architecture of **DelayCheck** is as follows: 
