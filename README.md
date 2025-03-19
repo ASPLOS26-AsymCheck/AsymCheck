@@ -14,7 +14,7 @@
 The system architecture of **DelayCheck** is as follows: 
 
 <center class ='img'>
-<img src="checkpoint_workflow_.jpg" width="600px" />
+<img src="checkpoint_workflow_1.jpg" width="600px" />
 </center>
 
 
