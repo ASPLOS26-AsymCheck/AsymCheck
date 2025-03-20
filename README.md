@@ -1,6 +1,6 @@
 # DelayCheck: Delaying Checkpointing for Efficient Modern Distributed Training
 
-**Delaying Checkpointing**, called **DelayCheck**, is a new checkpointing mechanism that delays the checkpointing operation until the forward pass ends and the backward pass begins, so as to reduce the training stalls for efficient modern distributed training. Further, we also propose an optimized on-disk checkpointing scheme and a fast failure recovery scheme to enhance the performance of DelayCheck.
+**Delaying** is a new checkpointing mechanism for efficient modern distributed training,  which delays and partitions the checkpointing operation until the forward pass ends and the backward pass begins, so as to reduce the training stalls for efficient modern distributed training. Further, we also propose an optimized on-disk checkpointing scheme and a fast failure recovery scheme to enhance the performance of DelayCheck.
 
 # Implementation
 
