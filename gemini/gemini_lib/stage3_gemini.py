@@ -2174,7 +2174,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
     def first_part_checkpoint_backward_async(self, model_state_dict):
 
         torch.cuda.set_device(dist.get_rank())
-        
+
         if model_state_dict == {}:
             return
 
