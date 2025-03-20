@@ -34,7 +34,7 @@ The system architecture of **DelayCheck** is as follows:
 ## **Get the code**
 ```shell
 git clone https://github.com/FAST26-DelayCheck/DelayCheck
-cd FAST26-DelayCheck
+cd DelayCheck
 pip install -r requirements.txt
 python setup.py
 ```
