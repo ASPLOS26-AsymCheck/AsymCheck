@@ -297,7 +297,7 @@ def parse_args():
     parser.add_argument('--use-adasum', action='store_true', default=False,
                     help='use adasum algorithm to do reduction')
     
-    # Elastic Horovod settings
+    
     parser.add_argument('--batches-per-commit', type=int, default=50,
                     help='number of batches processed before calling `state.commit()`; '
                          'commits prevent losing progress if an error occurs, but slow '
@@ -309,7 +309,7 @@ def parse_args():
                          'to broadcast, so we may not want to perform it every batch.')
 
     
-    # Gradient Merging    
+       
     parser.add_argument('--model-net', default='gpt_2', type=str, help='net type')
     
     parser.add_argument('--model', type=str, default='gpt_2',

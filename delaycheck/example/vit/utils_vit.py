@@ -408,7 +408,7 @@ def get_argument_parser():
         help='disables CUDA training'
     )
     
-# Gradient Merging Argument
+Argument
     parser.add_argument('--model-net', default='vit_large', type=str, help='net type')
     
     parser.add_argument('--model', type=str, default='vit_large',

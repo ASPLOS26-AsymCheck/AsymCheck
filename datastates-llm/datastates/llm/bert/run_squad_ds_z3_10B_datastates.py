@@ -952,10 +952,7 @@ def full_train():
                 print('Average Iteration Time = ', (time.time() -s_time)/10)
 
                 # 
-                # print(model.state_dict().keys())  # 查看模型参数字典的键
-                # print(optimizer.state_dict().keys())  # 查看优化器字典的键
-                # dict_keys(['zero_stage', 'loss_scaler', 'dynamic_loss_scale', 'overflow', 
-                # 'partition_count', 'optimizer_state_dict', 'fp32_flat_groups'])
+                
 
                 
 
@@ -987,35 +984,30 @@ def delete_folder_contents(folder):
 
 
 
-# 
-# 计算In-Memory Checkpoint时间, 
-# 
+
 def calculate_in_memory_ckpt_time(model , optimizer,  idx):
 
     in_memory_time = time.time()
     _model_state_dict_cpu = {}
     numel_count = 0
-    # 构建参数状态In-Memory Checkpoint方案, 
-    # Modify by mingzq, 20240930, 
+
     for key, value in model.state_dict().items():
         t_cpu = torch.zeros(value.numel(), device='cpu', dtype=value.dtype, requires_grad=False)
         _model_state_dict_cpu[key] = t_cpu                    
-        # 克隆张量
+
         value_clone = value.clone()
-        # 基于copy_保存到CPU内存,  
+ 
         _model_state_dict_cpu[key].copy_(value_clone.view(value.numel()), non_blocking=True)
         # _state_dict_cpu[key] = value_clone.cpu()
         numel_count += value.numel()
         # print('value.numel() = ', value.numel())
 
-    # save_checkpoint_in_memory(epoch)
-    # in_memory_time =  0.015248775482177734
-    # print('numel_count = ', numel_count)
+
     print('model_state_in_memory_time = ', time.time()- in_memory_time)
 
 
     in_memory_time = time.time()
-    # 构建优化器状态In-Memory Checkpoint方案, 
+
     if optimizer.state_dict()['optimizer_state_dict']['state']!={} and True:
         exp_avg_0_numel = optimizer.state_dict()['optimizer_state_dict']['state'][0]['exp_avg'].numel()
         exp_avg_sq_0_numel = optimizer.state_dict()['optimizer_state_dict']['state'][0]['exp_avg_sq'].numel()
@@ -1033,9 +1025,6 @@ def calculate_in_memory_ckpt_time(model , optimizer,  idx):
         # _optimizer_state_dict_exp_avg_sq_cpu = 
                     
         
-        # # Zero-3的fp32_flat_groups也需要写入CPU内存
-        # if 'zero-3' is True:
-        #     fp32_flat_groups_0_numel = optimizer.state_dict()['fp32_flat_groups'][0].numel()
 
         fp32_flat_groups_0 = optimizer.state_dict()['fp32_flat_groups'][0]
         fp32_flat_groups_0_numel =fp32_flat_groups_0.numel()
@@ -1047,10 +1036,6 @@ def calculate_in_memory_ckpt_time(model , optimizer,  idx):
     return
 
     if dist.get_rank() == 0 and idx>100 and True:
-        # print(model.state_dict().items())
-        # print('model.state_dict() = ', model.state_dict())
-        # print('model.state_dict().keys() = ', model.state_dict().keys())
-
 
         # optimizer.state_dict() =  dict_keys(['state', 'param_groups'])
         print('optimizer.state_dict().keys() = ', optimizer.state_dict().keys())
@@ -1062,18 +1047,6 @@ def calculate_in_memory_ckpt_time(model , optimizer,  idx):
             print('optimizer.state_dict().optimizer_state_dict[state][0] = ', optimizer.state_dict()['optimizer_state_dict']['state'][0])
             print('optimizer.state_dict().optimizer_state_dict[state][0][exp_avg].numel() = ', optimizer.state_dict()['optimizer_state_dict']['state'][0]['exp_avg'].numel())
             print('optimizer.state_dict().optimizer_state_dict[state][0][exp_avg_sq].numel() = ', optimizer.state_dict()['optimizer_state_dict']['state'][0]['exp_avg_sq'].numel())
-
-
-            # print('optimizer.state_dict().optimizer_state_dict[state][1] = ', optimizer.state_dict()['optimizer_state_dict']['state'][1])
-            # print('optimizer.state_dict().optimizer_state_dict[state][1][exp_avg].numel() = ', optimizer.state_dict()['optimizer_state_dict']['state'][1]['exp_avg'].numel())
-            # print('optimizer.state_dict().optimizer_state_dict[state][1][exp_avg_sq].numel() = ', optimizer.state_dict()['optimizer_state_dict']['state'][1]['exp_avg_sq'].numel())
-
-            # 
-            # fp32_flat_groups只有Zero-3才会出现, Zero-0只包含['state', 'param_groups'], 
-            # 
-            # print('optimizer.state_dict().fp32_flat_groups = ', optimizer.state_dict()['fp32_flat_groups'])
-            # print('optimizer.state_dict().fp32_flat_groups[0].numel() = ', optimizer.state_dict()['fp32_flat_groups'][0].numel())
-            # print('optimizer.state_dict().fp32_flat_groups[1].numel() = ', optimizer.state_dict()['fp32_flat_groups'][1].numel())
 
     pass
 
@@ -1108,8 +1081,7 @@ def save_checkpoint(epoch):
 def save_checkpoint_in_disk(epoch):
     if dist.get_rank() == 0:
         filepath = args.checkpoint_format.format(epoch=epoch + 1)
-                
-        # 模型状态和优化器状态的大小相同
+
         state = {
             'model': model.state_dict(),
             'optimizer': optimizer.state_dict(),
@@ -1121,19 +1093,9 @@ def save_checkpoint_in_disk(epoch):
 def save_checkpoint_in_memory(epoch):
     if dist.get_rank() == 0:
         # _state_dict_cpu = {}
-        
-        # filepath = args.checkpoint_format.format(epoch=epoch + 1)
-        # state = {
-        #     'model': model.state_dict(),
-        #     'optimizer': optimizer.state_dict(),
-        # }
-        # torch.save(state, filepath)
 
         for key, value in model.state_dict().items():
-            # 0.4139289855957031
-            # _state_dict_cpu[key]=value.cpu()
-            
-            # 0.24108409881591797
+
             _state_dict_cpu[key].copy_(value.view(value.numel()), non_blocking=True)
 
     return
@@ -1141,13 +1103,12 @@ def save_checkpoint_in_memory(epoch):
 
 
 def save_checkpoint_in_disk_snapshot(checkpoint_save_work_dir):
-    # 首先清空Checkpoint文件夹
+
     if 0==0:
         # delete_folder_contents(checkpoint_save_work_dir)
 
         print('delete_folder_contents')
-        # 快照先写入CPU内存再写入本地磁盘
-        # torchsnapshot: take snapshot
+
         progress["current_epoch"] += 1
         snapshot = torchsnapshot.Snapshot.take(
             # f"{checkpoint_save_work_dir}/run-{uuid.uuid4()}-epoch-{progress['current_epoch']}-model",
@@ -1163,11 +1124,10 @@ def save_checkpoint_in_disk_snapshot(checkpoint_save_work_dir):
 
 
 def save_checkpoint_in_disk_snapshot_para(app_state, checkpoint_save_work_dir):
-    # 首先清空Checkpoint文件夹
+
     if dist.get_rank()==0:
         delete_folder_contents(checkpoint_save_work_dir)
-        # 快照先写入CPU内存再写入本地磁盘
-        # torchsnapshot: take snapshot
+
         progress["current_epoch"] += 1
         snapshot = torchsnapshot.Snapshot.take(
             # f"{checkpoint_save_work_dir}/run-{uuid.uuid4()}-epoch-{progress['current_epoch']}-model",
@@ -1369,7 +1329,7 @@ if __name__ == '__main__':
 
 
     if args.cuda:
-    # Horovod: pin GPU to local rank. In case of CPU this code is ignored
+    
        torch.cuda.set_device(dist.get_rank())
        torch.cuda.manual_seed(args.seed)
     
@@ -1555,46 +1515,6 @@ if __name__ == '__main__':
         init_hvd_time = time.time()
     
 
-    # 创建内存共享缓冲区用于保存CPU内的检查点, 
-    # 共享缓冲区的创建可以由节点内的其他进程完成, 这些进程可以异步地执行, 而不需要在本地创建, 
-    # if dist.get_rank() == 0:
-    # if (dist.get_rank()) == 0:
-    #     # 
-    #     # 参数状态缓冲区, Modify by mingzq, 20240928, 
-    #     _name_parameter = 'parameter_buffer'
-    #     _parameter_shm = shared_memory.SharedMemory(create = True, size = 1024*1024*1024*100, name = _name_parameter)
-
-    #     _name_parameter_backup = 'parameter_buffer_backup'
-    #     _parameter_shm_backup = shared_memory.SharedMemory(create = True, size = 1024*1024*1024*100, name = _name_parameter_backup)
-
-    #     # 
-    #     # 
-    #     _name_optimizer = 'optimizer_buffer'
-    #     _optimizer_shm = shared_memory.SharedMemory(create = True, size = 1024*1024*1024*100, name = _name_optimizer)
-
-    #     _name_optimizer_backup = 'optimizer_buffer_backup'
-    #     _optimizer_shm_backup = shared_memory.SharedMemory(create = True, size = 1024*1024*1024*100, name = _name_optimizer_backup)
-
-
-
-        # 创建一个 NumPy 数组并将其存储在共享内存中
-        # array = np.ndarray((10,), dtype=np.float32, buffer=shm.buf)
-        # array[:] = np.arange(10)
-
-        # resource_tracker.unregister(shm.name, 'shared_memory')
-        # resource_tracker.register(shm.name, 'shared_memory')
-        # print(array)
-    
-    
-    
-    
-    # 
-    # model, optimizer, _, _ = deepspeed.initialize(
-    #     args=args,
-    #     model=model,
-    #     model_parameters=optimizer_grouped_parameters,
-    #     dist_init_required=True) 
-    
     
     
     import deepspeed_lib as deepspeed_lib
@@ -1615,18 +1535,6 @@ if __name__ == '__main__':
     # share_memory_count = torch.tensor(0).share_memory_()
     from multiprocessing import shared_memory
 
-    # # 创建内存共享缓冲区
-    # if dist.get_rank()==1:
-    #     _name = 'yyb-old_dataM'
-    #     shm = shared_memory.SharedMemory(create=True, size=1024*1024*100, name =_name)
-
-    #     # 创建一个 NumPy 数组并将其存储在共享内存中
-    #     array = np.ndarray((10,), dtype=np.float32, buffer=shm.buf)
-    #     array[:] = np.arange(10)
-
-    #     # resource_tracker.unregister(shm.name, 'shared_memory')
-    #     # resource_tracker.register(shm.name, 'shared_memory')
-    #     # print(array)
         
     
     # if True:

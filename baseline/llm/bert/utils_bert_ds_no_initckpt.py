@@ -294,7 +294,7 @@ def get_argument_parser():
 
 
     
-    # Gradient Merging    
+       
     parser.add_argument('--model-net', default='bert_base', type=str, help='net type')
     
     parser.add_argument('--model', type=str, default='bert_base',

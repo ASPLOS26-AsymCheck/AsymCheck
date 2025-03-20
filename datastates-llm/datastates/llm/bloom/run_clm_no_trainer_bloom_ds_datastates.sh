@@ -2,8 +2,7 @@
 
 OUT_DIR=${OUT_DIR:-"../log"}
 epochs="${epochs:-30}"
-density="${density:-0.1}"
-compressor="${compressor:-topk}"
+
 
 train_batch_size="${train_batch_size:-2}"
 val_batch_size="${val_batch_size:-2}"

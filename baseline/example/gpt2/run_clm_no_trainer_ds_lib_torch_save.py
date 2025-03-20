@@ -330,7 +330,7 @@ def parse_args():
                          'to broadcast, so we may not want to perform it every batch.')
 
     
-    # Gradient Merging    
+       
     parser.add_argument('--model-net', default='gpt_2', type=str, help='net type')
     
     parser.add_argument('--model', type=str, default='gpt_2',

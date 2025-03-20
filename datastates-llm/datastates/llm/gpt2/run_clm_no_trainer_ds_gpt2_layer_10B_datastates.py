@@ -318,7 +318,7 @@ def parse_args():
     parser.add_argument('--use-adasum', action='store_true', default=False,
                     help='use adasum algorithm to do reduction')
     
-    # Elastic Horovod settings
+    
     parser.add_argument('--batches-per-commit', type=int, default=50,
                     help='number of batches processed before calling `state.commit()`; '
                          'commits prevent losing progress if an error occurs, but slow '
@@ -330,7 +330,7 @@ def parse_args():
                          'to broadcast, so we may not want to perform it every batch.')
 
     
-    # Gradient Merging    
+       
     parser.add_argument('--model-net', default='gpt_2', type=str, help='net type')
     
     parser.add_argument('--model', type=str, default='gpt_2',
@@ -847,10 +847,6 @@ def main():
     #     model_parameters=optimizer_grouped_parameters,
     #     dist_init_required=True)
     # 
-
-
-    # Horovod: wrap optimizer with DistributedOptimizer.
-    # 得到一个分布式的SGD优化器
     
     
 
@@ -933,12 +929,11 @@ def main():
         # Extract `epoch_{i}` or `step_{i}`
         training_difference = os.path.splitext(path)[0]
         
-        # 基于Epoch的检查点
+        
         if "epoch" in training_difference:
             starting_epoch = int(training_difference.replace("epoch_", "")) + 1
             resume_step = None
             completed_steps = starting_epoch * num_update_steps_per_epoch
-        # 基于Iteration的检查点
         else:
             # need to multiply `gradient_accumulation_steps` to reflect real steps
             resume_step = int(training_difference.replace("step_", "")) * args.gradient_accumulation_steps
