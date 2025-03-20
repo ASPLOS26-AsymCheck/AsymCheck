@@ -47,7 +47,7 @@ For example, to run BERT with DelayCheck:
 
 
 ```shell
-cd DelayCheck/delaycheck/example/llm/GPT2
+cd DelayCheck/delaycheck/example/llm/gpt2
 bash run_clm_no_trainer_deepspeed_layer_10B_delay.sh
 ```
 
