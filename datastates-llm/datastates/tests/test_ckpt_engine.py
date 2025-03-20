@@ -17,7 +17,7 @@ def test_ckpt_engine():
     tensor2 = torch.randn(tensor_shape, dtype=tensor_dtype).to(device)
     tensor_bytes = tensor1.numel()*tensor1.element_size()
 
-    ckpt_path = "/home/mzq/workspace/project/DeepSpeedExamples/datastates-llm/datastates/tests/ckpt/datastates-ckpt.pt"
+    ckpt_path = "./datastates-llm/datastates/tests/ckpt/datastates-ckpt.pt"
 
     file_offset = 0
     version = 1

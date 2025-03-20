@@ -303,8 +303,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         self.micro_step_id = 0
         
 
-        # self.reduce_bucket_size
-        # default reduce_bucket_size = 500000000
+        
         self.reduce_bucket_size = int(reduce_bucket_size)
         
         # 8GPU, BERT-large, 24.28=Samples/s, model.backward_time=2.10, model.allreduce_time=4.47

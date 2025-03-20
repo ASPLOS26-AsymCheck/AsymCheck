@@ -37,7 +37,7 @@ def test_datastates():
 
     model_name = "datastates_test_model"
     np_array = np.random.randn(512).astype(np.float32)
-    ckpt_path = "/home/mzq/workspace/project/DeepSpeedExamples/datastates-llm/datastates/tests/ckpt/datastates-ckpt.pt"
+    ckpt_path = "./datastates-llm/datastates/tests/ckpt/datastates-ckpt.pt"
 
     ckpt_obj = {
         "tensor1": tensor,

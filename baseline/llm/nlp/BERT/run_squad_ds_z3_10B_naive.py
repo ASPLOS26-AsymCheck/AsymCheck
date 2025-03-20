@@ -74,7 +74,7 @@ import torch
 from torch.utils.data import TensorDataset, DataLoader, RandomSampler, SequentialSampler
 from torch.utils.data.distributed import DistributedSampler
 
-# Modify by mingzq, 20240929
+
 import shutil
 import uuid
 import torchsnapshot
@@ -85,15 +85,13 @@ from tqdm import tqdm
 from multiprocessing import shared_memory
 
 
-# logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
-#                     datefmt='%m/%d/%Y %H:%M:%S',
-#                     level=logging.INFO)
+
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
                     datefmt='%m/%d/%Y %H:%M:%S',
                     level=logging.WARNING)
 
 logger = logging.getLogger(__name__)
-# logger.setLevel(logging.WARNING)
+
 
 
 import argparse
@@ -1416,9 +1414,7 @@ if __name__ == '__main__':
     #     print('args.init_checkpoint = ', args.init_checkpoint)
     # checkpoint = torch.load(args.init_checkpoint, map_location='cuda')
     
-    # dir_path = "/home/user/mzq/workspaces/project/dear_pytorch/ATC24-FG-MGS/horovod/example/elastic/pytorch/nlp/bert/scripts/squad_base/"
-    # init_checkpoint = dir_path + "squad_elastic_topk_001_checkpoint/pytorch_model.bin"    
-    # checkpoint = torch.load(init_checkpoint, map_location='cuda')
+    
     
     # checkpoint = checkpoint["model"] if "model" in checkpoint.keys() else checkpoint
     # model.load_state_dict(checkpoint, strict=False)
@@ -1481,47 +1477,7 @@ if __name__ == '__main__':
             print('load_optimizer_time = ', time.time() - load_optimizer_time)
         
         init_hvd_time = time.time()
-    
 
-    # 创建内存共享缓冲区用于保存CPU内的检查点, 
-    # 共享缓冲区的创建可以由节点内的其他进程完成, 这些进程可以异步地执行, 而不需要在本地创建, 
-    # if dist.get_rank() == 0:
-    # if (dist.get_rank()) == 0:
-    #     # 
-    #     # 参数状态缓冲区, Modify by mingzq, 20240928, 
-    #     _name_parameter = 'parameter_buffer'
-    #     _parameter_shm = shared_memory.SharedMemory(create = True, size = 1024*1024*1024*100, name = _name_parameter)
-
-    #     _name_parameter_backup = 'parameter_buffer_backup'
-    #     _parameter_shm_backup = shared_memory.SharedMemory(create = True, size = 1024*1024*1024*100, name = _name_parameter_backup)
-
-    #     # 
-    #     # 
-    #     _name_optimizer = 'optimizer_buffer'
-    #     _optimizer_shm = shared_memory.SharedMemory(create = True, size = 1024*1024*1024*100, name = _name_optimizer)
-
-    #     _name_optimizer_backup = 'optimizer_buffer_backup'
-    #     _optimizer_shm_backup = shared_memory.SharedMemory(create = True, size = 1024*1024*1024*100, name = _name_optimizer_backup)
-
-
-
-        # 创建一个 NumPy 数组并将其存储在共享内存中
-        # array = np.ndarray((10,), dtype=np.float32, buffer=shm.buf)
-        # array[:] = np.arange(10)
-
-        # resource_tracker.unregister(shm.name, 'shared_memory')
-        # resource_tracker.register(shm.name, 'shared_memory')
-        # print(array)
-    
-    
-    
-    
-    # 
-    # model, optimizer, _, _ = deepspeed.initialize(
-    #     args=args,
-    #     model=model,
-    #     model_parameters=optimizer_grouped_parameters,
-    #     dist_init_required=True) 
     
     
     
@@ -1543,18 +1499,7 @@ if __name__ == '__main__':
     # share_memory_count = torch.tensor(0).share_memory_()
     from multiprocessing import shared_memory
 
-    # # 创建内存共享缓冲区
-    # if dist.get_rank()==1:
-    #     _name = 'yyb-old_dataM'
-    #     shm = shared_memory.SharedMemory(create=True, size=1024*1024*100, name =_name)
-
-    #     # 创建一个 NumPy 数组并将其存储在共享内存中
-    #     array = np.ndarray((10,), dtype=np.float32, buffer=shm.buf)
-    #     array[:] = np.arange(10)
-
-    #     # resource_tracker.unregister(shm.name, 'shared_memory')
-    #     # resource_tracker.register(shm.name, 'shared_memory')
-    #     # print(array)
+    
         
     
     # if True:
@@ -1674,7 +1619,7 @@ if __name__ == '__main__':
     }
     snapshot: Optional[Snapshot] = None
     
-    checkpoint_save_work_dir = '/home/data/mzq/checkpoint/bert_base'
+    checkpoint_save_work_dir = '/home/data/checkpoint/bert_base'
 
     full_train()
     

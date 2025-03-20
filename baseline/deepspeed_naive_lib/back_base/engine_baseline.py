@@ -136,8 +136,7 @@ import multiprocessing
 
 
 
-# 梯度合并的缓冲区大小, 梯度元素个数,
-# Design by mingzq, 20240821
+
 MEMORY_OPT_ALLREDUCE_SIZE = 20000000
 
 
@@ -175,7 +174,7 @@ def _save_checkpoint_in_memory(queue):
             
             
             
-            checkpoint_save_work_dir = '/home/mzq/workspace/project/DeepSpeedExamples/training/cifar100/multi_process_test'
+            checkpoint_save_work_dir = './multi_process_test'
             output_model_file = os.path.join(checkpoint_save_work_dir, f"run-{uuid.uuid4()}-epoch-{epoch}-iteration-{idx}")
 
             save_data={"Model":_model_state_dict_gpu,

@@ -100,9 +100,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         verbose=True,
         contiguous_gradients=True,
         
-        # Modify by mingzq, 20240830
-        # 固定缓冲区Buffer的大小, 
-        # reduce_bucket_size=500000000,
+        
         
         
         
@@ -293,8 +291,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         self.micro_step_id = 0
         
         
-        # self.reduce_bucket_size
-        # default reduce_bucket_size = 500000000
+        
         self.reduce_bucket_size = int(reduce_bucket_size)
         
         # 8GPU, BERT-large, 24.28=Samples/s, model.backward_time=2.10, model.allreduce_time=4.47
@@ -2242,7 +2239,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         # 
         # Gathering persisting parameters
         # 更新阶段收集其他GPU的参数, 20250228
-        # Modify by mingzq, 
+        
         if len(self.persistent_parameters) > 0:
             self.persistent_parameters[0].all_gather(self.persistent_parameters)
 
@@ -2482,7 +2479,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
             return False
     
     # 
-    # Modify by mingzq, 
+    
     @instrument_w_nvtx
     def backward(self, loss, retain_graph=False):
         """

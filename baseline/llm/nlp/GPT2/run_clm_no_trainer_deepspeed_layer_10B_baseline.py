@@ -111,9 +111,7 @@ from transformers import GPT2Config
 check_min_version("4.39.0.dev0")
 
 # logger = get_logger(__name__)
-# logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
-#                     datefmt='%m/%d/%Y %H:%M:%S',
-#                     level=logging.INFO)
+
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
                     datefmt='%m/%d/%Y %H:%M:%S',
@@ -589,19 +587,17 @@ def main():
         model = AutoModelForCausalLM.from_config(config, trust_remote_code=args.trust_remote_code)
 
     # 
-    # Modify by mingzq, 20250209, 
+    
     config = GPT2Config(
         vocab_size=50257,
-        # n_positions=1024,
-        # n_ctx=1024,
-        # n_embd=1024,
+        
         n_positions=1024,
         n_ctx=1024,
         n_embd=2048,
-        # n_layer=24,
+        
         n_layer=64,
         n_head=32,
-        # n_head=16,
+        
         n_inner=8192,
         activation_function="gelu",   # used to be "gelu_new" in earlier versions
         resid_pdrop=0.1,
@@ -855,7 +851,7 @@ def main():
 
     # We need to initialize the trackers we use, and also store our configuration.
     # The trackers initializes automatically on the main process.
-    # 初始化跟踪器, Modify by mingzq, 20240822
+    
     if args.with_tracking:
         experiment_config = vars(args)
         # TensorBoard cannot log Enums, need the raw value
@@ -957,7 +953,7 @@ def main():
                     model.save_checkpoint(save_dir="/mnt/model/")
                     # model.save_checkpoint(save_dir="/data/lzy/")
 
-                    # model.save_checkpoint(save_dir="/home/mzq/share_n16/")
+                    
                     if dist.get_rank() == 0:
                         print("save ckpt time = ", time.time() - ckpt_time)
                     ckpt_time_array.append(time.time() - ckpt_time)

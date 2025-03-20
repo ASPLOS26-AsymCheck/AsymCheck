@@ -100,14 +100,11 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         verbose=True,
         contiguous_gradients=True,
         
-        # Modify by mingzq, 20240830
-        # 固定缓冲区Buffer的大小, 
-        # reduce_bucket_size=500000000,
         
         
         
-        # self.reduce_bucket_size
-        # default reduce_bucket_size = 500000000
+        
+        
         reduce_bucket_size=10000000000,
 
         

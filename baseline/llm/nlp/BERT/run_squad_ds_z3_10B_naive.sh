@@ -2,20 +2,12 @@
 
 echo "Container nvidia build = " $NVIDIA_BUILD_ID
 
-# export DIR_Model="/home/mzq/mingzq/workspaces/project/grace/examples/torch/nlp/bert/pre-model/bert-large-uncased/uncased_L-24_H-1024_A-16"
-# export DIR_Model = "/data/dataset/nlp/bert/pre-model/bert-base-uncased/uncased_L-12_H-768_A-12"
-# export DIR_DataSet="/data/dataset/nlp/bert"
-# export DIR_Model="/home/data/mzq/nlp/pre-model/bert-base-uncased/uncased_L-12_H-768_A-12"
+
 export DIR_Model="/data/dataset/nlp/bert/pre-model/bert-large-uncased/uncased_L-24_H-1024_A-16"
 
 export DIR_DataSet="/data/dataset/nlp/bert"
-# export dir_path_checkpoint="/home/user/mzq/workspaces/project/dear_pytorch/ATC24-FG-MGS/horovod/example/elastic/pytorch/nlp/bert/scripts/squad_base/squad_elastic_topk_001_checkpoint/pytorch_model.bin"
 
-# init_checkpoint = ${1:-"/home/mzq/mingzq/workspaces/project/grace/examples/torch/nlp/bert/pre-model/bert-base-uncased/uncased_L-12_H-768_A-12/bert_model.ckpt"}
-# init_checkpoint=${1:-"$DIR_Model/bert_model.ckpt"}
-# init_checkpoint=${1:-"/home/user/mzq/workspaces/project/dear_pytorch/ATC24-FG-MGS/horovod/example/elastic/pytorch/nlp/bert/scripts/squad_base/squad_elastic_topk_001_checkpoint/pytorch_model.bin"}
-# init_checkpoint=${1:-"$DIR_Model/bert_base_wiki.pt"}
-# init_checkpoint=${1:-"$DIR_Model/bert_large_pretrained_amp.pt"}
+
 
 # init_checkpoint=${1:-"$dir_path_checkpoint"}
 
@@ -29,7 +21,7 @@ seed=${8:-"1"}
 squad_dir=${9:-"$DIR_DataSet/squad"}
 vocab_file=${10:-"$DIR_Model/vocab.txt"}
 
-OUT_DIR=${11:-"/home/mzq/workspace/project/DeepSpeedExamples/training/BERT/out"}
+OUT_DIR=${11:-"./out"}
 
 
 # train + eval
@@ -40,13 +32,7 @@ max_steps=${14:-"-1"}
 
 
 # setup
-# density="${density:-0.1}"
-density="${density:-1}"
-threshold="${threshold:-8192}"
-# compressor="${compressor:-sidcoexp}"
-compressor="${compressor:-topkef}"
-# max_epochs="${max_epochs:-200}"
-memory="${memory:-residual}"
+
 
 
 echo "out dir is $OUT_DIR"

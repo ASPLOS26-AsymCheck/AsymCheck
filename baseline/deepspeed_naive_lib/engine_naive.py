@@ -3515,7 +3515,7 @@ class DeepSpeedEngine(Module):
     def _copy_recovery_script(self, save_path):
         base_dir = os.path.dirname(os.path.dirname(__file__))
         
-        base_dir = '/home/mzq/miniconda3/envs/mzq/lib/python3.12/site-packages/deepspeed'
+        base_dir = './miniconda/envs/ds/lib/python3.12/site-packages/deepspeed'
         
         script = "zero_to_fp32.py"
         src = os.path.join(base_dir, "utils", script)

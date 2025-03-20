@@ -230,7 +230,7 @@ def get_argument_parser():
     
     
     
-    # Modify by mingzq, 
+    
     from transformers import (
     CONFIG_MAPPING,
     MODEL_MAPPING,

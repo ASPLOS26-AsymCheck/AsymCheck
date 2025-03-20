@@ -115,9 +115,7 @@ from transformers import GPT2Config
 check_min_version("4.39.0.dev0")
 
 # logger = get_logger(__name__)
-# logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
-#                     datefmt='%m/%d/%Y %H:%M:%S',
-#                     level=logging.INFO)
+
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
                     datefmt='%m/%d/%Y %H:%M:%S',
@@ -604,16 +602,14 @@ def main():
     
     config = GPT2Config(
         vocab_size=50257,
-        # n_positions=1024,
-        # n_ctx=1024,
-        # n_embd=1024,
+        
         n_positions=1024,
         n_ctx=1024,
         n_embd=2048,
-        # n_layer=24,
+        
         n_layer=64,
         n_head=32,
-        # n_head=16,
+        
         n_inner=8192,
         activation_function="gelu",   # used to be "gelu_new" in earlier versions
         resid_pdrop=0.1,

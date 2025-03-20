@@ -136,8 +136,7 @@ import multiprocessing
 
 
 
-# 梯度合并的缓冲区大小, 梯度元素个数,
-# Design by mingzq, 20240821
+
 MEMORY_OPT_ALLREDUCE_SIZE = 20000000
 
 
@@ -170,7 +169,7 @@ def _save_checkpoint_in_memory(queue):
             
             
             
-            checkpoint_save_work_dir = '/home/mzq/workspace/project/DeepSpeedExamples/training/cifar100/multi_process_test'
+            checkpoint_save_work_dir = './multi_process_test'
             output_model_file = os.path.join(checkpoint_save_work_dir, f"run-{uuid.uuid4()}-epoch-{epoch}-iteration-{idx}")
 
             save_data={"Model":_model_state_dict_gpu,
@@ -477,8 +476,8 @@ class DeepSpeedEngine(Module):
 
 
 
-    # 20240924, 
-    # Stop multi-threaded checkpoint operation, Design by mingzq
+     
+    # Stop multi-threaded checkpoint operation, 
     def stop_save_process(self):
         # put none to quit the subprocess
         self.queue.put(None)
@@ -2653,11 +2652,7 @@ class DeepSpeedEngine(Module):
             dp_world_size = dist.get_world_size(dp_group) / float(self.sequence_parallel_size)
             
         
-        # if torch.distributed.get_rank() == 0:
-        #     print('dp_group = ', dp_group)
-        #     print('dp_world_size = ', dp_world_size)
-        #     print('split_sparse_tensor_buckets = ', split_sparse_tensor_buckets)
-        #     print('split_dense_tensor_buckets = ', split_dense_tensor_buckets)
+        
 
 
 
@@ -2682,7 +2677,7 @@ class DeepSpeedEngine(Module):
     def _reduce_expert_gradients(self, expert_grads, elements_per_buffer):
 
 
-        print('-----------------_reduce_expert_gradients-----------------')
+       
 
         # to maintain the gradients value unaffected by ep_size setting,
         # utilize dp_world_size for allreduce average
@@ -3725,7 +3720,7 @@ class DeepSpeedEngine(Module):
     def _copy_recovery_script(self, save_path):
         # base_dir = os.path.dirname(os.path.dirname(__file__))
         
-        base_dir = '/home/mzq/miniconda3/envs/mzq/lib/python3.12/site-packages/deepspeed'
+        base_dir = './miniconda/envs/ds/lib/python3.12/site-packages/deepspeed'
         
         script = "zero_to_fp32.py"
         src = os.path.join(base_dir, "utils", script)

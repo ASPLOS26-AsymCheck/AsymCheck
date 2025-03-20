@@ -85,15 +85,13 @@ from tqdm import tqdm
 from multiprocessing import shared_memory
 
 
-# logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
-#                     datefmt='%m/%d/%Y %H:%M:%S',
-#                     level=logging.INFO)
+
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
                     datefmt='%m/%d/%Y %H:%M:%S',
                     level=logging.WARNING)
 
 logger = logging.getLogger(__name__)
-# logger.setLevel(logging.WARNING)
+
 
 
 import argparse

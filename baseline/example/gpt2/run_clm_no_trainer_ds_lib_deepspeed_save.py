@@ -120,9 +120,7 @@ import oteacheck_lib.utils
 check_min_version("4.39.0.dev0")
 
 # logger = get_logger(__name__)
-# logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
-#                     datefmt='%m/%d/%Y %H:%M:%S',
-#                     level=logging.INFO)
+
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
                     datefmt='%m/%d/%Y %H:%M:%S',

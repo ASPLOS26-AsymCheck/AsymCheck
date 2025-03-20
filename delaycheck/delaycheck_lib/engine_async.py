@@ -2684,11 +2684,7 @@ class DeepSpeedEngine(Module):
             dp_world_size = dist.get_world_size(dp_group) / float(self.sequence_parallel_size)
             
         
-        # if torch.distributed.get_rank() == 0:
-        #     print('dp_group = ', dp_group)
-        #     print('dp_world_size = ', dp_world_size)
-        #     print('split_sparse_tensor_buckets = ', split_sparse_tensor_buckets)
-        #     print('split_dense_tensor_buckets = ', split_dense_tensor_buckets)
+        
 
 
 
@@ -2714,7 +2710,7 @@ class DeepSpeedEngine(Module):
     def _reduce_expert_gradients(self, expert_grads, elements_per_buffer):
 
 
-        print('-----------------_reduce_expert_gradients-----------------')
+       
 
         # to maintain the gradients value unaffected by ep_size setting,
         # utilize dp_world_size for allreduce average

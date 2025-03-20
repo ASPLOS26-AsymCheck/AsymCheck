@@ -136,8 +136,7 @@ import multiprocessing
 
 
 
-# 梯度合并的缓冲区大小, 梯度元素个数,
-# Design by mingzq, 20240821
+
 MEMORY_OPT_ALLREDUCE_SIZE = 20000000
 
 
@@ -175,7 +174,7 @@ def _save_checkpoint_in_memory(queue):
             
             
             
-            checkpoint_save_work_dir = '/home/mzq/workspace/project/DeepSpeedExamples/training/cifar100/multi_process_test'
+            checkpoint_save_work_dir = './multi_process_test'
             output_model_file = os.path.join(checkpoint_save_work_dir, f"run-{uuid.uuid4()}-epoch-{epoch}-iteration-{idx}")
 
             save_data={"Model":_model_state_dict_gpu,
@@ -482,8 +481,8 @@ class DeepSpeedEngine(Module):
 
 
 
-    # 20240924, 
-    # Stop multi-threaded checkpoint operation, Design by mingzq
+     
+    # Stop multi-threaded checkpoint operation, 
     def stop_save_process(self):
         # put none to quit the subprocess
         self.queue.put(None)
@@ -2127,8 +2126,7 @@ class DeepSpeedEngine(Module):
                 self.buffered_allreduce_fallback(grads=grads, elements_per_buffer=bucket_size)
 
 
-    # 执行反向传播计算, 
-    # Modify by mingzq, 20240821
+    
     @instrument_w_nvtx
     def backward(self, loss, allreduce_gradients=True, release_loss=False, retain_graph=False, scale_wrt_gas=True):
         r"""Execute backward pass on the loss
@@ -2649,8 +2647,7 @@ class DeepSpeedEngine(Module):
         return non_expert_grads, expert_grads
 
 
-    # 执行非专家节点的梯度通常通信操作,
-    # Modify by mingzq, 20240821, 
+     
     def _reduce_non_expert_gradients(self, grads, elements_per_buffer):
 
         # print('--------------_reduce_non_expert_gradients----------------')
@@ -2675,22 +2672,18 @@ class DeepSpeedEngine(Module):
             dp_world_size = dist.get_world_size(dp_group) / float(self.sequence_parallel_size)
             
         
-        # if torch.distributed.get_rank() == 0:
-        #     print('dp_group = ', dp_group)
-        #     print('dp_world_size = ', dp_world_size)
-        #     print('split_sparse_tensor_buckets = ', split_sparse_tensor_buckets)
-        #     print('split_dense_tensor_buckets = ', split_dense_tensor_buckets)
+        
 
 
 
-        # 稀疏梯度Allreduce, Modify by mingzq, 
+        
         for _, sparse_bucket_tuple in enumerate(split_sparse_tensor_buckets):
             if sparse_bucket_tuple:
                 bucket_type, sparse_bucket = sparse_bucket_tuple
                 self.sparse_allreduce_no_retain(sparse_bucket, dp_group=dp_group, dp_world_size=dp_world_size)
         
         
-        # 稠密梯度Allreduce, Modify by mingzq, 
+        
         for _, dense_bucket_tuple in enumerate(split_dense_tensor_buckets):
             if dense_bucket_tuple:
                 bucket_type, dense_bucket = dense_bucket_tuple
@@ -2703,12 +2696,11 @@ class DeepSpeedEngine(Module):
     
     
     
-    # 执行节点的梯度同步操作, Modify by mingzq, 
-    # 包含MoE层的梯度Allreduce同步,
+    
     def _reduce_expert_gradients(self, expert_grads, elements_per_buffer):
 
 
-        print('-----------------_reduce_expert_gradients-----------------')
+       
 
         # to maintain the gradients value unaffected by ep_size setting,
         # utilize dp_world_size for allreduce average
@@ -2733,8 +2725,7 @@ class DeepSpeedEngine(Module):
                                              dp_world_size=dp_world_size)
     
     
-    # 基于Buffer的梯度同步方案, Buffer中元素数量固定, 即固定Buffer缓冲区的梯度合并操作,
-    # Modify by mingzq, 20240821
+    
     def buffered_allreduce_fallback(self, grads=None, elements_per_buffer=500000000):
 
 
@@ -2751,10 +2742,10 @@ class DeepSpeedEngine(Module):
             non_expert_grads = grads
 
 
-        # Non-Expert表示的是非混合专家模型的梯度同步策略, , 
+        
         self._reduce_non_expert_gradients(non_expert_grads, elements_per_buffer)
 
-        # MoE操作, 混合转机模型的梯度同步策略, 
+        
         if self.has_moe_layers:
             self._reduce_expert_gradients(expert_grads, elements_per_buffer)
         
@@ -3756,7 +3747,7 @@ class DeepSpeedEngine(Module):
     def _copy_recovery_script(self, save_path):
         # base_dir = os.path.dirname(os.path.dirname(__file__))
         
-        base_dir = '/home/mzq/miniconda3/envs/mzq/lib/python3.12/site-packages/deepspeed'
+        base_dir = './miniconda/envs/ds/lib/python3.12/site-packages/deepspeed'
         
         script = "zero_to_fp32.py"
         src = os.path.join(base_dir, "utils", script)
