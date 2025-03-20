@@ -41,9 +41,9 @@ python setup.py
 
 ## **Quick start**
 
-Codes of four types of checkpointing methods are provided. They are baseline, CheckFreq, tsnapshot and DelayCheck. For each methods, there are codes for four models, which are BERT, GPT2, ResNet and VIT.
+Codes of seven types of checkpointing methods are provided, as well as no-checkpoint Baseline. They are DataStates-LLM, FastPersist, Gemini, DeepFreeze, CheckFreq, TorchSnapshot and DelayCheck. For each methods, there are codes for four models, which are GPT2, BERT, RoBERT, BLOOM, ResNet and VIT.
 
-For example, to run BERT with DelayCheck:
+For example, to run gpt2-10B with DelayCheck:
 
 
 ```shell
