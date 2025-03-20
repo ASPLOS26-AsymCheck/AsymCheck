@@ -158,7 +158,8 @@ def _save_checkpoint_in_memory(queue):
     while True:
         s_time = time.time()
         stateful_model_state = torchsnapshot.StateDict()
-        
+        # model_dict_state, optimizer_state_dict
+        # stateful_model_state[new_name] = self._save_parameter_cpu[new_name]
         _model_state_dict_gpu, _optimizer_state_dict_gpu, data_type, checkpoint_save_work_dir, idx, epoch = queue.get()
         if data_type == 0:
             _state_dict_cpu = {}
@@ -173,7 +174,8 @@ def _save_checkpoint_in_memory(queue):
 
             save_data={"Model":_model_state_dict_gpu,
                        "Optimizer":_optimizer_state_dict_gpu,
-                       
+                       # "Optimizer-1":copy.deepcopy(_optimizer_state_dict_gpu),
+                       # "Optimizer-2":copy.deepcopy(_optimizer_state_dict_gpu),
                     }
             torch.save(save_data, output_model_file)
             
@@ -187,7 +189,14 @@ def _save_checkpoint_in_memory(queue):
             # }
             # # print('stateful_model_state.items = ', len(stateful_model_state.items()))
 
-            
+            # # # The snapshot is written to the CPU memory first and then to the local disk
+            # # # # torchsnapshot: take snapshot
+            # # # progress["current_epoch"] += 1
+            # # # Synchronous write I/O
+            # snapshot = torchsnapshot.Snapshot.take(f"{checkpoint_save_work_dir}/run-{uuid.uuid4()}-epoch-{epoch}-iteration-{idx}",
+            #                                        app_state, replicated=["**"],
+            #                                        # this pattern treats all states as replicated
+            #                                     )
 
             
             # # snapshot = torchsnapshot.Snapshot.async_take(f"{self.checkpoint_save_work_dir}/run-{uuid.uuid4()}-epoch-{epoch}-iteration-{idx}",
@@ -198,11 +207,11 @@ def _save_checkpoint_in_memory(queue):
         elif data_type == 1:              
             _state_tensor_cpu = []
             _state_tensor_cpu = _model_state_dict_gpu.cpu()
-            
+            # print('len(_state_dict_gpu) = ', len(_state_dict_gpu))
         else:
             raise NotImplementedError("Data type error!")
 
-                   
+        # print('asynch_checkpoint_in_memory!')               
 
     return
 

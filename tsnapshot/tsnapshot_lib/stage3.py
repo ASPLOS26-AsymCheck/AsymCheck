@@ -1531,7 +1531,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         rank = dist.get_rank(self.dp_process_group)
         buffer_to_reduce.div_(world_sz / float(self.sequence_parallel_size))
         
-        
+        # 梯度同步
         dist.all_reduce(buffer_to_reduce, group=self.dp_process_group)
 
         if self.postscale_gradients and self.gradient_predivide_factor != world_sz:
@@ -1540,7 +1540,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         if self.communication_data_type != self.dtype:
             buffer_to_reduce = buffer_to_reduce.to(self.dtype)
             
-        
+        # 聚合平均
         grad_partitions = []
         grad_offset_in_buffer = 0
         for param in self.params_in_ipg_bucket:
@@ -1548,7 +1548,8 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
             chunk_sz = math.ceil(grad.numel() / world_sz)
             
             # 
-            
+            # 对缓冲区进行梯度的还原, 还原成原始梯度的大小和形状,
+            # Modify by mingzq, 
             start_offset = grad_offset_in_buffer + min(rank * chunk_sz, grad.numel())
             end_offset = grad_offset_in_buffer + min(rank * chunk_sz + chunk_sz, grad.numel())
 
@@ -1562,12 +1563,12 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
                 grad_partitions.append(partition)
             grad_offset_in_buffer += grad.numel()
         
-        
+        # 返回还原之后的梯度数组
         return grad_partitions
     
     
     # 
-    
+    # 基于梯度分层的Allreduce
     
     @instrument_w_nvtx
     def __avg_scatter_grads(self, params_to_reduce: List[Parameter]) -> List[Tensor]:
@@ -1582,7 +1583,12 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
 
 
         # 
-        
+        # print('len(full_grads_for_rank) = ', len(full_grads_for_rank))
+        # print('full_grads_for_rank = ', full_grads_for_rank)
+        # grad_count = 0
+        # for grad_rank in full_grads_for_rank:
+        #     grad_count = grad_count + len(grad_rank)
+        # print('grad_count = ', grad_count)
 
 
         local_world_size = get_accelerator().device_count()
@@ -1731,11 +1737,12 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
                                                           gradient_tensors=offload_fp32_gradients[i])
         return buffers
     
-    
+    # Modify by mingzq, 20270824
+    # 在反向传播的过程中注册梯度, 
     def reduce_ready_partitions_and_remove_grads(self, param):
+        # print('reduce_ready_partitions_and_remove_grads')
         
-        
-        
+        # print_rank_0(f"Backward {debug_param2name_id_shape(param)}", force=True)
         self.reduce_independent_p_g_buckets_and_remove_grads(param)
 
 
@@ -2285,10 +2292,13 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         """
             Not supporting closure.
         """
-        
+        # Modify by mingzq, Record the number of elements saved to host memory for each gradient merge
+        # 20240920, 
         self.elements_copy_to_memory.clear()
 
-        
+        # Backup the latest cpu memory checkpoint in host memory to new shared memory
+        # Modify by mingzq, 
+        # 
         
         # 
         # 
@@ -2813,7 +2823,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         # Assume non-tensor states are not partitioned and equal across ranks, so return first one
         return local_state_partitions[0]
     
-    
+    # Modify by mingzq, 20240920
     # Restore base optimizer state from checkpoint by
     # 1) Merging optimizer state from checkpoints of all partitions
     # 2) Extracting optimizer state for current partition from the merged state

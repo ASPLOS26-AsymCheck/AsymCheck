@@ -1602,7 +1602,12 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
 
 
         # 
-        
+        # print('len(full_grads_for_rank) = ', len(full_grads_for_rank))
+        # print('full_grads_for_rank = ', full_grads_for_rank)
+        # grad_count = 0
+        # for grad_rank in full_grads_for_rank:
+        #     grad_count = grad_count + len(grad_rank)
+        # print('grad_count = ', grad_count)
 
 
         local_world_size = get_accelerator().device_count()
@@ -1750,9 +1755,9 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         return buffers
     
     def reduce_ready_partitions_and_remove_grads(self, param):
+        # print('reduce_ready_partitions_and_remove_grads')
         
-        
-        
+        # print_rank_0(f"Backward {debug_param2name_id_shape(param)}", force=True)
         self.reduce_independent_p_g_buckets_and_remove_grads(param)
 
 
@@ -2299,7 +2304,15 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         
 
         
-        
+        # if dist.get_rank() == 0:
+        #     _name = 'parameter_buffer_backup'
+        #     existing_shm_backup = shared_memory.SharedMemory(name = _name)
+        #     shard_buffer = np.ndarray(1024*1024*1024*8, dtype=self.parameter_cpu.dtype, buffer=existing_shm_backup.buf)
+        #     shard_buffer[:self.parameter_cpu.size] = self.parameter_cpu
+
+        # print('self.parameter_cpu.size() = ', self.parameter_cpu.size())
+        # print('self.parameter_cpu.size() = ', self.parameter_cpu.size)
+        # print('self.parameter_cpu = ', self.parameter_cpu)
 
         self.parameter_cpu = None
 
