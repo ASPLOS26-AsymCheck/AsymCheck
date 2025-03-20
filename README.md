@@ -32,8 +32,8 @@ The system architecture of **DelayCheck** is as follows:
 
 ## **Get the code**
 ```shell
-git clone https://github.com/EuroSys25-DelayCheck
-cd EuroSys25-DelayCheck
+git clone https://github.com/FAST26-DelayCheck/DelayCheck
+cd FAST26-DelayCheck
 pip install -r requirements.txt
 python setup.py
 ```
@@ -44,13 +44,19 @@ Codes of four types of checkpointing methods are provided. They are baseline, Ch
 
 For example, to run BERT with DelayCheck:
 
+
 ```shell
 cd DelayCheck/bert
 bash nvidia_run_squad_ds_lib_DelayCheck.sh
 ```
 
+
 ## **Referred Datasets**
 
-- ImageNet: [https://www.image-net.org/](https://www.image-net.org/)
+
 - Wikitex-103: [https://huggingface.co/datasets/wikitext](https://huggingface.co/datasets/wikitext)
 - SQuAD: [https://rajpurkar.github.io/SQuAD-explorer/](https://rajpurkar.github.io/SQuAD-explorer/)
+- ImageNet: [https://www.image-net.org/](https://www.image-net.org/)
+
+
+
