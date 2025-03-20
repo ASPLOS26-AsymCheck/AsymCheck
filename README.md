@@ -23,6 +23,8 @@ The system architecture of **DelayCheck** is as follows:
 # Installation
 
 ## **Prerequisites**
+- Python >= 3.12
+- PyTorch-1.3.+
 - CUDA-12.6
 - DeepSpeed-0.14.5 
 - NCCL-2.20.5 
@@ -47,7 +49,7 @@ For example, to run gpt2-10B with DelayCheck:
 
 ```shell
 cd DelayCheck/delaycheck/example/llm/gpt2
-bash run_clm_no_trainer_deepspeed_layer_10B_delay.sh
+bash run_clm_no_trainer_ds_gpt2_layer_10B_delay.sh
 ```
 
 
