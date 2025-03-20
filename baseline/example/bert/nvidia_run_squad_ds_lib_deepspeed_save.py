@@ -52,9 +52,7 @@ from turing.nvidia_modelingpreln import BertConfig as BertConfigPreLN
 from turing.nvidia_modelingpreln import BertForQuestionAnswering as BertForQuestionAnsweringPreLN
 
 import sys
-sys.path.append("../../") 
-import delaycheck_lib as delaycheck_lib
-import delaycheck_lib.utils
+import utils_bert
 
 # logging.basicConfig(
 #     format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
@@ -898,42 +896,19 @@ def main():
         'weight_decay':
         0.0
     }]
-    
-    
-    # create shared memory buffer for saving the checkpoint in CPU
-    # if dist.get_rank() == 0:
-    if (dist.get_rank()) % torch.cuda.device_count() == 0:
-        _name = 'parameter_buffer'
-        shm = shared_memory.SharedMemory(create=True, size=1024*1024*1024*100, name =_name)
-        
-        
-        # _name_backup = 'parameter_buffer_backup'
-        # shm_backup = shared_memory.SharedMemory(create=True, size=1024*1024*1024*100, name =_name_backup)
 
-        # create a numpy array and store it in shared memory
-        # array = np.ndarray((10,), dtype=np.float32, buffer=shm.buf)
-        # array[:] = np.arange(10)
-
-        # resource_tracker.unregister(shm.name, 'shared_memory')
-        # resource_tracker.register(shm.name, 'shared_memory')
-        # print(array)
     
     # return_items = [engine, engine.optimizer, engine.training_dataloader, engine.lr_scheduler]
     # model = engine
     
-    # model, optimizer, _, _ = deepspeed.initialize(
-    #     args=args,
-    #     model=model,
-    #     model_parameters=optimizer_grouped_parameters,
-    #     dist_init_required=True)
-    
-    
-    model, optimizer, _, _ = delaycheck_lib.initialize(
+    model, optimizer, _, _ = deepspeed.initialize(
         args=args,
         model=model,
         model_parameters=optimizer_grouped_parameters,
         dist_init_required=True)
     
+    
+
     
     
 
@@ -1195,21 +1170,11 @@ def main():
                         # 'optimizer' : optimizer.state_dict(),
                         # 'scheduler' : scheduler.state_dict()
                     }
-                    delaycheck_lib.utils.save_checkpoint_iteration_deepspeed(model, state, num_epoch + 1,  step)
+                    deepspeed_naive_lib.utils.save_checkpoint_iteration_deepspeed(model, state, num_epoch + 1,  step)
                 
                 if (step + 1) % (
                         ave_rounds) == 0 and torch.distributed.get_rank() == 0:
-                    
-                    # numel_count = 0
-                    # numel_count_model = 0
-                    # for key, value in optimizer.state.items():
-                    #     numel_count += value['exp_avg'].numel() + value['exp_avg_sq'].numel()
-                    # for key, value in model.state_dict().items():
-                    #     numel_count_model += value.numel()
-                    
-                    # print("Size of Optimizer Size:", numel_count)
-                    # print("Size of Model State:", numel_count_model)
-                    
+
                     print(
                         ' At step {}, averaged throughput for {} rounds is: {} Samples/s'
                         .format(
@@ -1227,8 +1192,7 @@ def main():
                     backward_time = sum(model.backward_time_array)
                     allreduce_time = sum(model.allreduce_time_array)
 
-                    # print('model.engine_timers.backward_inner_timers = ', backward_time)
-                    # print('model.engine_timers.backward_reduce_timers = ', allreduce_time)
+                    
                     
                     print('per_batch_time = ', batch_time_end/ave_rounds)
                     # print('per_iteration_io = ', sum(iteration_io_time_array)/ave_rounds)
@@ -1243,9 +1207,7 @@ def main():
                     # print('per_allreduce_time = ', allreduce_time/ave_rounds)
                     
                     print('per_ide_time = ', per_iteration_backward_allreduce_time - per_backward_time)
-                            
-                    
-                    
+
                     iteration_io_time_array = []
                     iteration_backward_time_array = []
                     iteration_forward_time_array = []
@@ -1255,21 +1217,6 @@ def main():
                     batch_time_start = time.time()
 
 
-                    # # Backward Time and Allreduce Time
-                    # backward_time = sum(model.backward_time_array)
-                    # allreduce_time = sum(model.allreduce_time_array)
-
-                    # print('model.engine_timers.backward_inner_timers = ', backward_time)
-                    # print('model.engine_timers.backward_reduce_timers = ', allreduce_time)
-
-                    # print('model.backward_time = ', backward_time)
-                    # print('model.allreduce_time = ', allreduce_time)
-                    
-                    # model.backward_time_array = []
-                    # model.allreduce_time_array = []
-                    
-                    # print('model.engine_timers.backward_inner_timers = ', model.engine_timers.backward_inner_timers)
-                    # print('model.engine_timers.backward_reduce_timers = ', model.engine_timers.backward_reduce_timers)
                 end = time.time()
     
         if torch.distributed.get_rank() == 0:

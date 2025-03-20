@@ -56,10 +56,9 @@ from torchsnapshot import Snapshot, Stateful
 import uuid
 from typing import Dict, Optional
 
-import sys
-sys.path.append("../../") 
-import delaycheck_lib as delaycheck_lib
-import delaycheck_lib.utils
+
+import tsnapshot_lib as delaycheck_lib
+import tsnapshot_lib.utils
 
 
 # logging.basicConfig(
@@ -929,21 +928,10 @@ def main():
     # 
     # Create a shared memory buffer to save the checkpoint in CPU
     # if dist.get_rank() == 0:
-    if (dist.get_rank()) % torch.cuda.device_count() == 0:
-        _name = 'parameter_buffer'
-        shm = shared_memory.SharedMemory(create=True, size=1024*1024*1024*100, name =_name)
+    
         
         
-        # _name_backup = 'parameter_buffer_backup'
-        # shm_backup = shared_memory.SharedMemory(create=True, size=1024*1024*1024*100, name =_name_backup)
-
-        # Create a NumPy array and store it in shared memory
-        # array = np.ndarray((10,), dtype=np.float32, buffer=shm.buf)
-        # array[:] = np.arange(10)
-
-        # resource_tracker.unregister(shm.name, 'shared_memory')
-        # resource_tracker.register(shm.name, 'shared_memory')
-        # print(array)
+        
     
     # return_items = [engine, engine.optimizer, engine.training_dataloader, engine.lr_scheduler]
     # model = engine
@@ -1238,17 +1226,7 @@ def main():
 
                 if (step + 1) % (
                         ave_rounds) == 0 and torch.distributed.get_rank() == 0:
-                    
-                    # numel_count = 0
-                    # numel_count_model = 0
-                    # for key, value in optimizer.state.items():
-                    #     numel_count += value['exp_avg'].numel() + value['exp_avg_sq'].numel()
-                    # for key, value in model.state_dict().items():
-                    #     numel_count_model += value.numel()
-                    
-                    # print("Size of Optimizer Size:", numel_count)
-                    # print("Size of Model State:", numel_count_model)
-                    
+
                     print(
                         ' At step {}, averaged throughput for {} rounds is: {} Samples/s'
                         .format(
@@ -1266,8 +1244,7 @@ def main():
                     backward_time = sum(model.backward_time_array)
                     allreduce_time = sum(model.allreduce_time_array)
 
-                    # print('model.engine_timers.backward_inner_timers = ', backward_time)
-                    # print('model.engine_timers.backward_reduce_timers = ', allreduce_time)
+                    
                     
                     print('per_batch_time = ', batch_time_end/ave_rounds)
                     # print('per_iteration_io = ', sum(iteration_io_time_array)/ave_rounds)

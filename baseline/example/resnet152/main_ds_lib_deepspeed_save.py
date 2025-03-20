@@ -30,10 +30,9 @@ from multiprocessing import shared_memory
 
 from transformers.utils import logging
 
-import sys
-sys.path.append("../../") 
-import delaycheck_lib as delaycheck_lib
-import delaycheck_lib.utils
+
+import deepspeed_naive_lib as deepspeed_naive_lib
+import deepspeed_naive_lib.utils
 
 logging.set_verbosity_info()
 logger = logging.get_logger("transformers")
@@ -251,29 +250,8 @@ def main_worker(gpu, ngpus_per_node, args):
         # existing_shm.unlink()
         shm = shared_memory.SharedMemory(create=True, size=1024*1024*1024*100, name =_name)
         
-        # _name_backup = 'parameter_buffer_backup'
-        # shm_backup = shared_memory.SharedMemory(create=True, size=1024*1024*1024*100, name =_name_backup)
-
-        # Create a NumPy array and store it in shared memory
-        # array = np.ndarray((10,), dtype=np.float32, buffer=shm.buf)
-        # array[:] = np.arange(10)
-
-        # resource_tracker.unregister(shm.name, 'shared_memory')
-        # resource_tracker.register(shm.name, 'shared_memory')
-        # print(array)
-
-
-    # Initialize DeepSpeed for the model
-    # model, optimizer, _, _ = deepspeed.initialize(
-    #     model = model,
-    #     optimizer = optimizer,
-    #     args = args,
-    #     lr_scheduler = None,#scheduler,
-    #     dist_init_required=True
-    # )
-    
-    
-    model, optimizer, _, _ = delaycheck_lib.initialize(
+ 
+    model, optimizer, _, _ = deepspeed_naive_lib.initialize(
         model = model,
         optimizer = optimizer,
         args = args,
@@ -457,23 +435,16 @@ def train(train_loader, model, criterion, optimizer, epoch, device, args):
                         # 'optimizer' : optimizer.state_dict(),
                         # 'scheduler' : scheduler.state_dict()
                     }
-                    delaycheck_lib.utils.save_checkpoint_iteration_deepspeed(model, state, epoch + 1,  idx)
+                    deepspeed_naive_lib.utils.save_checkpoint_iteration_deepspeed(model, state, epoch + 1,  idx)
                 
                 if idx % args.print_freq == 0 and dist.get_rank()==0:
                     
-                    # numel_count = 0
-                    # numel_count_model = 0
-                    # for key, value in optimizer.state.items():
-                    #     numel_count += value['momentum_buffer'].numel()
-                    # for key, value in model.state_dict().items():
-                    #     numel_count_model += value.numel()
+
                     
-                    # print("Size of Optimizer Size:", numel_count)
-                    # print("Size of Model State:", numel_count_model)
+                    
                     batch_time_end = time.time() - batch_time_start
 
-                    # print('model.engine_timers.backward_inner_timers = ', backward_time)
-                    # print('model.engine_timers.backward_reduce_timers = ', allreduce_time)
+                    
                     
                     print('per_batch_time = ', batch_time_end/args.print_freq)
                     
@@ -540,7 +511,7 @@ def train(train_loader, model, criterion, optimizer, epoch, device, args):
                     # 'optimizer' : optimizer.state_dict(),
                     # 'scheduler' : scheduler.state_dict()
                 }
-                delaycheck_lib.utils.save_checkpoint_iteration_deepspeed(model, state, epoch + 1,  idx)
+                deepspeed_naive_lib.utils.save_checkpoint_iteration_deepspeed(model, state, epoch + 1,  idx)
             
             
 

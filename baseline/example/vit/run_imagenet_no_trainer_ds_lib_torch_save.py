@@ -59,10 +59,9 @@ import torch.nn.functional as F
 import torch.optim as optim
 import torch.utils.data.distributed
 
-import sys
-sys.path.append("../../") 
-import delaycheck_lib as delaycheck_lib
-import delaycheck_lib.utils
+
+import deepspeed_naive_lib as deepspeed_naive_lib
+import deepspeed_naive_lib.utils
 
 import os
 import math
@@ -733,38 +732,21 @@ def main():
         _name = 'parameter_buffer'
         shm = shared_memory.SharedMemory(create=True, size=1024*1024*1024*100, name =_name)
 
-        # _name_backup = 'parameter_buffer_backup'
-        # shm_backup = shared_memory.SharedMemory(create=True, size=1024*1024*1024*100, name =_name_backup)
-
-        # Create a NumPy array and store it in shared memory
-        # array = np.ndarray((10,), dtype=np.float32, buffer=shm.buf)
-        # array[:] = np.arange(10)
-
-        # resource_tracker.unregister(shm.name, 'shared_memory')
-        # resource_tracker.register(shm.name, 'shared_memory')
-        # print(array)
+        
 
 
     if torch.distributed.get_rank() == 0:
         print('Prepare accelerator')
     
-    # Prepare everything with our `accelerator`.
-    # model, optimizer, train_dataloader, eval_dataloader, lr_scheduler = accelerator.prepare(
-    #     model, optimizer, train_dataloader, eval_dataloader, lr_scheduler
-    # )
-    
+
     ### model to cuda
     device = torch.device("cuda" if torch.cuda.is_available() and not args.no_cuda else "cpu")
     model.to(device)
 
-    # model, optimizer, _, _ = deepspeed.initialize(
-    #     args=args,
-    #     model=model,
-    #     model_parameters=optimizer_grouped_parameters,
-    #     dist_init_required=True)
 
 
-    model, optimizer, _, _ = delaycheck_lib.initialize(
+
+    model, optimizer, _, _ = deepspeed_naive_lib.initialize(
         args=args,
         model=model,
         model_parameters=optimizer_grouped_parameters,
@@ -777,17 +759,6 @@ def main():
     if torch.distributed.get_rank() == 0:
         print('state_time = ', time.time() - state_time)
 
-    
-    
-    # state = hvd.elastic.TorchState(model=model,
-    #                                optimizer=optimizer,
-    #                                train_sampler=train_sampler,
-    #                                # val_sampler=val_sampler,
-    #                                epoch=resume_from_epoch,
-    #                                batch=0)
-
-    
-    # optimizer._state = state
     
     if torch.distributed.get_rank()==0:
         print('state_time = ', time.time() - state_time)
@@ -1013,25 +984,14 @@ def main():
                             'state_dict': model.state_dict(),
                             'optimizer' : optimizer.state_dict(),
                         }
-                        delaycheck_lib.utils.save_checkpoint_iteration(state, epoch + 1,  completed_steps)
+                        deepspeed_naive_lib.utils.save_checkpoint_iteration(state, epoch + 1,  completed_steps)
                     
 
-                # print('optimizer.zero_grad()')
-                # t.update(1)
+
                 
                 if completed_steps % print_steps == 0 and torch.distributed.get_rank()==0:
                     
                     print(f'-----------------Step=%d----------------'%step)
-                    # numel_count = 0
-                    # numel_count_model = 0
-                    # for key, value in optimizer.state.items():
-                    #     numel_count += value['exp_avg'].numel() + value['exp_avg_sq'].numel()
-                    # for key, value in model.state_dict().items():
-                    #     numel_count_model += value.numel()
-                    
-                    # print("Size of Optimizer Size:", numel_count)
-                    # print("Size of Model State:", numel_count_model)
-                    
                     forward_backforward_time =sum(forward_backforward_time_array)
                     forward_time     = sum(forward_time_array)
                     backward_time    = sum(backward_time_array)
@@ -1049,8 +1009,7 @@ def main():
                     
                     batch_time_end = time.time() - batch_time_start
 
-                    # print('model.engine_timers.backward_inner_timers = ', backward_time)
-                    # print('model.engine_timers.backward_reduce_timers = ', allreduce_time)
+                    
                     
                     print('per_batch_time = ', batch_time_end/print_steps)
                     

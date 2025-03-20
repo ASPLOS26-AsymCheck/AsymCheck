@@ -105,10 +105,9 @@ import torch.distributed as dist
 from tqdm import tqdm
 from multiprocessing import shared_memory
 
-import sys
-sys.path.append("../../") 
-import delaycheck_lib as delaycheck_lib
-import delaycheck_lib.utils
+
+import deepspeed_naive_lib as deepspeed_naive_lib
+import deepspeed_naive_lib.utils
 
 try:
     mp.set_start_method('spawn')
@@ -728,7 +727,7 @@ def full_train():
                             'state_dict': model.state_dict(),
                             'optimizer' : optimizer.state_dict(),
                         }
-                    delaycheck_lib.utils.save_checkpoint_iteration(state, epoch + 1,  completed_steps)
+                    deepspeed_naive_lib.utils.save_checkpoint_iteration(state, epoch + 1,  completed_steps)
                 batch_time_array.append(time.time()-e_time)
                 if step >= 30: 
                     iteration_time.update(time.time() - end)
@@ -760,8 +759,7 @@ def full_train():
                     
                     batch_time_end = time.time() - batch_time_start
 
-                    # print('model.engine_timers.backward_inner_timers = ', backward_time)
-                    # print('model.engine_timers.backward_reduce_timers = ', allreduce_time)
+                    
                     
                     print('per_batch_time = ', batch_time_end/print_steps)
                     
@@ -1347,17 +1345,9 @@ if __name__ == "__main__":
         _optimizer_shm_backup = shared_memory.SharedMemory(create = True, size = 1024*1024*1024*100, name = _name_optimizer_backup)
 
 
-
-        # Create a NumPy array and store it in shared memory
-        # array = np.ndarray((10,), dtype=np.float32, buffer=shm.buf)
-        # array[:] = np.arange(10)
-
-        # resource_tracker.unregister(shm.name, 'shared_memory')
-        # resource_tracker.register(shm.name, 'shared_memory')
-        # print(array)
     
     
-    model, optimizer, _, _ = delaycheck_lib.initialize(
+    model, optimizer, _, _ = deepspeed_naive_lib.initialize(
         args=args,
         model=model,
         model_parameters=optimizer_grouped_parameters,

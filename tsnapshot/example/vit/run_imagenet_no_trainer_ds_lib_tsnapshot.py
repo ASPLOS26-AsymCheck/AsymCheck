@@ -120,10 +120,9 @@ import time
 import timeit
 import numpy as np
 
-import sys
-sys.path.append("../../") 
-import delaycheck_lib as delaycheck_lib
-import delaycheck_lib.utils
+
+import tsnapshot_lib as tsnapshot_lib
+import tsnapshot_lib.utils
 
 
 # try:
@@ -131,9 +130,6 @@ import delaycheck_lib.utils
 # except RuntimeError:
 #     pass
 
-
-# Will error if the minimal version of Transformers is not installed. Remove at your own risks.
-# check_min_version("4.43.0.dev0")
 
 # logger = get_logger(__name__)
 
@@ -769,16 +765,7 @@ def main():
         _name = 'parameter_buffer'
         shm = shared_memory.SharedMemory(create=True, size=1024*1024*1024*100, name =_name)
 
-        # _name_backup = 'parameter_buffer_backup'
-        # shm_backup = shared_memory.SharedMemory(create=True, size=1024*1024*1024*100, name =_name_backup)
-
-        # Create a NumPy array and store it in shared memory
-        # array = np.ndarray((10,), dtype=np.float32, buffer=shm.buf)
-        # array[:] = np.arange(10)
-
-        # resource_tracker.unregister(shm.name, 'shared_memory')
-        # resource_tracker.register(shm.name, 'shared_memory')
-        # print(array)
+        
 
 
     if torch.distributed.get_rank() == 0:
@@ -800,7 +787,7 @@ def main():
     #     dist_init_required=True)
 
 
-    model, optimizer, _, _ = delaycheck_lib.initialize(
+    model, optimizer, _, _ = tsnapshot_lib.initialize(
         args=args,
         model=model,
         model_parameters=optimizer_grouped_parameters,
@@ -1054,7 +1041,7 @@ def main():
                     }
                     
                     checkpoint_save_work_dir = 'vit_checkpoint'
-                    delaycheck_lib.utils.save_checkpoint_in_disk_snapshot(progress_save, app_state, checkpoint_save_work_dir)
+                    tsnapshot_lib.utils.save_checkpoint_in_disk_snapshot(progress_save, app_state, checkpoint_save_work_dir)
                     
                 # print('optimizer.zero_grad()')
                 # t.update(1)
@@ -1085,8 +1072,7 @@ def main():
                     backward_time = sum(model.backward_time_array)
                     allreduce_time = sum(model.allreduce_time_array)
 
-                    # print('model.engine_timers.backward_inner_timers = ', backward_time)
-                    # print('model.engine_timers.backward_reduce_timers = ', allreduce_time)
+                    
                     
                     print('per_batch_time = ', batch_time_end/print_steps)
                     

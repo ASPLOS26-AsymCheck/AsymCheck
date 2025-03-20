@@ -37,10 +37,9 @@ import torchsnapshot
 from typing import Dict, Optional
 from torchsnapshot import Snapshot, Stateful
 
-import sys
-sys.path.append("../../") 
-import delaycheck_lib as delaycheck_lib
-import delaycheck_lib.utils
+
+import tsnapshot_lib as tsnapshot_lib
+import tsnapshot_lib.utils
 
 
 logging.set_verbosity_info()
@@ -254,30 +253,9 @@ def main_worker(gpu, ngpus_per_node, args):
     if dist.get_rank() % torch.cuda.device_count() == 0:
         _name = 'parameter_buffer'
         shm = shared_memory.SharedMemory(create=True, size=1024*1024*1024*100, name =_name)
-        
-        # _name_backup = 'parameter_buffer_backup'
-        # shm_backup = shared_memory.SharedMemory(create=True, size=1024*1024*1024*100, name =_name_backup)
 
-        # Create a NumPy array and store it in shared memory
-        # array = np.ndarray((10,), dtype=np.float32, buffer=shm.buf)
-        # array[:] = np.arange(10)
-
-        # resource_tracker.unregister(shm.name, 'shared_memory')
-        # resource_tracker.register(shm.name, 'shared_memory')
-        # print(array)
-
-
-    # Initialize DeepSpeed for the model
-    # model, optimizer, _, _ = deepspeed.initialize(
-    #     model = model,
-    #     optimizer = optimizer,
-    #     args = args,
-    #     lr_scheduler = None,#scheduler,
-    #     dist_init_required=True
-    # )
     
-    
-    model, optimizer, _, _ = delaycheck_lib.initialize(
+    model, optimizer, _, _ = tsnapshot_lib.initialize(
         model = model,
         optimizer = optimizer,
         args = args,
@@ -464,7 +442,7 @@ def train(train_loader, model, criterion, optimizer, epoch, device, args):
                     snapshot: Optional[Snapshot] = None
                     checkpoint_save_work_dir = './resnet_checkpoint'
                     
-                    delaycheck_lib.utils.save_checkpoint_in_disk_snapshot(progress_save, app_state, checkpoint_save_work_dir)
+                    tsnapshot_lib.utils.save_checkpoint_in_disk_snapshot(progress_save, app_state, checkpoint_save_work_dir)
 
                 if idx % args.print_freq == 0 and dist.get_rank()==0:
 
@@ -472,8 +450,7 @@ def train(train_loader, model, criterion, optimizer, epoch, device, args):
                     backward_time = sum(model.backward_time_array)
                     allreduce_time = sum(model.allreduce_time_array)
 
-                    # print('model.engine_timers.backward_inner_timers = ', backward_time)
-                    # print('model.engine_timers.backward_reduce_timers = ', allreduce_time)
+                    
                     
                     print('per_batch_time = ', batch_time_end/args.print_freq)
                     
@@ -545,7 +522,7 @@ def train(train_loader, model, criterion, optimizer, epoch, device, args):
                 snapshot: Optional[Snapshot] = None
                 checkpoint_save_work_dir = './resnet_checkpoint'
                 
-                delaycheck_lib.utils.save_checkpoint_in_disk_snapshot(progress_save, app_state, checkpoint_save_work_dir)
+                tsnapshot_lib.utils.save_checkpoint_in_disk_snapshot(progress_save, app_state, checkpoint_save_work_dir)
             
             
 

@@ -766,8 +766,7 @@ def full_train():
                     backward_time = sum(model.backward_time_array)
                     allreduce_time = sum(model.allreduce_time_array)
 
-                    # print('model.engine_timers.backward_inner_timers = ', backward_time)
-                    # print('model.engine_timers.backward_reduce_timers = ', allreduce_time)
+                    
                     
                     print('per_batch_time = ', batch_time_end/print_steps)
                     
