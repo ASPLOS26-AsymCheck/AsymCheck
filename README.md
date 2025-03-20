@@ -1,6 +1,8 @@
 # DelayCheck: Delaying Checkpointing for Efficient Modern Distributed Training
 
-**Delaying** is a new checkpointing mechanism for efficient modern distributed training,  which delays and partitions the checkpointing operation until the forward pass ends and the backward pass begins, so as to reduce the training stalls for efficient modern distributed training. Further, we also propose an optimized on-disk checkpointing scheme and a fast failure recovery scheme to enhance the performance of DelayCheck.
+**Delaying** is a new checkpointing mechanism for efficient modern distributed training,
+which delays and partitions the checkpointing operation until the forward pass ends and the backward pass begins,so as to reduce the training stalls.
+Further, **Delaying** also proposes an optimized on-disk checkpointing scheme and a fast failure recovery scheme to enhance the performance of **Delaying**.
 
 # Implementation
 
@@ -16,9 +18,6 @@ The system architecture of **DelayCheck** is as follows:
 <center class ='img'>
 <img src="checkpoint_workflow_.jpg" width="600px" />
 </center>
-
-
-
 
 
 # Installation
@@ -41,7 +40,7 @@ python setup.py
 
 ## **Quick start**
 
-Codes of seven types of checkpointing methods are provided, as well as no-checkpoint Baseline. They are DataStates-LLM, FastPersist, Gemini, DeepFreeze, CheckFreq, TorchSnapshot and DelayCheck. For each methods, there are codes for four models, which are GPT2, BERT, RoBERT, BLOOM, ResNet and VIT.
+We provide codes for seven types of checkpointing solutions. They are DataStates-LLM, FastPersist, Gemini, DeepFreeze, CheckFreq, TorchSnapshot and DelayCheck. For each methods, there are codes for six models, which are GPT2, BERT, RoBERT, BLOOM, ResNet and VIT.
 
 For example, to run gpt2-10B with DelayCheck:
 
@@ -55,7 +54,7 @@ bash run_clm_no_trainer_deepspeed_layer_10B_delay.sh
 ## **Referred Datasets**
 
 
-- Wikitex-103: [https://huggingface.co/datasets/wikitext](https://huggingface.co/datasets/wikitext)
+- Wikitex-103/2: [https://huggingface.co/datasets/wikitext](https://huggingface.co/datasets/wikitext)
 - SQuAD: [https://rajpurkar.github.io/SQuAD-explorer/](https://rajpurkar.github.io/SQuAD-explorer/)
 - ImageNet: [https://www.image-net.org/](https://www.image-net.org/)
 
