@@ -1412,11 +1412,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
                 grad_partitions = self.__avg_scatter_grads(self.params_in_ipg_bucket)
 
             # 
-            # Asynchronous refresh checkpoint to remote persistent storage
-            def save_ckpt_to_remote_disk():
-
-
-                pass
+            
             
 
 

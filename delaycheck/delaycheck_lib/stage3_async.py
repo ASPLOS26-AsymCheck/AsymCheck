@@ -306,26 +306,10 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         
         self.reduce_bucket_size = int(reduce_bucket_size)
         
-        # 8GPU, BERT-large, 24.28=Samples/s, model.backward_time=2.10, model.allreduce_time=4.47
-        # self.reduce_bucket_size = 10000000000
         
-        # 8GPU, BERT-large, 24.20=Samples/s, model.backward_time=2.11, model.allreduce_time=4.47
-        # self.reduce_bucket_size = 5000000000
+        
+        
 
-        # 8GPU, BERT-large, 24.41=Samples/s, model.backward_time=2.12, model.allreduce_time=4.4
-        # self.reduce_bucket_size = 1000000000
-
-        # 8GPU, BERT-large, 26.81=Samples/s, model.backward_time=2.1, model.allreduce_time=3.44
-        # self.reduce_bucket_size = 200000000
-
-        # 2.07it/s, 
-        # 8GPU, Resnet-152, 0.553, 0.568
-        # 8GPU, BERT-large, 30.54=Samples/s, model.backward_time=3.67, model.allreduce_time=0.672
-        # self.reduce_bucket_size = 20000000
-
-        # 2.14it/s
-        # 8GPU,  Resnet-152, 0.573, 0.609
-        # 8GPU, BERT-large, 31.30=Samples/s, model.backward_time=3.69, model.allreduce_time=0.48
         # self.reduce_bucket_size = 10000000
 
         # 8GPU, Resnet-152, 0.583, 0.573
@@ -341,8 +325,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         # self.reduce_bucket_size = 5000000000
         
 
-        # 8GPU, BERT-large, 33.13=Samples/s, model.backward_time=3.40,model.allreduce_time=0.209
-        # self.reduce_bucket_size = 100000
+        
 
         # 
         print('Initialize shared memory!!!')
@@ -1611,11 +1594,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
                 grad_partitions = self.__avg_scatter_grads(self.params_in_ipg_bucket)
 
             # 
-            # Asynchronous refresh checkpoint to remote persistent storage
-            def save_ckpt_to_remote_disk():
-
-
-                pass
+            
             # 
             self.partition_grads(self.params_in_ipg_bucket, grad_partitions)
             

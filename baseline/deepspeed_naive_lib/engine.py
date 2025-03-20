@@ -400,7 +400,7 @@ class DeepSpeedEngine(Module):
         
         
         # 
-        # 配置具体的优化器, 
+        
         if has_optimizer:
             self._configure_optimizer(optimizer, model_parameters)
             self._configure_lr_scheduler()
@@ -2185,7 +2185,7 @@ class DeepSpeedEngine(Module):
             else:
                 loss.backward(retain_graph=retain_graph)
 
-        # 表示反向传播的内部执行时间, 
+        
         self._stop_timers(self.engine_timers.backward_inner_timers)
         
         b_time = time.time()
@@ -2578,7 +2578,7 @@ class DeepSpeedEngine(Module):
     def allreduce_and_copy(self, small_bucket, dp_group, dp_world_size=None):
         allreduced = self.allreduce_bucket(small_bucket, dp_group, dp_world_size)
         
-        # 同步完成, 将同步结果加入到Buffer
+        
         for buf, synced in zip(small_bucket, self.unflatten(allreduced, small_bucket)):
             buf.copy_(synced)
     

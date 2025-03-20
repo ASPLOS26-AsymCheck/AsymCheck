@@ -219,7 +219,7 @@ def initialize(args=None,
         if config_class.hybrid_engine.enabled:
             
             print('DeepSpeedHybridEngine')
-            # 混合并行引擎
+            
             engine = DeepSpeedHybridEngine(args=args,
                                            model=model,
                                            optimizer=optimizer,
@@ -234,7 +234,7 @@ def initialize(args=None,
         else:
             
             print('------------------DeepSpeedEngine----------------------')
-            # 数据并行引擎
+            
             engine = DeepSpeedEngine(args=args,
                                      model=model,
                                      optimizer=optimizer,
@@ -253,7 +253,7 @@ def initialize(args=None,
         config_class = DeepSpeedConfig(config, mpu)
         
         print('PipelineEngine')
-        # 流水线并行引擎
+        
         engine = PipelineEngine(args=args,
                                 model=model,
                                 optimizer=optimizer,

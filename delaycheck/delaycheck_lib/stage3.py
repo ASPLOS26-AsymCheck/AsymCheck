@@ -296,8 +296,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         
         self.reduce_bucket_size = int(reduce_bucket_size)
 
-        # 8GPU, BERT-large, 24.28=Samples/s, model.backward_time=2.10, model.allreduce_time=4.47
-        # self.reduce_bucket_size = 10000000000
+        
 
         # 8GPU, BERT-large, 24.20=Samples/s, model.backward_time=2.11, model.allreduce_time=4.47
         # self.reduce_bucket_size = 5000000000
@@ -318,32 +317,20 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         # 8GPU,  Resnet-152, 0.573, 0.609
         # 8GPU, BERT-large, 31.30=Samples/s, model.backward_time=3.69, model.allreduce_time=0.48
 
-        # 20240928, 
-        # self.reduce_bucket_size = 10000000
+        
 
-        # 8GPU, Resnet-152, 0.583, 0.573
-        # 8GPU, BERT-large, 32.30 Samples/s, model.backward_time=3.85, model.allreduce_time=0.34
-        # self.reduce_bucket_size = 500000000
+        
 
         # 
-        # ResNet-152, 
-        # Parameters = 60000000
-        # self.reduce_bucket_size = 2000000
-        # self.reduce_bucket_size = 5000000
+        
 
         # 
-        # BERT-large, 
-        # Parameters = 340000000
-        # self.reduce_bucket_size = 1000000
+        
         # self.reduce_bucket_size = 100000
 
-        # 
-        # ViT-large, 
-        # Parameters = 340000000
+        
 
-        # 
-        # ViT-large, 
-        # Parameters = 340000000
+        
 
         # 
         # The more Samples processed per unit time, the greater the throughput  
@@ -351,8 +338,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         # self.reduce_bucket_size = 1000000
 
         # 
-        # 8GPU, BERT-large, 33.13=Samples/s, model.backward_time=3.40,model.allreduce_time=0.209
-        # self.reduce_bucket_size = 100000
+        
 
         # self.reduce_bucket_size = 100000
 
@@ -1515,11 +1501,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
                 grad_partitions = self.__avg_scatter_grads(self.params_in_ipg_bucket)
 
             # 
-            # Asynchronous refresh checkpoint to remote persistent storage
-            def save_ckpt_to_remote_disk():
-
-
-                pass
+            
             
 
 
@@ -2291,12 +2273,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         """
 
         self.elements_copy_to_memory.clear()
-        
-
-        
-        
-
-        self.parameter_cpu = None
+    self.parameter_cpu = None
 
 
 

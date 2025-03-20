@@ -925,10 +925,7 @@ def main():
                     
                         
                         
-                        # dict_keys(['zero_stage', 'loss_scaler', 'dynamic_loss_scale', 'overflow', 
-                        # 'partition_count', 'optimizer_state_dict', 'fp32_flat_groups'])
-
-                        # print(optimizer.state_dict())
+                        
 
                         s_time = time.time()
 

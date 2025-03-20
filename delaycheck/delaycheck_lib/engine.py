@@ -2661,12 +2661,7 @@ class DeepSpeedEngine(Module):
 
         # print('--------------_reduce_non_expert_gradients----------------')
         
-        
-
-        
-        
-
-        split_sparse_tensor_buckets, split_dense_tensor_buckets = split_half_float_double_sparse(grads)
+    split_sparse_tensor_buckets, split_dense_tensor_buckets = split_half_float_double_sparse(grads)
 
         # Determine whether to use pipeline parallelism
         if self.pipeline_parallelism:

@@ -972,29 +972,7 @@ def main():
 
 
                 # 
-                # if dist.get_rank()==0:
-                #     ckpt_path = "./datastates_ckpt/datastates-ckpt-"+str(dist.get_rank())+"-gpt2-large"+".pt"
-                #     # ckpt_path = "./datastates_ckpt/datastates-ckpt-"+str(dist.get_rank())+".pt"
-                #     ckpt_obj = {
-                #         'epoch': epoch + 1,
-                #         'iteration': step + 1,
-
-                #         'state_dict': model_small.state_dict(),
-                #         'state_dict_1': model_small.state_dict(),                        
-                #         'state_dict_2': model_small.state_dict(),
-                        
-                #         # 'state_dict': model_copy.state_dict(),                     
-                #         # 'state_dict': model_copy, 
-                #         # 'optimizer' : optimizer.state_dict()['optimizer_state_dict'], 
-                #         # 'optimizer' : optimizer.state_dict(), 
-                #         # 'scheduler' : scheduler.state_dict()
-                #     }
-
-                #     # print(f"Engine initalized.. Going to checkpoint now...")       
-                #     ckpt_engine.save(state_dict=ckpt_obj, path=ckpt_path)                    
-                #     # ckpt_engine.save(state_dict=ckpt_obj, path=None)
-                #     # print("Async save operation launched")
-                #     ckpt_engine.wait()
+                
                 
 
 
@@ -1008,10 +986,9 @@ def main():
                     
                     
                     
-                    # dict_keys(['zero_stage', 'loss_scaler', 'dynamic_loss_scale', 'overflow', 
-                    # 'partition_count', 'optimizer_state_dict', 'fp32_flat_groups'])
+                    
 
-                    # print(optimizer.state_dict())
+                    )
 
                     s_time = time.time()
 

@@ -1174,61 +1174,7 @@ def main():
         if torch.distributed.get_rank() == 0:
             logger.info(f"epoch {epoch}: {eval_loss}")
 
-        # if args.with_tracking:
-        #     accelerator.log(
-        #         {
-        #             "accuracy": eval_metric,
-        #             "train_loss": total_loss.item() / len(train_dataloader),
-        #             "epoch": epoch,
-        #             "step": completed_steps,
-        #         },
-        #         step=completed_steps,
-        #     )
 
-        # if args.push_to_hub and epoch < args.num_train_epochs - 1:
-        #     accelerator.wait_for_everyone()
-        #     unwrapped_model = accelerator.unwrap_model(model)
-        #     unwrapped_model.save_pretrained(
-        #         args.output_dir, is_main_process=accelerator.is_main_process, save_function=accelerator.save
-        #     )
-        #     if accelerator.is_main_process:
-        #         image_processor.save_pretrained(args.output_dir)
-        #         api.upload_folder(
-        #             commit_message=f"Training in progress epoch {epoch}",
-        #             folder_path=args.output_dir,
-        #             repo_id=repo_id,
-        #             repo_type="model",
-        #             token=args.hub_token,
-        #         )
-
-        # if args.checkpointing_steps == "epoch":
-        #     output_dir = f"epoch_{epoch}"
-        #     if args.output_dir is not None:
-        #         output_dir = os.path.join(args.output_dir, output_dir)
-        #     accelerator.save_state(output_dir)
-
-    # if args.with_tracking:
-    #     accelerator.end_training()
-
-    # if args.output_dir is not None:
-    #     accelerator.wait_for_everyone()
-    #     unwrapped_model = accelerator.unwrap_model(model)
-    #     unwrapped_model.save_pretrained(
-    #         args.output_dir, is_main_process=accelerator.is_main_process, save_function=accelerator.save
-    #     )
-    #     if accelerator.is_main_process:
-    #         image_processor.save_pretrained(args.output_dir)
-    #         if args.push_to_hub:
-    #             api.upload_folder(
-    #                 commit_message="End of training",
-    #                 folder_path=args.output_dir,
-    #                 repo_id=repo_id,
-    #                 repo_type="model",
-    #                 token=args.hub_token,
-    #             )
-    #         all_results = {f"eval_{k}": v for k, v in eval_metric.items()}
-    #         with open(os.path.join(args.output_dir, "all_results.json"), "w") as f:
-    #             json.dump(all_results, f)
     if torch.distributed.get_rank() == 0:
         print("Final_Iteration_Time = ", iteration_time.avg)
         with open("./iteartion_time_bert.txt", "w+") as fp:

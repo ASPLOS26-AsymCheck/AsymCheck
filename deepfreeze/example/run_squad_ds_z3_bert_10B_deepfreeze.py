@@ -937,7 +937,7 @@ def full_train():
                 # dict_keys(['zero_stage', 'loss_scaler', 'dynamic_loss_scale', 'overflow', 
                 # 'partition_count', 'optimizer_state_dict', 'fp32_flat_groups'])
 
-                # print(optimizer.state_dict())
+                )
 
                 s_time = time.time()
 
@@ -1076,18 +1076,10 @@ def save_checkpoint_in_memory(epoch):
     if dist.get_rank() == 0:
         # _state_dict_cpu = {}
         
-        # filepath = args.checkpoint_format.format(epoch=epoch + 1)
-        # state = {
-        #     'model': model.state_dict(),
-        #     'optimizer': optimizer.state_dict(),
-        # }
-        # torch.save(state, filepath)
+        
 
         for key, value in model.state_dict().items():
-            # 0.4139289855957031
-            # _state_dict_cpu[key]=value.cpu()
             
-            # 0.24108409881591797
             _state_dict_cpu[key].copy_(value.view(value.numel()), non_blocking=True)
 
     return

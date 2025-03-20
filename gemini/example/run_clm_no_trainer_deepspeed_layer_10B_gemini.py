@@ -1006,9 +1006,7 @@ def main():
                 if dist.get_rank() ==0 and step % 10==0:
                     
 
-                    # print('Average Forward Time = ', sum(forworad_time_array)/10)
-                    # print('Average Backward Time = ', sum(backworad_time_array)/10)
-                    # print('Average Step Time = ', sum(step_time_array)/10)
+                    
                     
                     print('Average Forward Time = ', ft)
                     print('Average Backward Time = ', bt)

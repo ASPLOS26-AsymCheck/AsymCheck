@@ -399,7 +399,7 @@ class DeepSpeedEngine(Module):
             print('start_checkpoint_in_memory!')
         
         # 
-        # 配置具体的优化器, 
+        
         if has_optimizer:
             self._configure_optimizer(optimizer, model_parameters)
             self._configure_lr_scheduler()
@@ -1964,7 +1964,7 @@ class DeepSpeedEngine(Module):
         return scaled_loss
     
     # 
-    20250228, 
+    
     # 前向传播计算激活值, 也需要参数的通信, 
     @instrument_w_nvtx
     def forward(self, *inputs, **kwargs):
@@ -2114,7 +2114,7 @@ class DeepSpeedEngine(Module):
 
             # print('self.is_gradient_accumulation_boundary()')
             # 
-            20250228, 
+            
             # 执行ZeRO-3的梯度Allreduce操作, 
             if self.zero_optimization_stage() == ZeroStageEnum.optimizer_states and hasattr(
                     self.optimizer, 'reduce_gradients'):
@@ -2130,7 +2130,7 @@ class DeepSpeedEngine(Module):
                 self.buffered_allreduce_fallback(grads=grads, elements_per_buffer=bucket_size)
     
     # 
-    20250228, 
+    
     # 执行损失函数和优化器的反向传播计算, 并执行梯度的Allreduce操作, 
     20240821, 
     # 
@@ -2201,19 +2201,15 @@ class DeepSpeedEngine(Module):
             else:
                 loss.backward(retain_graph=retain_graph)
 
-        # 表示反向传播的内部执行时间, 
+        
         self._stop_timers(self.engine_timers.backward_inner_timers)
         
         b_time = time.time()
         
         self.backward_time_array.append(b_time - s_time)
         
-        # 
+
         
-        
-        # 
-        20250228, 
-        # 反向传播结束执行梯度的Allreduce操作
         self._start_timers(self.engine_timers.backward_reduce_timers)
         if allreduce_gradients and self.enable_backward_allreduce:
             # Traditional code path that allreduces the module parameter grads, 
@@ -2598,7 +2594,7 @@ class DeepSpeedEngine(Module):
     def allreduce_and_copy(self, small_bucket, dp_group, dp_world_size=None):
         allreduced = self.allreduce_bucket(small_bucket, dp_group, dp_world_size)
         
-        # 同步完成, 将同步结果加入到Buffer
+        
         for buf, synced in zip(small_bucket, self.unflatten(allreduced, small_bucket)):
             buf.copy_(synced)
     
@@ -2664,11 +2660,7 @@ class DeepSpeedEngine(Module):
         # print('--------------_reduce_non_expert_gradients----------------')
         
         
-        # 判断grads的组成成分
-        
-        
-        
-        # 因为他的通信是异步的
+       
         
         
 
