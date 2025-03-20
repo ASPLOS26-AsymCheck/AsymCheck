@@ -432,7 +432,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         self._leaf_module_hooks = []
         self.create_reduce_and_remove_grad_hooks()
 
-        #exit(0)
+        
 
         # we may have a way of fusing dynamic scale. Do not support for now
         self.loss_scaler = CreateLossScaler(dtype=self.dtype,
@@ -1681,9 +1681,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         if len(small_bucket) > 0:
             self.allreduce_and_copy(small_bucket, rank=rank, log=log)
 
-    #############################################################################
-    #############################################################################
-    #############################################################################
+    
 
     # views the tensor as multiple partitions and returns
     # those partitions

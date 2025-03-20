@@ -75,7 +75,8 @@ def lcm(x, y):
 def move_to_cpu(tensor_list):
     for tensor in tensor_list:
         tensor.data = tensor.data.cpu()
-        
+
+
 def save_ckpt_to_disk(start_queue, module_queue, optimizer_queue, rank):
     save_dir = "./checkpoint/"
     while True:
@@ -388,10 +389,6 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         #     self.save_ckpt_to_disk_process = mp.Process(target=save_ckpt_to_disk, args=(self.start_queue, self.module_queue, self.optimizer_queue, dist.get_rank(),))
         #     self.save_ckpt_to_disk_process.start()
 
-        
-        
-        
-
         if self.all2all_process_group is not None:
             assert self.all2all_process_group is not None and self.reduce_scatter == True, "when enable all_to_all_reduce, reduce_scatter should also be enabled for data type checks."
 
@@ -507,8 +504,6 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         self._grad_acc_hooks = []
         self._leaf_module_hooks = []
         self.create_reduce_and_remove_grad_hooks()
-
-        #exit(0)
 
         # we may have a way of fusing dynamic scale. Do not support for now
         self.loss_scaler = CreateLossScaler(dtype=self.dtype,
@@ -1393,13 +1388,8 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
 
     def model_copy(self, rank, parameter_bucket):
         # print('parameter_bucket = ', parameter_bucket)
-                
         # self.model_stream.synchronize()
-        
-        # 
-        # if dist.get_rank()==0:
-        if 1==0:
-            
+        if False:            
             with torch.cuda.stream(self.model_stream):
             # with torch.cuda.stream(self.model_stream):
                 if self.elements_in_ipg_bucket<self.reduce_bucket_size:
@@ -1410,41 +1400,27 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
                 sum_elements_copy = sum(self.model_elements_copy_to_memory)
                 per_rank_copy = self.elements_in_ipg_bucket 
                 start = sum_elements_copy
-            
-                # 
-                # s_time = time.time()
-                # model_buffer_name = 'model_buffer'
-                # existing_model_shm = shared_memory.SharedMemory(name = model_buffer_name) 
-                # shape = (4, 1024*1024*1024*10) 
-                # model_shard_buffer = np.ndarray(shape, dtype=np.float16, buffer=existing_model_shm.buf)
-                # # print('load shared memory time = ', time.time() - s_time)
 
-                # model_shard_buffer[rank, start : start + per_rank_copy] = parameter_tensor_cpu.numpy()
-
-                # self.model_elements_copy_to_memory.append(per_rank_copy)
 
         pass
     
     
     def model_copy_async(self, rank, __ipg_parameter_bucket_flat_buffer):
 
-        if 0==0:
+        if True:
             model_stream = torch.cuda.Stream()
             with torch.cuda.stream(model_stream):
                 # if self.elements_in_ipg_bucket<self.reduce_bucket_size:
                 #     self.gpu_model_buffer = torch.empty(self.elements_in_ipg_bucket, dtype=torch.float32, device=self.device)
-                
                 parameter_bucket = __ipg_parameter_bucket_flat_buffer.narrow(0, 0, self.elements_in_ipg_bucket)
                 
                 parameter_tensor_cpu = parameter_bucket.to('cpu', non_blocking=True)
-                # if dist.get_rank()==0:
-                #     print('model numel = ', parameter_tensor_cpu.numel())
 
                 self.model_data.append(parameter_tensor_cpu)
                 # parameter_tensor_cpu = self.gpu_model_buffer.copy_(parameter_bucket, non_blocking=True).to('cpu', non_blocking=True)
-                # 
-
         pass
+    
+    
     def save_ckpt_to_disk_sync(self, model_tensor_cpu_array, parameter_tensor_cpu_array_1, parameter_tensor_cpu_array_2, rank):
         start_time = time.time()
         save_dir = "./checkpoint/"
@@ -1490,9 +1466,8 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
                 world_size = dist.get_world_size()
                 rank = dist.get_rank()
 
-                # 
+                # Synchronous
                 # self.model_copy_async(rank, self.__ipg_parameter_bucket_flat_buffer)
-                # 
 
                 grad_partitions = self.__avg_scatter_contiguous_grads(grad_bucket)
                 
@@ -1859,9 +1834,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         if len(small_bucket) > 0:
             self.allreduce_and_copy(small_bucket, rank=rank, log=log)
 
-    #############################################################################
-    #############################################################################
-    #############################################################################
+    
 
     # views the tensor as multiple partitions and returns
     # those partitions

@@ -1448,7 +1448,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         rank = dist.get_rank(self.dp_process_group)
         buffer_to_reduce.div_(world_sz / float(self.sequence_parallel_size))
         
-        # 梯度同步
+        
         dist.all_reduce(buffer_to_reduce, group=self.dp_process_group)
 
         if self.postscale_gradients and self.gradient_predivide_factor != world_sz:
@@ -1796,9 +1796,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         if len(small_bucket) > 0:
             self.allreduce_and_copy(small_bucket, rank=rank, log=log)
 
-    #############################################################################
-    #############################################################################
-    #############################################################################
+    
 
     # views the tensor as multiple partitions and returns
     # those partitions

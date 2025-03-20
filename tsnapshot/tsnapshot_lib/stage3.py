@@ -1528,7 +1528,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         rank = dist.get_rank(self.dp_process_group)
         buffer_to_reduce.div_(world_sz / float(self.sequence_parallel_size))
         
-        # 梯度同步
+        
         dist.all_reduce(buffer_to_reduce, group=self.dp_process_group)
 
         if self.postscale_gradients and self.gradient_predivide_factor != world_sz:
@@ -1883,9 +1883,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         if len(small_bucket) > 0:
             self.allreduce_and_copy(small_bucket, rank=rank, log=log)
 
-    #############################################################################
-    #############################################################################
-    #############################################################################
+    
 
     # views the tensor as multiple partitions and returns
     # those partitions
@@ -2273,7 +2271,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
 
 
     # 
-    # 参数更新和优化器All-gather
+    
     # 
     @instrument_w_nvtx
     def step(self, closure=None):
@@ -2283,25 +2281,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         
         self.elements_copy_to_memory.clear()
 
-        
-        
-        # 
-        # 
-        # if dist.get_rank() == 0:
-        #     _name = 'parameter_buffer_backup'
-        #     existing_shm_backup = shared_memory.SharedMemory(name = _name)
-        #     shard_buffer = np.ndarray(1024*1024*1024*8, dtype=self.parameter_cpu.dtype, buffer=existing_shm_backup.buf)
-        #     shard_buffer[:self.parameter_cpu.size] = self.parameter_cpu
-        # 
-        # 
-
-        # print('self.parameter_cpu.size() = ', self.parameter_cpu.size())
-        # print('self.parameter_cpu.size() = ', self.parameter_cpu.size)
-        # print('self.parameter_cpu = ', self.parameter_cpu)
-
         self.parameter_cpu = None
-
-
 
         self._pre_step()
         self._partition_all_parameters()

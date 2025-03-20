@@ -1902,9 +1902,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         if len(small_bucket) > 0:
             self.allreduce_and_copy(small_bucket, rank=rank, log=log)
 
-    #############################################################################
-    #############################################################################
-    #############################################################################
+    
 
     # views the tensor as multiple partitions and returns
     # those partitions
