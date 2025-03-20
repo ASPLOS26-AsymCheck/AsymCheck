@@ -2092,13 +2092,13 @@ class DeepSpeedEngine(Module):
         # ZeRO stage >= 2 communicates during non gradient accumulation boundaries as well
         if self.zero_optimization_partition_gradients():
 
-            # 表示采用Zero-3的梯度Allreduce操作
+            # 
             # print('self.zero_optimization_partition_gradients()')
 
             self.optimizer.overlapping_partition_gradients_reduce_epilogue()
 
         # Communicate only at gradient accumulation boundaries, 
-        # 仅在梯度累积边界进行通信, 
+        # 
         # ZeRO stage <= 1, 
         elif self.is_gradient_accumulation_boundary():
 

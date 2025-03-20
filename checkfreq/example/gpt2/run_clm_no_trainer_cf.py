@@ -49,8 +49,7 @@ from torch.utils.data import DataLoader
 from tqdm.auto import tqdm
 
 
-# import horovod.torch as hvd
-# from adtopk_lib.helper import get_communicator
+
 
 from utils import get_argument_parser, \
     get_summary_writer, write_summary_events, \
@@ -71,13 +70,13 @@ from transformers.utils import check_min_version, send_example_telemetry
 from transformers.utils.versions import require_version
 
 import numpy as np
-# from adtopk_lib.compression import compressors
+
 import numpy as np
 import matplotlib.pyplot as plt
 import time
 import timeit
 import numpy as np
-# from adtopk_lib.profiling import benchmark
+
 
 
 import sys
@@ -769,125 +768,6 @@ def main():
     device = torch.device("cuda" if torch.cuda.is_available() and not args.no_cuda else "cpu")
     model.to(device)
 
-    # Horovod: broadcast parameters & optimizer state.
-    # hvd.broadcast_parameters(model.state_dict(), root_rank=0)
-    
-    ### ADTopk
-    # if args.density < 1:
-    #     communicator_str = 'allgather'
-    # else:
-    #     communicator_str = 'allreduce'
-    # # params = {'compressor': args.compressor, 'memory': args.memory, 'density': args.density,'communicator': communicator_str,'model_named_parameters':model.named_parameters()}
-    # params = {'compressor': 'none', 'memory': 'none', 'density': args.density,'communicator': 'allreduce','model_named_parameters':model.named_parameters()}
-
-    
-    # communicator = get_communicator(params)
-    # optimizer = hvd.DistributedOptimizer(
-    #     optimizer, communicator, named_parameters=model.named_parameters())
-    
-    ### zxjdnn
-    # allreduce baseline
-    # if args.percent == -1:
-    #     comm_params = {
-    #         'comm_mode':'allreduce',
-    #         'compressor':'none',
-    #         'memory':'none',
-    #         'send_size_aresame':True
-    #     }
-    # else:
-    #     comm_params = {
-    #         'comm_mode':'allgather_fast',
-    #         'compressor':'topk',
-    #         'memory':args.memory,
-    #         'percent':args.percent,
-    #         'send_size_aresame':True,
-    #         'model_named_parameters': model.named_parameters()
-    #     }
-
-    # Horovod: wrap optimizer with DistributedOptimizer.
-    
-
-    # import zxjdnn_lib
-
-    # Horovod: wrap optimizer with DistributedOptimizer.
-    
-    # optimizer = zxjdnn_lib.DistributedOptimizer(
-    #     optimizer, comm_params=comm_params, named_parameters=model.named_parameters())
-
-    # Prepare everything with our `accelerator`.
-    # model, optimizer, train_dataloader, eval_dataloader, lr_scheduler = accelerator.prepare(
-    #     model, optimizer, train_dataloader, eval_dataloader, lr_scheduler
-    # )
-    
-    # from adtopk_lib.helper import get_communicator
-
-    if args.density < 1:
-        communicator_str = 'allgather'
-    else:
-        communicator_str = 'allreduce'
-        args.compressor ='none'
-        args.memory = 'none'
-        
-    params = {'compressor': args.compressor, 
-              'memory': args.memory, 
-              'density': args.density,
-              'communicator': communicator_str,
-              'model_named_parameters':model.named_parameters()
-            }
-        
-    # communicator = get_communicator(params)
-        
-    # optimizer = hvd.DistributedOptimizer(
-    #     optimizer, 
-    #     communicator = communicator, 
-    #     model= model,
-    #     named_parameters = model.named_parameters(),
-    #     op = hvd.Average) 
-        
-    # Set up fixed fake data
-    # image_size = 224
-    # if args.model == 'inception_v3':
-    #     image_size = 227
-    # data = torch.randn(args.batch_size, 3, image_size, image_size)
-    # target = torch.LongTensor(args.batch_size).random_() % 1000
-    # if args.cuda:
-    #     data, target = data.cuda(), target.cuda()
-    # if args.mgwfbp:
-    #     seq_layernames, layerwise_times, _ = benchmark(model, (data, target), F.cross_entropy, task='imagenet')
-    #     layerwise_times =hvd.broadcast(layerwise_times,root_rank=0)
-    #     # layerwise_times = comm.bcast(layerwise_times, root=0)
-    # else:
-            
-        
-    # seq_layernames, layerwise_times = None, None
-    # # MG-WFBP
-    # optimizer = hvd.DistributedOptimizer(args.model_net,
-    #                                      optimizer, 
-    #                                      model= model,
-    #                                      named_parameters=model.named_parameters(), 
-    #                                      compression=compressors[args.compressor](), 
-    #                                      is_sparse=args.density<1, 
-    #                                      density=args.density, 
-    #                                      seq_layernames=seq_layernames, 
-    #                                      layerwise_times=layerwise_times, 
-    #                                      norm_clip=None, 
-    #                                      threshold=args.threshold, 
-    #                                      writer=None, 
-    #                                      gradient_path='./', 
-    #                                      momentum_correction=False, 
-    #                                      fp16=args.fp16, 
-    #                                      mgwfbp=args.mgwfbp, 
-    #                                      rdma=args.rdma, 
-    #                                      asc=args.asc
-    #                                 )
-    
-    
-    
-
-    # Horovod: broadcast parameters & optimizer state.
-    # hvd.broadcast_parameters(model.state_dict(), root_rank=0)
-    # hvd.broadcast_optimizer_state(optimizer, root_rank=0)
-    
 
     # On TPU, the tie weights in our model have been disconnected, so we need to restore the ties.
     # if accelerator.distributed_type == DistributedType.TPU:

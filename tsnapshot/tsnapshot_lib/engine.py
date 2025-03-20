@@ -2092,9 +2092,6 @@ class DeepSpeedEngine(Module):
             ranks=[0])
     
     # 
-    20250228,
-    # 执行梯度的Allreduce操作, 
-    # 
     @instrument_w_nvtx
     def allreduce_gradients(self, bucket_size=MEMORY_OPT_ALLREDUCE_SIZE):
         # Pass (PP) gas boundary flag to optimizer (required for zero)
@@ -2102,20 +2099,20 @@ class DeepSpeedEngine(Module):
         # ZeRO stage >= 2 communicates during non gradient accumulation boundaries as well
         if self.zero_optimization_partition_gradients():
 
-            # 表示采用Zero-3的梯度Allreduce操作
+            # 
             # print('self.zero_optimization_partition_gradients()')
 
             self.optimizer.overlapping_partition_gradients_reduce_epilogue()
 
         # Communicate only at gradient accumulation boundaries, 
-        # 仅在梯度累积边界进行通信, 
+        # 
         # ZeRO stage <= 1, 
         elif self.is_gradient_accumulation_boundary():
 
             # print('self.is_gradient_accumulation_boundary()')
             # 
             
-            # 执行ZeRO-3的梯度Allreduce操作, 
+            # 
             if self.zero_optimization_stage() == ZeroStageEnum.optimizer_states and hasattr(
                     self.optimizer, 'reduce_gradients'):
                 # ZeRO stage = 1
@@ -2131,8 +2128,8 @@ class DeepSpeedEngine(Module):
     
     # 
     
-    # 执行损失函数和优化器的反向传播计算, 并执行梯度的Allreduce操作, 
-    20240821, 
+    
+    
     # 
     @instrument_w_nvtx
     def backward(self, loss, allreduce_gradients=True, release_loss=False, retain_graph=False, scale_wrt_gas=True):

@@ -52,8 +52,7 @@ from torch.utils.data import DataLoader
 from tqdm.auto import tqdm
 
 
-# import horovod.torch as hvd
-# from adtopk_lib.helper import get_communicator
+
 
 import sys
 sys.path.append("../") 
@@ -80,13 +79,13 @@ import deepspeed
 
 
 import numpy as np
-# from adtopk_lib.compression import compressors
+
 import numpy as np
 import matplotlib.pyplot as plt
 import time
 import timeit
 import numpy as np
-# from adtopk_lib.profiling import benchmark
+
 
 from transformers import (
         GPT2DoubleHeadsModel,
@@ -98,13 +97,6 @@ from transformers import (
         GPT2Tokenizer,
     )
 from transformers import GPT2Config
-
-# 
-# 环境变量HOROVOD_FUSION_THRESHOLD实际上以字节为单位.
-# 然而, 当使用horovodrun时, 有一个--fusion-threshold-mb以MB为单位的参数.
-# os.environ['HOROVOD_FUSION_THRESHOLD'] = '0'
-# os.environ['HOROVOD_CYCLE_TIME']       = '0'
-# os.environ['HOROVOD_CACHE_CAPACITY']   = '0'
 
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
@@ -342,7 +334,6 @@ def parse_args():
     parser.add_argument('--asc', action='store_true', default=False, help='Use MG-WFBP')
     parser.add_argument('--nstreams', type=int, default=1, help='Number of communication streams')
 
-    # 设置合并的阈值大小, default=23705252为ResNet-50所有层梯度元素数量的总和
     parser.add_argument('--threshold', type=int, default=34015396, help='Set threshold if mgwfbp is False')
     parser.add_argument('--rdma', action='store_true', default=False, help='Use RDMA')
 

@@ -1639,8 +1639,7 @@ if __name__ == '__main__':
     # 
 
     if dist.get_rank() == 0:
-        # print(model.state_dict().items())
-        # print('model.state_dict().keys() = ', model.state_dict().keys())
+        
         print('optimizer.state_dict() = ', optimizer.state_dict().keys())
         
         pass

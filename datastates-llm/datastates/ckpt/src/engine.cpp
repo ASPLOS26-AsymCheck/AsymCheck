@@ -27,7 +27,7 @@ void datastates_llm_t::ckpt_tensor(int version, const torch::Tensor &t, const st
             assert((t.device().is_cuda() && t.device().index() == gpu_id) && "Tensor not on the same GPU as ckpt engine");
             mem_region_t* m = new mem_region_t(version, uid, static_cast<char *>(t.data_ptr()), size, file_offset, path, GPU_TIER);
 
-            // 刷新到远程持久存储, 20250121, 
+            //  
             gpu_tier->flush(m);
 
             return;

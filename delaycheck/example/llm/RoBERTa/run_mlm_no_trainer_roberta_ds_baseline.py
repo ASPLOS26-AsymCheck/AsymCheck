@@ -78,13 +78,13 @@ import deepspeed
 
 
 import numpy as np
-# from adtopk_lib.compression import compressors
+
 import numpy as np
 import matplotlib.pyplot as plt
 import time
 import timeit
 import numpy as np
-# from adtopk_lib.profiling import benchmark
+
 
 # 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
@@ -923,18 +923,10 @@ def main():
                 # loss.backward()
                 
                 # # 
-                # # Delay Checkpoint
-                # if dist.get_rank() == 0:
-                #     stream.synchronize()
-
-                # if dist.get_rank() == 0:
-                #     stream = torch.cuda.Stream()
                 
-                #     with torch.cuda.stream(stream):
-                #         cpu_tensor = gpu_tensor.to('cpu', non_blocking=True)
                     
                 
-                #     # stream.synchronize()
+                
                 model.backward(loss)
                 backworad_time_array.append(time.time() - backworad_time)
                 step_time = time.time()
@@ -955,23 +947,8 @@ def main():
                 step_time_array.append(time.time() - step_time)
                 
                 # # 
-                # # immediate checkpoint
-                # if dist.get_rank() == 0:
-                #     stream.synchronize()
-
-                # if dist.get_rank() == 0:
-                #     stream = torch.cuda.Stream()
-                
-                #     with torch.cuda.stream(stream):
-                #         cpu_tensor = gpu_tensor.to('cpu', non_blocking=True)
-                    
-                
-                #     # stream.synchronize()
                 
 
-
-                # 
-                
                 
 
 

@@ -49,8 +49,7 @@ from torch.utils.data import DataLoader
 from tqdm.auto import tqdm
 
 
-# import horovod.torch as hvd
-# import adtopk_lib.optimizer_adtopk_hvd as hvd
+
 
 import os
 import math
@@ -59,9 +58,7 @@ from tqdm import tqdm
 # from utils_model import get_network
 
 
-# os.environ['HOROVOD_FUSION_THRESHOLD'] = '0'
-# os.environ['HOROVOD_CACHE_CAPACITY'] = '0'
-# # os.environ['HOROVOD_CYCLE_TIME'] = '0'
+
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -1344,15 +1341,10 @@ if __name__ == "__main__":
     
     
     
-    # state = hvd.elastic.TorchState(model=model,
-    #                                optimizer=optimizer,
-    #                                train_sampler=train_sampler,
-    #                                # val_sampler=val_sampler,
-    #                                epoch=resume_from_epoch,
-    #                                batch=0)
+    
 
     
-    # optimizer._state = state
+    
     
     
     if torch.distributed.get_rank()==0:
@@ -1368,8 +1360,7 @@ if __name__ == "__main__":
     _state_dict_gpu_flatten = torch.zeros(numel_count, device=value.device, dtype=value.dtype, requires_grad=False)
     
     if torch.distributed.get_rank() == 0:
-        # print(model.state_dict().items())
-        # print('model.state_dict().keys() = ', model.state_dict().keys())
+        
         
         print('optimizer.state_dict() = ', optimizer.state_dict().keys())
         
@@ -1388,46 +1379,9 @@ if __name__ == "__main__":
     checkpoint_save_work_dir = './gpt2_checkpoint'
 
 
-    # optimizer.app_state = app_state
-    # optimizer.checkpoint_save_work_dir = checkpoint_save_work_dir
 
 
     full_train()
 
 
 
-    # full_train(state)
-    # dllogger.flush()
-    
-    
-    #     if args.checkpointing_steps == "epoch":
-    #         output_dir = f"epoch_{epoch}"
-    #         if args.output_dir is not None:
-    #             output_dir = os.path.join(args.output_dir, output_dir)
-    #         accelerator.save_state(output_dir)
-
-    # if args.with_tracking:
-    #     accelerator.end_training()
-
-    # if args.output_dir is not None:
-    #     accelerator.wait_for_everyone()
-    #     unwrapped_model = accelerator.unwrap_model(model)
-    #     unwrapped_model.save_pretrained(
-    #         args.output_dir, is_main_process=accelerator.is_main_process, save_function=accelerator.save
-    #     )
-    #     if accelerator.is_main_process:
-    #         tokenizer.save_pretrained(args.output_dir)
-    #         if args.push_to_hub:
-    #             api.upload_folder(
-    #                 commit_message="End of training",
-    #                 folder_path=args.output_dir,
-    #                 repo_id=repo_id,
-    #                 repo_type="model",
-    #                 token=args.hub_token,
-    #             )
-    #         with open(os.path.join(args.output_dir, "all_results.json"), "w") as f:
-    #             json.dump({"perplexity": perplexity}, f)
-
-
-# if __name__ == "__main__":
-#     main()

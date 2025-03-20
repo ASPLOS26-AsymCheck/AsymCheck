@@ -53,8 +53,7 @@ import torch.distributed as dist
 import threading  
 
 
-# import horovod.torch as hvd
-# from adtopk_lib.helper import get_communicator
+
 
 import sys
 sys.path.append("../") 
@@ -81,13 +80,13 @@ import deepspeed
 
 
 import numpy as np
-# from adtopk_lib.compression import compressors
+
 import numpy as np
 import matplotlib.pyplot as plt
 import time
 import timeit
 import numpy as np
-# from adtopk_lib.profiling import benchmark
+
 
 from transformers import (
         GPT2DoubleHeadsModel,

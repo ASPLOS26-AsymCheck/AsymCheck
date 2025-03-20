@@ -75,9 +75,7 @@ from multiprocessing import shared_memory
 # from utils_model import get_network
 
 
-# os.environ['HOROVOD_FUSION_THRESHOLD'] = '0'
-# os.environ['HOROVOD_CACHE_CAPACITY'] = '0'
-# # os.environ['HOROVOD_CYCLE_TIME'] = '0'
+
 
 from utils_vit import get_argument_parser, \
     get_summary_writer, write_summary_events, \
@@ -99,7 +97,7 @@ from transformers.utils.versions import require_version
 import deepspeed
 
 
-# from adtopk_lib.compression import compressors
+
 import numpy as np
 import matplotlib.pyplot as plt
 import time
@@ -113,7 +111,7 @@ import torchsnapshot
 from torchsnapshot import Snapshot, Stateful
 
 import numpy as np
-# from adtopk_lib.compression import compressors
+
 import numpy as np
 import matplotlib.pyplot as plt
 import time
@@ -801,15 +799,10 @@ def main():
 
     
     
-    # state = hvd.elastic.TorchState(model=model,
-    #                                optimizer=optimizer,
-    #                                train_sampler=train_sampler,
-    #                                # val_sampler=val_sampler,
-    #                                epoch=resume_from_epoch,
-    #                                batch=0)
+    
 
     
-    # optimizer._state = state
+    
     
     if torch.distributed.get_rank()==0:
         print('state_time = ', time.time() - state_time)

@@ -1043,7 +1043,7 @@ def save_checkpoint_in_disk(epoch):
     if dist.get_rank() == 0:
         filepath = args.checkpoint_format.format(epoch=epoch + 1)
                 
-        # 模型状态和优化器状态的大小相同
+        
         state = {
             'model': model.state_dict(),
             'optimizer': optimizer.state_dict(),
@@ -1588,8 +1588,7 @@ if __name__ == '__main__':
     # 
 
     if dist.get_rank() == 0:
-        # print(model.state_dict().items())
-        # print('model.state_dict().keys() = ', model.state_dict().keys())
+        
         print('optimizer.state_dict() = ', optimizer.state_dict().keys())
         
         pass

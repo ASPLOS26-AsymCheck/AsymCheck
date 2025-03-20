@@ -95,7 +95,7 @@ from transformers.utils.versions import require_version
 import deepspeed
 
 
-# from adtopk_lib.compression import compressors
+
 import numpy as np
 import matplotlib.pyplot as plt
 import time
@@ -109,7 +109,7 @@ import torchsnapshot
 from torchsnapshot import Snapshot, Stateful
 
 import numpy as np
-# from adtopk_lib.compression import compressors
+
 import numpy as np
 import matplotlib.pyplot as plt
 import time
@@ -785,7 +785,7 @@ def main():
         print('state_time = ', time.time() - state_time)
 
 
-    # optimizer._state = state
+    
     
     if torch.distributed.get_rank()==0:
         print('state_time = ', time.time() - state_time)
