@@ -42,8 +42,8 @@ import multiprocessing
 
 import sys
 sys.path.append("../../") 
-import oteacheck_lib as oteacheck_lib
-import oteacheck_lib.utils
+import delaycheck_lib as delaycheck_lib
+import delaycheck_lib.utils
 
 
 logging.set_verbosity_info()
@@ -300,7 +300,7 @@ def main_worker(gpu, ngpus_per_node, args):
     # )
     
     
-    model, optimizer, _, _ = oteacheck_lib.initialize(
+    model, optimizer, _, _ = delaycheck_lib.initialize(
         model = model,
         optimizer = optimizer,
         args = args,
@@ -495,10 +495,10 @@ def train(train_loader, model, criterion, optimizer, epoch, device, args):
                     
                 if dist.get_rank() % torch.cuda.device_count() == 0 and idx % args.ckpt_freq == 0 and numel_count != 0:
                     model_state =  optimizer.shard_buffer[:numel_count]
-                    oteacheck_lib.utils.save_checkpoint_async_model(model, model_state, epoch, idx)
+                    delaycheck_lib.utils.save_checkpoint_async_model(model, model_state, epoch, idx)
                 
                 if idx and idx % args.load_freq == 0 and numel_count != 0:
-                    oteacheck_lib.utils.load_shard_checkpoint(model, optimizer, numel_dict)
+                    delaycheck_lib.utils.load_shard_checkpoint(model, optimizer, numel_dict)
 
 
                 if idx % args.print_freq == 0 and dist.get_rank()==0:
@@ -607,10 +607,10 @@ def train(train_loader, model, criterion, optimizer, epoch, device, args):
                     
             if dist.get_rank() % torch.cuda.device_count() == 0 and i % args.ckpt_freq == 0 and numel_count != 0:
                 model_state =  optimizer.shard_buffer[:numel_count]
-                oteacheck_lib.utils.save_checkpoint_async_model(model, model_state, epoch, i)
+                delaycheck_lib.utils.save_checkpoint_async_model(model, model_state, epoch, i)
                 
             if i and i % args.load_freq == 0 and numel_count != 0:
-                oteacheck_lib.utils.load_shard_checkpoint(model, optimizer, numel_dict)
+                delaycheck_lib.utils.load_shard_checkpoint(model, optimizer, numel_dict)
 
 
     return (float(losses.val))

@@ -39,8 +39,8 @@ from torchsnapshot import Snapshot, Stateful
 
 import sys
 sys.path.append("../../") 
-import oteacheck_lib as oteacheck_lib
-import oteacheck_lib.utils
+import delaycheck_lib as delaycheck_lib
+import delaycheck_lib.utils
 
 
 logging.set_verbosity_info()
@@ -277,7 +277,7 @@ def main_worker(gpu, ngpus_per_node, args):
     # )
     
     
-    model, optimizer, _, _ = oteacheck_lib.initialize(
+    model, optimizer, _, _ = delaycheck_lib.initialize(
         model = model,
         optimizer = optimizer,
         args = args,
@@ -464,7 +464,7 @@ def train(train_loader, model, criterion, optimizer, epoch, device, args):
                     snapshot: Optional[Snapshot] = None
                     checkpoint_save_work_dir = './resnet_checkpoint'
                     
-                    oteacheck_lib.utils.save_checkpoint_in_disk_snapshot(progress_save, app_state, checkpoint_save_work_dir)
+                    delaycheck_lib.utils.save_checkpoint_in_disk_snapshot(progress_save, app_state, checkpoint_save_work_dir)
 
                 if idx % args.print_freq == 0 and dist.get_rank()==0:
 
@@ -545,7 +545,7 @@ def train(train_loader, model, criterion, optimizer, epoch, device, args):
                 snapshot: Optional[Snapshot] = None
                 checkpoint_save_work_dir = './resnet_checkpoint'
                 
-                oteacheck_lib.utils.save_checkpoint_in_disk_snapshot(progress_save, app_state, checkpoint_save_work_dir)
+                delaycheck_lib.utils.save_checkpoint_in_disk_snapshot(progress_save, app_state, checkpoint_save_work_dir)
             
             
 

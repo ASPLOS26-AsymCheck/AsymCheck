@@ -1762,7 +1762,7 @@ class DeepSpeedEngine(Module):
                 
                 
                 
-                from oteacheck_lib.stage3 import DeepSpeedZeroOptimizer_Stage3
+                from delaycheck_lib.stage3 import DeepSpeedZeroOptimizer_Stage3
                 
                 
                 print('Initialization Zero-3!!!')

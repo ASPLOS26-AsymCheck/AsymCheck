@@ -32,14 +32,14 @@ from deepspeed.constants import TORCH_DISTRIBUTED_DEFAULT_PORT
 # from deepspeed.runtime.engine import DeepSpeedEngine, DeepSpeedOptimizerCallable, DeepSpeedSchedulerCallable
 # from deepspeed.runtime.engine import ADAM_OPTIMIZER, LAMB_OPTIMIZER
 
-# from oteacheck_lib.engine import DeepSpeedEngine, DeepSpeedOptimizerCallable, DeepSpeedSchedulerCallable
-# from oteacheck_lib.engine import ADAM_OPTIMIZER, LAMB_OPTIMIZER
+# from delaycheck_lib.engine import DeepSpeedEngine, DeepSpeedOptimizerCallable, DeepSpeedSchedulerCallable
+# from delaycheck_lib.engine import ADAM_OPTIMIZER, LAMB_OPTIMIZER
 
-# from oteacheck_lib.engine_naive import DeepSpeedEngine, DeepSpeedOptimizerCallable, DeepSpeedSchedulerCallable
-# from oteacheck_lib.engine_naive import ADAM_OPTIMIZER, LAMB_OPTIMIZER
+# from delaycheck_lib.engine_naive import DeepSpeedEngine, DeepSpeedOptimizerCallable, DeepSpeedSchedulerCallable
+# from delaycheck_lib.engine_naive import ADAM_OPTIMIZER, LAMB_OPTIMIZER
 
-from oteacheck_lib.engine_async import DeepSpeedEngine, DeepSpeedOptimizerCallable, DeepSpeedSchedulerCallable
-from oteacheck_lib.engine_async import ADAM_OPTIMIZER, LAMB_OPTIMIZER
+from delaycheck_lib.engine_async import DeepSpeedEngine, DeepSpeedOptimizerCallable, DeepSpeedSchedulerCallable
+from delaycheck_lib.engine_async import ADAM_OPTIMIZER, LAMB_OPTIMIZER
 
 
 from deepspeed.runtime.hybrid_engine import DeepSpeedHybridEngine

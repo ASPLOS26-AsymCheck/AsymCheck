@@ -70,8 +70,8 @@ import torch.distributed as dist
 from tqdm import tqdm
 from multiprocessing import shared_memory
 
-import oteacheck_lib as oteacheck_lib
-import oteacheck_lib.utils
+import delaycheck_lib as delaycheck_lib
+import delaycheck_lib.utils
 
 
 # from utils_model import get_network
@@ -799,7 +799,7 @@ def main():
     #     dist_init_required=True)
 
 
-    model, optimizer, _, _ = oteacheck_lib.initialize(
+    model, optimizer, _, _ = delaycheck_lib.initialize(
         args=args,
         model=model,
         model_parameters=optimizer_grouped_parameters,
@@ -1049,7 +1049,7 @@ def main():
                                 # 'optimizer' : optimizer.state_dict(),
                                 # 'scheduler' : scheduler.state_dict()
                             }
-                        oteacheck_lib.utils.save_checkpoint_iteration_deepspeed(model, state, epoch + 1,  completed_steps)
+                        delaycheck_lib.utils.save_checkpoint_iteration_deepspeed(model, state, epoch + 1,  completed_steps)
                     
 
                 # print('optimizer.zero_grad()')

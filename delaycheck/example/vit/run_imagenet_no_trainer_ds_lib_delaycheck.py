@@ -61,8 +61,8 @@ import torch.utils.data.distributed
 
 import sys
 sys.path.append("../../") 
-import oteacheck_lib as oteacheck_lib
-import oteacheck_lib.utils
+import delaycheck_lib as delaycheck_lib
+import delaycheck_lib.utils
 
 
 import os
@@ -797,7 +797,7 @@ def main():
     #     model_parameters=optimizer_grouped_parameters,
     #     dist_init_required=True)
     
-    model, optimizer, _, _ = oteacheck_lib.initialize(
+    model, optimizer, _, _ = delaycheck_lib.initialize(
         args=args,
         model=model,
         model_parameters=optimizer_grouped_parameters,
@@ -1060,10 +1060,10 @@ def main():
                     
                 if dist.get_rank() % torch.cuda.device_count() == 0 and completed_steps % args.ckpt_freq == 0 and numel_count != 0:
                     model_state = optimizer.shard_buffer[:numel_count]
-                    oteacheck_lib.utils.save_checkpoint_async_model(model, model_state, epoch, completed_steps)
+                    delaycheck_lib.utils.save_checkpoint_async_model(model, model_state, epoch, completed_steps)
                 
                 if completed_steps != 0 and completed_steps % args.load_freq == 0 and numel_count != 0:
-                    oteacheck_lib.utils.load_shard_checkpoint(model, optimizer, numel_dict)
+                    delaycheck_lib.utils.load_shard_checkpoint(model, optimizer, numel_dict)
                 
                 print_steps = 10
                 if completed_steps % print_steps == 0 and torch.distributed.get_rank()==0:

@@ -61,8 +61,8 @@ import torch.utils.data.distributed
 
 import sys
 sys.path.append("../../") 
-import oteacheck_lib as oteacheck_lib
-import oteacheck_lib.utils
+import delaycheck_lib as delaycheck_lib
+import delaycheck_lib.utils
 
 import os
 import math
@@ -764,7 +764,7 @@ def main():
     #     dist_init_required=True)
 
 
-    model, optimizer, _, _ = oteacheck_lib.initialize(
+    model, optimizer, _, _ = delaycheck_lib.initialize(
         args=args,
         model=model,
         model_parameters=optimizer_grouped_parameters,
@@ -1013,7 +1013,7 @@ def main():
                             'state_dict': model.state_dict(),
                             'optimizer' : optimizer.state_dict(),
                         }
-                        oteacheck_lib.utils.save_checkpoint_iteration(state, epoch + 1,  completed_steps)
+                        delaycheck_lib.utils.save_checkpoint_iteration(state, epoch + 1,  completed_steps)
                     
 
                 # print('optimizer.zero_grad()')

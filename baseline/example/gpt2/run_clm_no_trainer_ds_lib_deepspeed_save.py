@@ -113,8 +113,8 @@ except RuntimeError:
 
 import sys
 sys.path.append("../../") 
-import oteacheck_lib as oteacheck_lib
-import oteacheck_lib.utils
+import delaycheck_lib as delaycheck_lib
+import delaycheck_lib.utils
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
 check_min_version("4.39.0.dev0")
@@ -731,7 +731,7 @@ def full_train():
                             # 'optimizer' : optimizer.state_dict(),
                             # 'scheduler' : scheduler.state_dict()
                         }
-                    oteacheck_lib.utils.save_checkpoint_iteration_deepspeed(model, state, epoch + 1,  completed_steps)
+                    delaycheck_lib.utils.save_checkpoint_iteration_deepspeed(model, state, epoch + 1,  completed_steps)
                 batch_time_array.append(time.time()-e_time)
                 if step >= 30: 
                     iteration_time.update(time.time() - end)
@@ -1362,7 +1362,7 @@ if __name__ == "__main__":
     
     
     
-    model, optimizer, _, _ = oteacheck_lib.initialize(
+    model, optimizer, _, _ = delaycheck_lib.initialize(
         args=args,
         model=model,
         model_parameters=optimizer_grouped_parameters,

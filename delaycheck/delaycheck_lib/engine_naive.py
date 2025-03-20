@@ -1627,7 +1627,7 @@ class DeepSpeedEngine(Module):
                 # from deepspeed.runtime.zero.stage3 import DeepSpeedZeroOptimizer_Stage3
                 
                 
-                from oteacheck_lib.stage3_naive import DeepSpeedZeroOptimizer_Stage3
+                from delaycheck_lib.stage3_naive import DeepSpeedZeroOptimizer_Stage3
 
 
 

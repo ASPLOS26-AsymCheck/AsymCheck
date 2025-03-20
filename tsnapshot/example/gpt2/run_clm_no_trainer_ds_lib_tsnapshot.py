@@ -107,8 +107,8 @@ from multiprocessing import shared_memory
 
 import sys
 sys.path.append("../../") 
-import oteacheck_lib as oteacheck_lib
-import oteacheck_lib.utils
+import delaycheck_lib as delaycheck_lib
+import delaycheck_lib.utils
 
 try:
     mp.set_start_method('spawn')
@@ -738,7 +738,7 @@ def full_train():
                     }
                     
                     checkpoint_save_work_dir = 'gpt2_checkpoint'
-                    oteacheck_lib.utils.save_checkpoint_in_disk_snapshot(progress_save, app_state, checkpoint_save_work_dir)
+                    delaycheck_lib.utils.save_checkpoint_in_disk_snapshot(progress_save, app_state, checkpoint_save_work_dir)
                     
                 print_steps = 10
                 
@@ -1464,7 +1464,7 @@ if __name__ == "__main__":
         # print(array)
     
     
-    model, optimizer, _, _ = oteacheck_lib.initialize(
+    model, optimizer, _, _ = delaycheck_lib.initialize(
         args=args,
         model=model,
         model_parameters=optimizer_grouped_parameters,

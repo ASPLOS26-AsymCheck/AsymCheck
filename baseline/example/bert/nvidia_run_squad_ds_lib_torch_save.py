@@ -53,8 +53,8 @@ from turing.nvidia_modelingpreln import BertForQuestionAnswering as BertForQuest
 
 import sys
 sys.path.append("../../") 
-import oteacheck_lib as oteacheck_lib
-import oteacheck_lib.utils
+import delaycheck_lib as delaycheck_lib
+import delaycheck_lib.utils
 # logging.basicConfig(
 #     format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
 #     datefmt='%m/%d/%Y %H:%M:%S',
@@ -929,7 +929,7 @@ def main():
     #     dist_init_required=True)
     
     
-    model, optimizer, _, _ = oteacheck_lib.initialize(
+    model, optimizer, _, _ = delaycheck_lib.initialize(
         args=args,
         model=model,
         model_parameters=optimizer_grouped_parameters,
@@ -1197,7 +1197,7 @@ def main():
                         'state_dict': model.state_dict(),
                         'optimizer' : optimizer.state_dict()
                     }
-                    oteacheck_lib.utils.save_checkpoint_iteration(state, num_epoch + 1,  step)
+                    delaycheck_lib.utils.save_checkpoint_iteration(state, num_epoch + 1,  step)
 
 
                 if (step + 1) % (

@@ -58,8 +58,8 @@ from typing import Dict, Optional
 
 import sys
 sys.path.append("../../") 
-import oteacheck_lib as oteacheck_lib
-import oteacheck_lib.utils
+import delaycheck_lib as delaycheck_lib
+import delaycheck_lib.utils
 
 
 # logging.basicConfig(
@@ -955,7 +955,7 @@ def main():
     #     dist_init_required=True)
     
     
-    model, optimizer, _, _ = oteacheck_lib.initialize(
+    model, optimizer, _, _ = delaycheck_lib.initialize(
         args=args,
         model=model,
         model_parameters=optimizer_grouped_parameters,
@@ -1234,7 +1234,7 @@ def main():
                     }
                 
                     checkpoint_save_work_dir = 'checkpoints'
-                    oteacheck_lib.utils.save_checkpoint_in_disk_snapshot(progress_save, app_state, checkpoint_save_work_dir)
+                    delaycheck_lib.utils.save_checkpoint_in_disk_snapshot(progress_save, app_state, checkpoint_save_work_dir)
 
                 if (step + 1) % (
                         ave_rounds) == 0 and torch.distributed.get_rank() == 0:
