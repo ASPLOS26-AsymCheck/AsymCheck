@@ -294,7 +294,7 @@ class DeepSpeedEngine(Module):
                  config=None,
                  config_class=None,
                  dont_change_device=False,
-                 oteacheck=False):
+                 ):
         super(DeepSpeedEngine, self).__init__()
         self.dont_change_device = dont_change_device
         self.client_optimizer = optimizer
@@ -333,7 +333,7 @@ class DeepSpeedEngine(Module):
         self._is_gradient_accumulation_boundary = None
         self.scale_wrt_gas = None
         self.losses = None
-        self.oteacheck = oteacheck
+        
         
         
         self.backward_time_array = []
@@ -1803,7 +1803,7 @@ class DeepSpeedEngine(Module):
                     zero_hpz_partition_size=self.zero_hpz_partition_size(),
                     zero_quantized_weights=self.zero_quantized_weights(),
                     zero_quantized_nontrainable_weights=self.zero_quantized_nontrainable_weights(),
-                    oteacheck=self.oteacheck
+                    
                 )
 
         else:

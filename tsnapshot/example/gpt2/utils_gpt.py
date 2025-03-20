@@ -472,9 +472,7 @@ def get_argument_parser():
         metavar='ARCH', default='gpt-large',
         help='model architecture')
     
-    parser.add_argument("--oteacheck",
-                        action='store_true',
-                        help="Whether to use oteacheck.")
+    
     
     parser.add_argument("--ckpt_freq",
                     type=int,

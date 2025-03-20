@@ -110,7 +110,7 @@ parser.add_argument('--multiprocessing_distributed', action='store_true',
                          'multi node data parallel training')
 parser.add_argument('--dummy', action='store_true', help="use fake data to benchmark")
 parser.add_argument('--local_rank', type=int, default=-1, help="local rank for distributed training on gpus")
-parser.add_argument("--oteacheck", action='store_true', help="Whether to run use oteacheck.")
+
 parser.add_argument("--ckpt_freq",
                     type=int,
                     default=1,
@@ -297,7 +297,7 @@ def main_worker(gpu, ngpus_per_node, args):
         args = args,
         lr_scheduler = None,#scheduler,
         dist_init_required=True,
-        oteacheck=args.oteacheck
+        
     )
 
 

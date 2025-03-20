@@ -779,7 +779,7 @@ def main():
         model=model,
         model_parameters=optimizer_grouped_parameters,
         dist_init_required=True,
-        oteacheck=args.oteacheck)
+        )
 
     state_time = time.time()
 

@@ -426,7 +426,7 @@ Argument
     
     parser.add_argument('-a', '--arch', metavar='ARCH', default='vit-large',help='model architecture')
     
-    parser.add_argument("--oteacheck", action='store_true', help="Whether to use oteacheck.")
+    
 
     parser.add_argument("--ckpt_freq",
                     type=int,

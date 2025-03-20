@@ -111,7 +111,7 @@ def initialize(args=None,
                collate_fn=None,
                config=None,
                config_params=None, 
-               oteacheck=False):
+               ):
     
     
     """Initialize the DeepSpeed Engine.
@@ -231,7 +231,7 @@ def initialize(args=None,
                                      collate_fn=collate_fn,
                                      config=config,
                                      config_class=config_class, 
-                                     oteacheck=oteacheck)
+                                     )
         
     else:
         assert mpu is None, "mpu must be None with pipeline parallelism"

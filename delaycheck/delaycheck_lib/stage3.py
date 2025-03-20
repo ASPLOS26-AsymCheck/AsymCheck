@@ -144,7 +144,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         zero_hpz_partition_size=1,
         zero_quantized_weights=False,
         zero_quantized_nontrainable_weights=False,
-        oteacheck=False
+        
     ):
         see_memory_usage("Stage 3 initialize beginning", force=True)
 
@@ -190,7 +190,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         self.params_in_nvme_and_cpu = False
         self.max_params_in_cpu = 0
         self.partial_offload = offload_ratio
-        self.oteacheck = oteacheck
+        
 
         #num of ranks in a ZeRO param partitioning group
         self.zero_hpz_partition_size = zero_hpz_partition_size
@@ -1406,32 +1406,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
 
                 # Reconstruction of Zero-3
                 # if torch.distributed.get_rank() == 0: 
-                if self.oteacheck:
-                    # print('-----------------------Reconstructe Zero-3--------------------')
-                    parameter_tensor_cpu =  save_ckpt_to_memory(parameter_bucket)                    
-                    parameter_numel = parameter_tensor_cpu.numel()                    
-                    parameter_numpy_cpu =  parameter_tensor_cpu.numpy()       
-                    _name = 'parameter_buffer'                    
-                    existing_shm = shared_memory.SharedMemory(name = _name)                    
-                    shard_buffer = np.ndarray(1024*1024*1024*8, dtype=parameter_numpy_cpu.dtype, buffer=existing_shm.buf)
-
-                    sum_elements_copy = sum(self.elements_copy_to_memory)
-
-                    # Case-1: Copy operation performed by a rank, 20240920, 
-                    # shard_buffer[sum_elements_copy : sum_elements_copy + parameter_numel] = parameter_numpy_cpu
-
-                    # Case-2: Copy operations performed by multiple ranks, 20240920, 
-                    per_rank_copy = int(parameter_numel//world_size)
-                    # while parameter_numel % world_size!=0:
-                    if rank == world_size-1:
-                        shard_buffer[sum_elements_copy + per_rank_copy*rank : sum_elements_copy + parameter_numel] = parameter_numpy_cpu[per_rank_copy*rank:]
-                    else:
-                        # print(parameter_numpy_cpu[per_rank_copy*rank:per_rank_copy*(rank+1)])
-                        shard_buffer[sum_elements_copy + per_rank_copy*rank : sum_elements_copy + per_rank_copy*(rank+1)] = parameter_numpy_cpu[per_rank_copy*rank:per_rank_copy*(rank+1)]
-                    self.elements_copy_to_memory.append(parameter_numel)
-
-                    
-                # 
+                
                 grad_partitions = self.__avg_scatter_contiguous_grads(grad_bucket)
                 
 

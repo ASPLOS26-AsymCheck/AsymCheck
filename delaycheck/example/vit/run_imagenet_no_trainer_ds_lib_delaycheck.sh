@@ -70,7 +70,7 @@ config_json=ds_fp16_z3_config.json
 
 CMD=" deepspeed   \
       --hostfile hostfile_4.txt \
-      run_imagenet_no_trainer_ds_lib_oteacheck.py   \
+      run_imagenet_no_trainer_ds_lib_delaycheck.py   \
       --job_name ${JOB_NAME} \
       --fp16 \
       --deepspeed \
@@ -89,7 +89,6 @@ CMD+=" --metric_accuracy $metric_accuracy  --with_tracking "
 CMD+=" --density=$density --compressor=$compressor --memory=$memory --percent=$percent "
 CMD+=" --output_dir $output_dir  "
 CMD+=" --arch vit-large  "
-CMD+=" --oteacheck "
 
 
 LOGFILE=$OUT_DIR/logfile.txt
