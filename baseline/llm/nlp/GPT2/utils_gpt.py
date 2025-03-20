@@ -19,20 +19,7 @@ def get_argument_parser():
         help="Bert pre-trained model selected in the list: bert-base-uncased, "
         "bert-large-uncased, bert-base-cased, bert-large-cased, bert-base-multilingual-uncased, "
         "bert-base-multilingual-cased, bert-base-chinese.")
-    # parser.add_argument(
-    #     "--output_dir",
-    #     default=None,
-    #     type=str,
-    #     required=True,
-    #     help=
-    #     "The output directory where the model checkpoints and predictions will be written."
-    # )
 
-    # Other parameters
-    # parser.add_argument("--train_file",
-    #                     default=None,
-    #                     type=str,
-    #                     help="SQuAD json for training. E.g., train-v1.1.json")
     
     parser.add_argument(
         "--predict_file",
@@ -77,15 +64,9 @@ def get_argument_parser():
                         type=int,
                         help="Total batch size for predictions.")
     
-    # parser.add_argument("--learning_rate",
-    #                     default=5e-5,
-    #                     type=float,
-    #                     help="The initial learning rate for Adam.")
+
     
-    # parser.add_argument("--num_train_epochs",
-    #                     default=3.0,
-    #                     type=float,
-    #                     help="Total number of training epochs to perform.")
+
     
     parser.add_argument(
         "--warmup_proportion",
@@ -431,7 +412,7 @@ def get_argument_parser():
     parser.add_argument('--use-adasum', action='store_true', default=False,
                     help='use adasum algorithm to do reduction')
     
-    # Elastic Horovod settings
+    
     parser.add_argument('--batches-per-commit', type=int, default=50,
                     help='number of batches processed before calling `state.commit()`; '
                          'commits prevent losing progress if an error occurs, but slow '

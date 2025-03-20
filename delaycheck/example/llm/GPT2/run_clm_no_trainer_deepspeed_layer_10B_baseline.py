@@ -105,9 +105,7 @@ from transformers import GPT2Config
 # 
 
 
-# os.environ['HOROVOD_FUSION_THRESHOLD'] = '0'
-# os.environ['HOROVOD_CYCLE_TIME']       = '0'
-# os.environ['HOROVOD_CACHE_CAPACITY']   = '0'
+
 
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
@@ -315,7 +313,7 @@ def parse_args():
     parser.add_argument('--use-adasum', action='store_true', default=False,
                     help='use adasum algorithm to do reduction')
     
-    # Elastic Horovod settings
+    
     parser.add_argument('--batches-per-commit', type=int, default=50,
                     help='number of batches processed before calling `state.commit()`; '
                          'commits prevent losing progress if an error occurs, but slow '
@@ -805,7 +803,7 @@ def main():
     
 
 
-    # Horovod: wrap optimizer with DistributedOptimizer.
+    
     
     
     

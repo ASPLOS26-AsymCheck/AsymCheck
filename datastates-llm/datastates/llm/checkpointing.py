@@ -106,14 +106,7 @@ class Checkpointing:
             
 
             # 
-            # 写入磁盘的操作
-            # with open(path, 'wb') as f:
-            #     f.seek(0)
-            #     f.write(header_size)
-            #     f.write(header)
-            #     # Write the lean state dict towards the end of the file.
-            #     f.seek(_start_tensor_offset+metadata_size)
-            #     f.write(lean_state_dict)
+            
             # 
 
             return None

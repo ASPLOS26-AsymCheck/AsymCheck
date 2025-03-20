@@ -296,17 +296,9 @@ def get_argument_parser():
         default=8,
         help="Batch size (per device) for the evaluation dataloader.",
     )
-    # parser.add_argument(
-    #     "--learning_rate",
-    #     type=float,
-    #     default=5e-5,
-    #     help="Initial learning rate (after the potential warmup period) to use.",
-    # )
+
     parser.add_argument("--weight_decay", type=float, default=0.0, help="Weight decay to use.")
     
-# parser.add_argument("--num_train_epochs", type=int, 
-    #                     default=3, 
-    #                     help="Total number of training epochs to perform.")
 
     parser.add_argument(
         "--max_train_steps",
@@ -315,12 +307,7 @@ def get_argument_parser():
         help="Total number of training steps to perform. If provided, overrides num_train_epochs.",
     )
     
-# parser.add_argument(
-    #     "--gradient_accumulation_steps",
-    #     type=int,
-    #     default=1,
-    #     help="Number of updates steps to accumulate before performing a backward/update pass.",
-    # )
+
     
     parser.add_argument(
         "--lr_scheduler_type",
@@ -333,7 +320,6 @@ def get_argument_parser():
         "--num_warmup_steps", type=int, default=0, help="Number of steps for the warmup in the lr scheduler."
     )
     
-# parser.add_argument("--output_dir", type=str, default=None, help="Where to store the final model.")
 
     
     # parser.add_argument("--seed", type=int, default=None, help="A seed for reproducible training.")

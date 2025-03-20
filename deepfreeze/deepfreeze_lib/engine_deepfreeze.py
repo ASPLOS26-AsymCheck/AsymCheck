@@ -1897,13 +1897,7 @@ class DeepSpeedEngine(Module):
 
         self._start_timers(self.engine_timers.forward_timers)
         
-        # if self.micro_steps == 20 and dist.get_rank() == 0:
-        #     torch.save(self.module.state_dict(), "/data/lzy/module")
-        #     numel = 0
-        #     for key, value in self.module.state_dict().items():
-        #         numel += value.numel()
-        #         print(value)
-        #     print("total numel = ", numel)
+        
 
         # if self.training_dataloader is None:
         #     self.tput_timer.start()
@@ -1930,13 +1924,7 @@ class DeepSpeedEngine(Module):
             exit()
         else:
             see_memory_usage("Engine after forward", force=self.memory_breakdown())
-        # if self.micro_steps == 20 and dist.get_rank() == 0:
-        #     torch.save(self.module.state_dict(), "/data/lzy/module")
-        #     numel = 0
-        #     for key, value in self.module.state_dict().items():
-        #         numel += value.numel()
-        #         print(value)
-        #     print("total numel = ", numel)
+        
         return loss
 
     def _cast_inputs_half(self, inputs):
@@ -2004,13 +1992,7 @@ class DeepSpeedEngine(Module):
             retain_graph: bool, default: false
                 forward on user defined choice of retain_graph
         """
-        # if self.micro_steps == 20 and dist.get_rank() == 0:
-        #     torch.save(self.module.state_dict(), "/data/lzy/module")
-        #     numel = 0
-        #     for key, value in self.module.state_dict().items():
-        #         numel += value.numel()
-        #         print(value)
-        #     print("total numel = ", numel)
+        
             
         see_memory_usage("Engine before backward", force=self.memory_breakdown())
 

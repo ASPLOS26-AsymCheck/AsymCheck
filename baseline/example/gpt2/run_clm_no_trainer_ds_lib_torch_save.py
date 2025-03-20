@@ -318,7 +318,7 @@ def parse_args():
     parser.add_argument('--use-adasum', action='store_true', default=False,
                     help='use adasum algorithm to do reduction')
     
-    # Elastic Horovod settings
+    
     parser.add_argument('--batches-per-commit', type=int, default=50,
                     help='number of batches processed before calling `state.commit()`; '
                          'commits prevent losing progress if an error occurs, but slow '
@@ -384,20 +384,7 @@ def parse_args():
     return args
 
 
-# # Horovod: average metrics from distributed training.
-# class Metric(object):
-#     def __init__(self, name):
-#         self.name = name
-#         self.sum = torch.tensor(0.)
-#         self.n = torch.tensor(0.)
 
-#     def update(self, val):
-#         self.sum += hvd.allreduce(val.detach().cpu(), name=self.name)
-#         self.n += 1
-
-#     @property
-#     def avg(self):
-#         return self.sum / self.n
 
 
 from enum import Enum
@@ -1092,15 +1079,7 @@ if __name__ == "__main__":
     
     args.preprocessing_num_workers = 16
     
-    # with accelerator.main_process_first():
-    #     tokenized_datasets = raw_datasets.map(
-    #         tokenize_function,
-    #         batched=True,
-    #         num_proc=args.preprocessing_num_workers,
-    #         remove_columns=column_names,
-    #         load_from_cache_file=not args.overwrite_cache,
-    #         desc="Running tokenizer on dataset",
-    #     )
+    
 
     
     tokenized_datasets = raw_datasets.map(

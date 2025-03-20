@@ -339,7 +339,7 @@ def parse_args():
     parser.add_argument('--use-adasum', action='store_true', default=False,
                     help='use adasum algorithm to do reduction')
     
-    # Elastic Horovod settings
+    
     parser.add_argument('--batches-per-commit', type=int, default=50,
                     help='number of batches processed before calling `state.commit()`; '
                          'commits prevent losing progress if an error occurs, but slow '
@@ -416,18 +416,7 @@ def main():
 
     check_early_exit_warning(args)
     
-    # args = parse_args()
-    # args.cuda = not args.no_cuda and torch.cuda.is_available()
-    # # allreduce_batch_size = args.batch_size * args.batches_per_allreduce
-    # hvd.init()
-    # torch.manual_seed(args.seed)
-    # if args.cuda:
-    #     # Horovod: pin GPU to local rank.
-    #     torch.cuda.set_device(hvd.local_rank())
-    #     torch.cuda.manual_seed(args.seed)
-    # # cudnn.benchmark = True
-    # # Horovod: limit # of CPU threads to be used per worker.
-    # torch.set_num_threads(4)
+    
     
     if args.gradient_accumulation_steps < 1:
         raise ValueError(

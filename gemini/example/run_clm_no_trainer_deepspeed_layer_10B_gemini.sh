@@ -16,11 +16,6 @@ if [ ! -d "$OUT_DIR" ]; then
 fi
 
 # 
-# HOROVOD_GPU_OPERATIONS=NCCL HOROVOD_CACHE_CAPACITY=0 horovodrun  -np  1 -H node19:1  python run_clm_no_trainer_hvd.py --dataset_name /data/dataset/nlp/openai-community/wikitext-103-raw-v1 --dataset_config_name default --model_name_or_path /data/dataset/nlp/openai-community/gpt2-large --output_dir  ./tmp/test-clm
-# HOROVOD_GPU_OPERATIONS=NCCL HOROVOD_CACHE_CAPACITY=0 horovodrun  -np  8 -H node15:1,node16:1,node17:1,node18:1,node19:1,node20:1,node21:1,node22:1   python run_clm_no_trainer.py --dataset_name /data/dataset/nlp/openai-community/wikitext-103-raw-v1 --dataset_config_name default --model_name_or_path /data/dataset/nlp/openai-community/gpt2-large --output_dir  ./tmp/test-clm
-# HOROVOD_GPU_OPERATIONS=NCCL HOROVOD_CACHE_CAPACITY=0 horovodrun  -np  2 -H  node19:1,node20:1   python run_clm_no_trainer_hvd.py  --dataset_name /data/dataset/nlp/openai-community/wikitext-103-raw-v1 --dataset_config_name default --model_name_or_path /data/dataset/nlp/openai-community/gpt2-large --output_dir  ./tmp/test-clm
-
-# 
 
 
 export Save_Checkpoint="./gpt2_checkpoint"

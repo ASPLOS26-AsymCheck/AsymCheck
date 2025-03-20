@@ -1383,7 +1383,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
             # self.elements_in_ipg_bucket <= self.reduce_bucket_size =  True
             # not self.reduce_scatter =  False
 
-            , 
+
             self.reduce_scatter =  False
 
             if self.contiguous_gradients and self.elements_in_ipg_bucket <= self.reduce_bucket_size and not self.reduce_scatter:

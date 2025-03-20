@@ -334,7 +334,7 @@ def parse_args():
     parser.add_argument('--use-adasum', action='store_true', default=False,
                     help='use adasum algorithm to do reduction')
     
-    # Elastic Horovod settings
+    
     parser.add_argument('--batches-per-commit', type=int, default=50,
                     help='number of batches processed before calling `state.commit()`; '
                          'commits prevent losing progress if an error occurs, but slow '
@@ -410,18 +410,7 @@ def main():
 
     check_early_exit_warning(args)
     
-    # args = parse_args()
-    # args.cuda = not args.no_cuda and torch.cuda.is_available()
-    # # allreduce_batch_size = args.batch_size * args.batches_per_allreduce
-    # hvd.init()
-    # torch.manual_seed(args.seed)
-    # if args.cuda:
-    #     # Horovod: pin GPU to local rank.
-    #     torch.cuda.set_device(hvd.local_rank())
-    #     torch.cuda.manual_seed(args.seed)
-    # # cudnn.benchmark = True
-    # # Horovod: limit # of CPU threads to be used per worker.
-    # torch.set_num_threads(4)
+    
     
     if args.gradient_accumulation_steps < 1:
         raise ValueError(
@@ -492,27 +481,6 @@ def main():
     # If passed along, set the training seed now.
     if args.seed is not None:
         set_seed(args.seed)
-
-
-    # Handle the repository creation
-    # if accelerator.is_main_process:
-    #     if args.push_to_hub:
-    #         # Retrieve of infer repo_name
-    #         repo_name = args.hub_model_id
-    #         if repo_name is None:
-    #             repo_name = Path(args.output_dir).absolute().name
-    #         # Create repo and retrieve repo_id
-    #         api = HfApi()
-    #         repo_id = api.create_repo(repo_name, exist_ok=True, token=args.hub_token).repo_id
-
-    #         with open(os.path.join(args.output_dir, ".gitignore"), "w+") as gitignore:
-    #             if "step_*" not in gitignore:
-    #                 gitignore.write("step_*\n")
-    #             if "epoch_*" not in gitignore:
-    #                 gitignore.write("epoch_*\n")
-    #     elif args.output_dir is not None:
-    #         os.makedirs(args.output_dir, exist_ok=True)
-    # accelerator.wait_for_everyone()
     
 
     # Get the datasets: you can either provide your own training and evaluation files (see below)

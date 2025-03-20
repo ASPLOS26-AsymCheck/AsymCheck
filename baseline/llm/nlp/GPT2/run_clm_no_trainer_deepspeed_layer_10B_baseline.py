@@ -304,7 +304,7 @@ def parse_args():
     parser.add_argument('--use-adasum', action='store_true', default=False,
                     help='use adasum algorithm to do reduction')
     
-    # Elastic Horovod settings
+    
     parser.add_argument('--batches-per-commit', type=int, default=50,
                     help='number of batches processed before calling `state.commit()`; '
                          'commits prevent losing progress if an error occurs, but slow '
@@ -367,20 +367,6 @@ def parse_args():
     return args
 
 
-# # Horovod: average metrics from distributed training.
-# class Metric(object):
-#     def __init__(self, name):
-#         self.name = name
-#         self.sum = torch.tensor(0.)
-#         self.n = torch.tensor(0.)
-
-#     def update(self, val):
-#         self.sum += hvd.allreduce(val.detach().cpu(), name=self.name)
-#         self.n += 1
-
-#     @property
-#     def avg(self):
-#         return self.sum / self.n
 
 
 def main():
@@ -624,17 +610,9 @@ def main():
     def tokenize_function(examples):
         return tokenizer(examples[text_column_name])
 
-    # with accelerator.main_process_first():
-    #     tokenized_datasets = raw_datasets.map(
-    #         tokenize_function,
-    #         batched=True,
-    #         num_proc=args.preprocessing_num_workers,
-    #         remove_columns=column_names,
-    #         load_from_cache_file=not args.overwrite_cache,
-    #         desc="Running tokenizer on dataset",
-    #     )
     
-    # 生成Token的过程非常耗时, 在弹性GPU中恢复单个, 很耗时！！！
+    
+    # 
     tokenized_datasets = raw_datasets.map(
             tokenize_function,
             batched=True,
@@ -881,12 +859,12 @@ def main():
         # Extract `epoch_{i}` or `step_{i}`
         training_difference = os.path.splitext(path)[0]
         
-        # 基于Epoch的检查点
+        # 
         if "epoch" in training_difference:
             starting_epoch = int(training_difference.replace("epoch_", "")) + 1
             resume_step = None
             completed_steps = starting_epoch * num_update_steps_per_epoch
-        # 基于Iteration的检查点
+        # 
         else:
             # need to multiply `gradient_accumulation_steps` to reflect real steps
             resume_step = int(training_difference.replace("step_", "")) * args.gradient_accumulation_steps
@@ -1022,7 +1000,7 @@ def main():
             # losses.append(accelerator.gather_for_metrics(loss.repeat(args.per_device_eval_batch_size)))
             losses.append(loss)
 
-        # 将losses中的零维标量转换为1维张量
+        # 
         losses = [loss.unsqueeze(0) for loss in losses]
         losses = torch.cat(losses)
         try:

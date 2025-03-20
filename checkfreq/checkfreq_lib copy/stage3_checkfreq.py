@@ -554,20 +554,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         while True:
             with torch.cuda.stream(stream):
                 for key, tensor in module_state_dict.items():
-                    # 
-                    # # gpt config
-                    # if numel >= 3327956992:
-                    #     break
-                    
-                    # # BERT config
-                    # if numel >= 3698595842:
-                    #     break
-                    
-                    # # BLOOM config
-                    # if numel >= 3619128320:
-                    #     break
-                    
-                    # RoBERTa config
+  
                     if numel >= 3759661145:
                         break
                     
@@ -578,20 +565,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
                     cpu_tensor_dict[key + str(id)] = cpu_tensor
             id += 1
             stream.synchronize()
-            # 
-            # # gpt config
-            # if numel >= 3327956992:
-            #     break
 
-            # # BERT config
-            # if numel >= 3698595842:
-            #     break
-
-            # # BLOOM config  
-            # if numel >= 3619128320:
-            #     break
-            
-            # RoBERTa config
             if numel >= 3759661145:
                 break
 

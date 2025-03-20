@@ -59,15 +59,9 @@ def get_argument_parser():
                         type=int,
                         help="Total batch size for predictions.")
     
-    # parser.add_argument("--learning_rate",
-    #                     default=5e-5,
-    #                     type=float,
-    #                     help="The initial learning rate for Adam.")
+
     
-    # parser.add_argument("--num_train_epochs",
-    #                     default=3.0,
-    #                     type=float,
-    #                     help="Total number of training epochs to perform.")
+
     
     parser.add_argument(
         "--warmup_proportion",
@@ -420,7 +414,7 @@ def get_argument_parser():
     parser.add_argument('--use-adasum', action='store_true', default=False,
                     help='use adasum algorithm to do reduction')
     
-    # Elastic Horovod settings
+    
     parser.add_argument('--batches-per-commit', type=int, default=50,
                     help='number of batches processed before calling `state.commit()`; '
                          'commits prevent losing progress if an error occurs, but slow '

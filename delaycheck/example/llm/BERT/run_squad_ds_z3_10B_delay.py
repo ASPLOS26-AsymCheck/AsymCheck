@@ -1349,7 +1349,7 @@ if __name__ == '__main__':
 
 
     if args.cuda:
-    # Horovod: pin GPU to local rank. In case of CPU this code is ignored
+    
        torch.cuda.set_device(dist.get_rank())
        torch.cuda.manual_seed(args.seed)
     
@@ -1601,7 +1601,7 @@ if __name__ == '__main__':
         # args.train_batch_size = args.train_batch_size * max(1, n_gpu)
         args.train_batch_size = args.train_batch_size
         
-        # num_replicas=hvd.size() is added in case Horovod is used
+        
         
         train_sampler = RandomSampler(train_data) if dist.get_world_size()==0 else DistributedSampler(train_data, 
                                                                                            num_replicas = dist.get_world_size(), 
