@@ -1321,8 +1321,7 @@ def calculate_in_memory_ckpt_time(model , optimizer,  idx):
                     
         
         
-        # if 'zero-3' is True:
-        #     fp32_flat_groups_0_numel = optimizer.state_dict()['fp32_flat_groups'][0].numel()
+        
 
         fp32_flat_groups_0 = optimizer.state_dict()['fp32_flat_groups'][0]
         fp32_flat_groups_0_numel =fp32_flat_groups_0.numel()

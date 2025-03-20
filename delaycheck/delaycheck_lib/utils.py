@@ -22,7 +22,6 @@ def save_checkpoint_iteration_deepspeed(model, state, epoch,  iteration, save_di
     model.save_checkpoint(save_dir= save_file_path, client_state=state)
 
 
- 
 def save_checkpoint_in_disk_snapshot(progress_save, app_state, checkpoint_save_work_dir='./checkpoint'):
     progress_save["current_epoch"] += 1
     snapshot = torchsnapshot.Snapshot.take(
@@ -63,14 +62,10 @@ def calculate_in_memory_ckpt_time(model , optimizer,  idx):
         exp_avg_cpu = torch.zeros(exp_avg_0_numel, device='cpu', dtype=exp_avg.dtype, requires_grad=False)
         exp_avg_cpu.copy_(exp_avg.view(exp_avg_0_numel), non_blocking=False)
         
-        
         exp_avg_sq = optimizer.state_dict()['optimizer_state_dict']['state'][0]['exp_avg']
         exp_avg_sq_cpu = torch.zeros(exp_avg_sq_0_numel, device='cpu', dtype=exp_avg_sq.dtype, requires_grad=False)
         exp_avg_sq_cpu.copy_(exp_avg_sq.view(exp_avg_sq_0_numel), non_blocking=False)
 
-
-        # if 'zero-3' is True:
-        #     fp32_flat_groups_0_numel = optimizer.state_dict()['fp32_flat_groups'][0].numel()
 
         fp32_flat_groups_0 = optimizer.state_dict()['fp32_flat_groups'][0]
         fp32_flat_groups_0_numel =fp32_flat_groups_0.numel()
@@ -127,3 +122,8 @@ def save_checkpoint_async_model(model, optimizer_state, epoch, idx, checkpoint_s
     
     if dist.get_rank() == 0 :
         print('save_checkpoint_async = ', end_time)
+
+
+
+
+
