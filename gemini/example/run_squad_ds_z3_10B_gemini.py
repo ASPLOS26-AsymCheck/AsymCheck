@@ -971,13 +971,11 @@ def calculate_in_memory_ckpt_time(model , optimizer,  idx):
         value_clone = value.clone()
         
         _model_state_dict_cpu[key].copy_(value_clone.view(value.numel()), non_blocking=True)
-        # _state_dict_cpu[key] = value_clone.cpu()
+        
         numel_count += value.numel()
-        # print('value.numel() = ', value.numel())
+        
 
-    # save_checkpoint_in_memory(epoch)
-    # in_memory_time =  0.015248775482177734
-    # print('numel_count = ', numel_count)
+    
     print('model_state_in_memory_time = ', time.time()- in_memory_time)
 
 
@@ -996,8 +994,7 @@ def calculate_in_memory_ckpt_time(model , optimizer,  idx):
         exp_avg_sq_cpu = torch.zeros(exp_avg_sq_0_numel, device='cpu', dtype=exp_avg_sq.dtype, requires_grad=False)
         exp_avg_sq_cpu.copy_(exp_avg_sq.view(exp_avg_sq_0_numel), non_blocking=True)
 
-        # _optimizer_state_dict_exp_avg_cpu = 
-        # _optimizer_state_dict_exp_avg_sq_cpu = 
+        
                     
         
         
@@ -1014,9 +1011,7 @@ def calculate_in_memory_ckpt_time(model , optimizer,  idx):
     return
 
     if dist.get_rank() == 0 and idx>100 and True:
-        # print(model.state_dict().items())
-        # print('model.state_dict() = ', model.state_dict())
-        # print('model.state_dict().keys() = ', model.state_dict().keys())
+        
 
 
         # optimizer.state_dict() =  dict_keys(['state', 'param_groups'])

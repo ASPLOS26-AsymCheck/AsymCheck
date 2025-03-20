@@ -1621,7 +1621,7 @@ class DeepSpeedEngine(Module):
                 log_dist(f'Creating {model_dtype} ZeRO stage {zero_stage} optimizer', ranks=[0])
                 
                 # 
-                # Modify by mingzq, 20241018, 
+                
                 # Zero-3
                 # from deepspeed.runtime.zero.stage3 import DeepSpeedZeroOptimizer_Stage3
                 

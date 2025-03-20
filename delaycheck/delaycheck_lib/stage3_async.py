@@ -1689,12 +1689,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
 
 
         # 
-        # print('len(full_grads_for_rank) = ', len(full_grads_for_rank))
-        # print('full_grads_for_rank = ', full_grads_for_rank)
-        # grad_count = 0
-        # for grad_rank in full_grads_for_rank:
-        #     grad_count = grad_count + len(grad_rank)
-        # print('grad_count = ', grad_count)
+        
 
 
         local_world_size = get_accelerator().device_count()

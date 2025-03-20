@@ -160,8 +160,7 @@ def _save_checkpoint_in_memory(queue):
     while True:
         s_time = time.time()
         stateful_model_state = torchsnapshot.StateDict()
-        # model_dict_state, optimizer_state_dict
-        # stateful_model_state[new_name] = self._save_parameter_cpu[new_name]
+        
         _model_state_dict_gpu, _optimizer_state_dict_gpu, data_type, checkpoint_save_work_dir, idx, epoch = queue.get()
         if data_type == 0:
             _state_dict_cpu = {}
@@ -170,52 +169,28 @@ def _save_checkpoint_in_memory(queue):
                 # _state_dict_cpu[key] = value.cpu()
                 stateful_model_state[key]= value.cpu()
             
-            # torch.save()的checkpoint保存技术, 
-            # checkpoint_save_work_dir = '/home/data/mzq/ckpt_save/vgg19/iteration'
-            # checkpoint_save_work_dir = '/home/data/mzq/ckpt_save/bert_large/iteration'
+            
             
             checkpoint_save_work_dir = '/data/lzy/'
             output_model_file = os.path.join(checkpoint_save_work_dir, f"run-{uuid.uuid4()}-epoch-{epoch}-iteration-{idx}")
             save_data={"Model":_model_state_dict_gpu,
                        "Optimizer":_optimizer_state_dict_gpu,
-                       # "Optimizer-1":copy.deepcopy(_optimizer_state_dict_gpu),
-                       # "Optimizer-2":copy.deepcopy(_optimizer_state_dict_gpu),
+                       
                     }
             torch.save(save_data, output_model_file)
             
-            # Snapshot.take checkpoint保存技术, 并行IO操作
-            # app_state: Dict[str, Stateful] = {
-            #     "rng_state": torchsnapshot.RNGState(),
-            #     # "model": self._model,
-            #     "model_state_cpu": stateful_model_state,
-            #     # "optim": self._optimizer,
-            #     # "progress": progress,
-            # }
-            # # print('stateful_model_state.items = ', len(stateful_model_state.items()))
+            
 
-            # # # The snapshot is written to the CPU memory first and then to the local disk
-            # # # # torchsnapshot: take snapshot
-            # # # progress["current_epoch"] += 1
-            # # # Synchronous write I/O
-            # snapshot = torchsnapshot.Snapshot.take(f"{checkpoint_save_work_dir}/run-{uuid.uuid4()}-epoch-{epoch}-iteration-{idx}",
-            #                                        app_state, replicated=["**"],
-            #                                        # this pattern treats all states as replicated
-            #                                     )
-
-            # # # # 异步写入IO 
-            # # snapshot = torchsnapshot.Snapshot.async_take(f"{self.checkpoint_save_work_dir}/run-{uuid.uuid4()}-epoch-{epoch}-iteration-{idx}",
-            # #                                        app_state, replicated=["**"],
-            # # # this pattern treats all states as replicated
-            # # )
+            
 
         elif data_type == 1:              
             _state_tensor_cpu = []
             _state_tensor_cpu = _model_state_dict_gpu.cpu()
-            # print('len(_state_dict_gpu) = ', len(_state_dict_gpu))
+            
         else:
             raise NotImplementedError("Data type error!")
 
-        # print('asynch_checkpoint_in_memory!')               
+                     
 
     return
 
@@ -1431,8 +1406,7 @@ class DeepSpeedEngine(Module):
         optimizer_wrapper = self._do_optimizer_sanity_check(basic_optimizer)
         
         # 
-        # 选择具体的Zero, 返回对应Zero的优化器, 
-        # Modify by mingzq, 20240924, 
+        
         # 
         if optimizer_wrapper == ZERO_OPTIMIZATION:
             self.optimizer = self._configure_zero_optimizer(basic_optimizer)
@@ -1772,8 +1746,7 @@ class DeepSpeedEngine(Module):
                 
                 from deepspeed_lib.stage3 import DeepSpeedZeroOptimizer_Stage3
                 
-                # Modify by mingzq, 20240830, 
-                # 基于Zero-3进行训练, 
+                
                 print('Initialization Zero-3!!!')
                 print('self.zero_reduce_bucket_size() = ', self.zero_reduce_bucket_size())
 

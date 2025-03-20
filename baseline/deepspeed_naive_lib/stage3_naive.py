@@ -134,8 +134,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
 
 
         # 
-        # 设置基于Allreduce的Bucket的大小, 即梯度合并的缓冲区大小
-        # Modify by mingzq, 20250301, 
+       
         # 
         # 
         reduce_bucket_size=10000000000,
