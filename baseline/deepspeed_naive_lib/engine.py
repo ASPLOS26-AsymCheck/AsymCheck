@@ -136,8 +136,7 @@ import multiprocessing
 
 
 
-# 梯度合并的缓冲区大小, 梯度元素个数,
-# Design by mingzq, 20240821
+
 MEMORY_OPT_ALLREDUCE_SIZE = 20000000
 
 
@@ -159,8 +158,7 @@ def _save_checkpoint_in_memory(queue):
     while True:
         s_time = time.time()
         stateful_model_state = torchsnapshot.StateDict()
-        # model_dict_state, optimizer_state_dict
-        # stateful_model_state[new_name] = self._save_parameter_cpu[new_name]
+        
         _model_state_dict_gpu, _optimizer_state_dict_gpu, data_type, checkpoint_save_work_dir, idx, epoch = queue.get()
         if data_type == 0:
             _state_dict_cpu = {}
@@ -169,53 +167,31 @@ def _save_checkpoint_in_memory(queue):
                 # _state_dict_cpu[key] = value.cpu()
                 stateful_model_state[key]= value.cpu()
             
-            # torch.save()的checkpoint保存技术, 
-            # checkpoint_save_work_dir = '/home/data/mzq/ckpt_save/vgg19/iteration'
-            # checkpoint_save_work_dir = '/home/data/mzq/ckpt_save/bert_large/iteration'
+            
             
             checkpoint_save_work_dir = '/home/mzq/workspace/project/DeepSpeedExamples/training/cifar100/multi_process_test'
             output_model_file = os.path.join(checkpoint_save_work_dir, f"run-{uuid.uuid4()}-epoch-{epoch}-iteration-{idx}")
 
             save_data={"Model":_model_state_dict_gpu,
                        "Optimizer":_optimizer_state_dict_gpu,
-                       # "Optimizer-1":copy.deepcopy(_optimizer_state_dict_gpu),
-                       # "Optimizer-2":copy.deepcopy(_optimizer_state_dict_gpu),
+                       
                     }
             torch.save(save_data, output_model_file)
             
-            # Snapshot.take checkpoint保存技术, 并行IO操作
-            # app_state: Dict[str, Stateful] = {
-            #     "rng_state": torchsnapshot.RNGState(),
-            #     # "model": self._model,
-            #     "model_state_cpu": stateful_model_state,
-            #     # "optim": self._optimizer,
-            #     # "progress": progress,
-            # }
-            # # print('stateful_model_state.items = ', len(stateful_model_state.items()))
+            
 
-            # # # The snapshot is written to the CPU memory first and then to the local disk
-            # # # # torchsnapshot: take snapshot
-            # # # progress["current_epoch"] += 1
-            # # # Synchronous write I/O
-            # snapshot = torchsnapshot.Snapshot.take(f"{checkpoint_save_work_dir}/run-{uuid.uuid4()}-epoch-{epoch}-iteration-{idx}",
-            #                                        app_state, replicated=["**"],
-            #                                        # this pattern treats all states as replicated
-            #                                     )
+            
 
-            # # # # 异步写入IO 
-            # # snapshot = torchsnapshot.Snapshot.async_take(f"{self.checkpoint_save_work_dir}/run-{uuid.uuid4()}-epoch-{epoch}-iteration-{idx}",
-            # #                                        app_state, replicated=["**"],
-            # # # this pattern treats all states as replicated
-            # # )
+            
 
         elif data_type == 1:              
             _state_tensor_cpu = []
             _state_tensor_cpu = _model_state_dict_gpu.cpu()
-            # print('len(_state_dict_gpu) = ', len(_state_dict_gpu))
+            
         else:
             raise NotImplementedError("Data type error!")
 
-        # print('asynch_checkpoint_in_memory!')               
+                   
 
     return
 
