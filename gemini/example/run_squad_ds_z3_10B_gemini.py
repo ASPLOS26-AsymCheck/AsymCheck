@@ -915,7 +915,7 @@ def full_train():
             
 
             if idx % step == 0 and dist.get_rank()==0:
-            # if step % args.log_freq == 0 and dist.get_rank()==0:
+            
                 dllogger.log(step=(epoch, global_step,), data={"step_loss": final_loss,
                                 "learning_rate": optimizer.param_groups[0]['lr']})
                 print('Average Forward Time = ', sum(forworad_time_array)/10)

@@ -2236,17 +2236,6 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
             
         while True:         
             for key, value in model_state_dict.items():
-                # # # gpt2 config
-                # if total_size >= 3327956992:
-                #     break
-                
-                # # BERT config
-                # if total_size >= 3698595842:
-                #     break
-                
-                # BLOOM config
-                # if total_size >= 3619128320:
-                #     break
                     
                 # RoBERTa config
                 if total_size >= 3759661145:
@@ -2271,17 +2260,6 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
                         numel = 0
                         index = (index + 1) % 2
                         
-            # # # gpt2 config
-            # if total_size >= 3327956992:
-            #     break
-            
-            # # BERT config
-            # if total_size >= 3698595842:
-            #     break
-            
-            # # BLOOM config
-            # if total_size >= 3619128320:
-            #     break
             
             # RoBERTa config
             if total_size >= 3759661145:
@@ -2311,11 +2289,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
             cpu_tensor_array.append(cpu_buffer[index])
             cpu_buffer[index] = None
         
-        # if dist.get_rank() == 0:
-        #     print("model write times = ", time)
-        #     print("model total size = ", total_size)
-        #     print("model target write times = ", (total_size / buffer_size))
-        #     print("model cpu tensor num = ", len(cpu_tensor_array))
+        
         
         self.module_cpu_tensor_array = cpu_tensor_array
 

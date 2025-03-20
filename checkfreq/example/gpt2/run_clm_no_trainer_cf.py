@@ -334,8 +334,7 @@ def parse_args():
     parser.add_argument('--threshold', type=int, default=34015396, help='Set threshold if mgwfbp is False')
     parser.add_argument('--rdma', action='store_true', default=False, help='Use RDMA')
 
-    # Top-k + EF
-    # parser.add_argument('--compressor', type=str, default='topkef', choices=compressors.keys(), help='Specify the compressors if density < 1.0')
+    
     parser.add_argument('--compressor', type=str, default='topkef', help='Specify the compressors if density < 1.0')
     
     parser.add_argument('--memory', type=str, default = 'residual', help='Error-feedback')
@@ -685,14 +684,7 @@ def main():
     # To speed up this part, we use multiprocessing. See the documentation of the map method for more information:
     # https://huggingface.co/docs/datasets/process#map
 
-    # with accelerator.main_process_first():
-    #     lm_datasets = tokenized_datasets.map(
-    #         group_texts,
-    #         batched=True,
-    #         num_proc=args.preprocessing_num_workers,
-    #         load_from_cache_file=not args.overwrite_cache,
-    #         desc=f"Grouping texts in chunks of {block_size}",
-    #     )
+    
     
     
     lm_datasets = tokenized_datasets.map(

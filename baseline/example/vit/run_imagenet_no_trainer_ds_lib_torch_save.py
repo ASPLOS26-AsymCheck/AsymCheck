@@ -372,8 +372,7 @@ def parse_args():
     parser.add_argument('--threshold', type=int, default=34015396, help='Set threshold if mgwfbp is False')
     parser.add_argument('--rdma', action='store_true', default=False, help='Use RDMA')
 
-    # Top-k + EF
-    # parser.add_argument('--compressor', type=str, default='topkef', choices=compressors.keys(), help='Specify the compressors if density < 1.0')
+    
     parser.add_argument('--compressor', type=str, default='topkef', help='Specify the compressors if density < 1.0')
     
     parser.add_argument('--memory', type=str, default = 'residual', help='Error-feedback')

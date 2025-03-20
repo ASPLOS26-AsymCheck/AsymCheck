@@ -1162,7 +1162,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         # TODO. make this less error prone
         self.micro_step_id += 1
         
-    # Zero-3 Gradient Allreduce操作
+    
     
     def overlapping_partition_gradients_reduce_epilogue(self):
         self.independent_gradient_partition_epilogue()

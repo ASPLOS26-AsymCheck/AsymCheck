@@ -930,7 +930,7 @@ def full_train():
             # 
             
             if idx % step == 0 and dist.get_rank()==0:
-            # if step % args.log_freq == 0 and dist.get_rank()==0:
+            
                 dllogger.log(step=(epoch, global_step,), data={"step_loss": final_loss,
                                 "learning_rate": optimizer.param_groups[0]['lr']})
                 print('Average Forward Time = ', sum(forworad_time_array)/10)
@@ -941,12 +941,7 @@ def full_train():
                 print('Average Iteration Time = ', (time.time() -s_time)/10)
 
                 # 
-                
-                
-                # dict_keys(['zero_stage', 'loss_scaler', 'dynamic_loss_scale', 'overflow', 
-                # 'partition_count', 'optimizer_state_dict', 'fp32_flat_groups'])
-
-                )
+ 
 
                 s_time = time.time()
 
