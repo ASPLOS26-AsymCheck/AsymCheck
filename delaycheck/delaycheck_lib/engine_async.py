@@ -2747,7 +2747,7 @@ class DeepSpeedEngine(Module):
     def buffered_allreduce_fallback(self, grads=None, elements_per_buffer=500000000):
 
 
-        # print('-----------buffered_allreduce_fallback-------------')
+        # 
 
         if grads is None:
             if hasattr(self.optimizer, "get_grads_for_reduction"):

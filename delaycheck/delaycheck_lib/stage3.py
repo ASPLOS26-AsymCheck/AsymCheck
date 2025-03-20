@@ -1379,7 +1379,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         if not get_accelerator().resolves_data_dependency():
             self.reduce_and_partition_stream.wait_stream(get_accelerator().default_stream())
         
-        # self.reduce_bucket_size = 500000000, 
+        
         # self.elements_in_ipg_bucket The number of elements in the current Bucket 
         if self.contiguous_gradients and self.elements_in_ipg_bucket + param.grad.numel() <= self.reduce_bucket_size:
             # move the gradient to a contiguous buffer
@@ -1417,7 +1417,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
     @torch.no_grad()
     def __reduce_and_partition_ipg_grads(self, safe_mode: bool = False) -> None:
         
-        # print('__reduce_and_partition_ipg_grads')
+        
         # When params_in_ipg_bucket is empty, return without performing Allreduce operation
         if not self.params_in_ipg_bucket:
             return

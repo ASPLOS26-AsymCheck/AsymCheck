@@ -155,8 +155,6 @@ except ImportError:
 
 
 # 
-# Modify by mingzq, 20241012
-# 
 def _save_checkpoint_in_memory(queue):
     while True:
         s_time = time.time()
@@ -1436,8 +1434,6 @@ class DeepSpeedEngine(Module):
         optimizer_wrapper = self._do_optimizer_sanity_check(basic_optimizer)
         
         # 
-        # 选择具体的Zero, 返回对应Zero的优化器, 
-        # Modify by mingzq, 20240924, 
         # 
         if optimizer_wrapper == ZERO_OPTIMIZATION:
             self.optimizer = self._configure_zero_optimizer(basic_optimizer)
@@ -1774,11 +1770,8 @@ class DeepSpeedEngine(Module):
                 
                 
                 # from deepspeed.runtime.zero.stage3 import DeepSpeedZeroOptimizer_Stage3
-                # Modify by mingzq, 20240923, 
                 from deepspeed_lib.stage3 import DeepSpeedZeroOptimizer_Stage3
                 
-                # Modify by mingzq, 20240830, 
-                # 基于Zero-3进行训练, 
                 print('Initialization Zero-3!!!')
                 print('self.zero_reduce_bucket_size() = ', self.zero_reduce_bucket_size())
 
@@ -2151,8 +2144,6 @@ class DeepSpeedEngine(Module):
                 self.buffered_allreduce_fallback(grads=grads, elements_per_buffer=bucket_size)
 
 
-    # 执行反向传播计算, 
-    # Modify by mingzq, 20240821
     @instrument_w_nvtx
     def backward(self, loss, allreduce_gradients=True, release_loss=False, retain_graph=False, scale_wrt_gas=True):
         r"""Execute backward pass on the loss
@@ -2227,12 +2218,12 @@ class DeepSpeedEngine(Module):
         
         self.backward_time_array.append(b_time - s_time)
         
-        # 执行Allreduce操作, Modify by mingzq, 20240821, 
-        # 拿到DNN所有的层反向传播的梯度, 再统一执行Allreduce操作, 
+        
+        
         self._start_timers(self.engine_timers.backward_reduce_timers)
         if allreduce_gradients and self.enable_backward_allreduce:
             # Traditional code path that allreduces the module parameter grads, 
-            # DeepSpeed大部分都是在完成反向传播结束后执行Allreduce操作, 
+            # 
             self.allreduce_gradients()
 
 
@@ -2618,13 +2609,13 @@ class DeepSpeedEngine(Module):
             buf.copy_(synced)
     
     
-    # 合并梯度然后进行Allreduce操作, Modify by mingzq, 20240820
+    #  
     # 
     def allreduce_no_retain(self, bucket, dp_group, numel_per_bucket=500000000, dp_world_size=None):
         small_bucket = []
         numel = 0
         
-        # 将bucket中的元素划分Small Buffer执行Allreduce操作, 
+        #  
         for tensor in bucket:
             small_bucket.append(tensor)
             numel = numel + tensor.numel()
@@ -2633,7 +2624,7 @@ class DeepSpeedEngine(Module):
                 small_bucket = []
                 numel = 0
         
-        # 将剩下的梯度元素执行Allreduce操作, 
+        # 
         if len(small_bucket) > 0:
             self.allreduce_and_copy(small_bucket, dp_group, dp_world_size)
 
@@ -2673,24 +2664,12 @@ class DeepSpeedEngine(Module):
         return non_expert_grads, expert_grads
 
 
-    # 执行非专家节点的梯度通常通信操作,
-    # Modify by mingzq, 20240821, 
-    def _reduce_non_expert_gradients(self, grads, elements_per_buffer):
 
-        # print('--------------_reduce_non_expert_gradients----------------')
-        
-        
-        # 判断grads的组成成分
-        
-        
-        
-        # 因为他的通信是异步的
-        
-        
+    def _reduce_non_expert_gradients(self, grads, elements_per_buffer):
 
         split_sparse_tensor_buckets, split_dense_tensor_buckets = split_half_float_double_sparse(grads)
 
-        # 判断是否采用流水线并行的方法
+        # 
         if self.pipeline_parallelism:
             dp_group = self.mpu.get_data_parallel_group()
             dp_world_size = dist.get_world_size(dp_group)
@@ -2707,14 +2686,12 @@ class DeepSpeedEngine(Module):
 
 
 
-        # 稀疏梯度Allreduce, Modify by mingzq, 20240820
         for _, sparse_bucket_tuple in enumerate(split_sparse_tensor_buckets):
             if sparse_bucket_tuple:
                 bucket_type, sparse_bucket = sparse_bucket_tuple
                 self.sparse_allreduce_no_retain(sparse_bucket, dp_group=dp_group, dp_world_size=dp_world_size)
         
-        
-        # 稠密梯度Allreduce, Modify by mingzq, 20240820
+    
         for _, dense_bucket_tuple in enumerate(split_dense_tensor_buckets):
             if dense_bucket_tuple:
                 bucket_type, dense_bucket = dense_bucket_tuple
@@ -2727,8 +2704,6 @@ class DeepSpeedEngine(Module):
     
     
     
-    # 执行节点的梯度同步操作, Modify by mingzq, 20240820
-    # 包含MoE层的梯度Allreduce同步,
     def _reduce_expert_gradients(self, expert_grads, elements_per_buffer):
 
 
@@ -2756,13 +2731,8 @@ class DeepSpeedEngine(Module):
                                              numel_per_bucket=elements_per_buffer,
                                              dp_world_size=dp_world_size)
     
-    
-    # 基于Buffer的梯度同步方案, Buffer中元素数量固定, 即固定Buffer缓冲区的梯度合并操作,
-    # Modify by mingzq, 20240821
+
     def buffered_allreduce_fallback(self, grads=None, elements_per_buffer=500000000):
-
-
-        # print('-----------buffered_allreduce_fallback-------------')
 
         if grads is None:
             if hasattr(self.optimizer, "get_grads_for_reduction"):
@@ -2775,10 +2745,10 @@ class DeepSpeedEngine(Module):
             non_expert_grads = grads
 
 
-        # Non-Expert表示的是非混合专家模型的梯度同步策略, 20240820, 
+
         self._reduce_non_expert_gradients(non_expert_grads, elements_per_buffer)
 
-        # MoE操作, 混合转机模型的梯度同步策略, 20240820
+
         if self.has_moe_layers:
             self._reduce_expert_gradients(expert_grads, elements_per_buffer)
         

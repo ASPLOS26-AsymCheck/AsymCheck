@@ -100,19 +100,9 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         verbose=True,
         contiguous_gradients=True,
         
-        # Modify by mingzq, 20240830
-        # 固定缓冲区Buffer的大小, 
-        # reduce_bucket_size=500000000,
-        
-        
-        
-        # self.reduce_bucket_size
-        # default reduce_bucket_size = 500000000
         reduce_bucket_size=10000000000,
 
         
-        
-        # 预取bucket大小
         prefetch_bucket_size=50000000,
         
         max_reuse_distance=1000000000,
@@ -283,7 +273,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         self.gradient_accumulation_steps = gradient_accumulation_steps
         self.micro_step_id = 0
 
-        # 调整缓冲区的大小, Modify by mingzq, 20240929
+        
         self.reduce_bucket_size = int(reduce_bucket_size)
 
         if self.all2all_process_group is not None:
@@ -361,7 +351,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         self.params_in_ipg_bucket = []
         
         # Count the number of gradient elements copied to CPU memory, 
-        # Modify by mingzq, 20240920, 
+        
         self.elements_copy_to_memory = []
         
         self.parameter_cpu = None
@@ -523,7 +513,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
             logger.info(f"optimizer state initialized")
 
         # IPG
-        # 合并梯度, Modify by mingzq, 
+        
         # 
         if self.contiguous_gradients:
             self.__ipg_bucket_flat_buffer: Tensor = torch.empty(self.reduce_bucket_size,
@@ -1128,14 +1118,14 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
                 self.first_param_index_in_partition[i][partition_id] = self.get_first_param_index(
                     i, param_group, partition_id)
     
-    # Modify by mingzq, 20240824
-    # 独立梯度分割后记, 
+    
+    
     @instrument_w_nvtx
     def independent_gradient_partition_epilogue(self):
         
         self.report_ipg_memory_usage(f"In ipg_epilogue before reduce_ipg_grads", 0)
         
-        # Gradient Allreduce, Modify by mingzq, 20240824
+        
         # 
         self.__reduce_and_partition_ipg_grads()
         
@@ -1166,7 +1156,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         self.micro_step_id += 1
         
     # Zero-3 Gradient Allreduce操作
-    # Modify by mingzq, 20240824
+    
     def overlapping_partition_gradients_reduce_epilogue(self):
         self.independent_gradient_partition_epilogue()
 
@@ -1188,10 +1178,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
                         param_tmp = param.expand_as(param)
                         grad_acc = param_tmp.grad_fn.next_functions[0][0]
                         
-                        # Modify by mingzq, 20240828
-                        # 对就绪的梯度进行分区合并和Allreduce操作, 
-                        # 多机一个Iteration的时间和单机一个Iteration的时间的差值为
-                        # 梯度同步通信的时间, 
+                        
                         # 
                         @instrument_w_nvtx
                         def reduce_partition_and_remove_grads(*notneeded):
@@ -1211,7 +1198,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
                     param.partition()
 
         # We delay reduce-scatter for all gradients in the leaf modules until the backward pass of the leaf module is done
-        # 我们会延迟叶模块中所有梯度的reduce-scatter，直到叶模块的后向传递完成为止
+        
         for leaf_module, leaf_parameters in self.leaf_parameters.items():
 
             def wrapper_pre_hook(params):
@@ -1221,7 +1208,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
                     module._leaf_module_inputs_remaining = 0
                     
                     
-                    # 注册钩子函数, Modify by mingzq, 20240920
+                    # 
                     @instrument_w_nvtx
                     def reduce_leaf_module_grads(grad):
                         module._leaf_module_inputs_remaining -= 1
@@ -1280,7 +1267,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
             force=False)
 
     ###############Independent Partition Gradient ########################
-    # Modify by mingzq, 20240824
+    
     def reduce_independent_p_g_buckets_and_remove_grads(self, param):
         
         # print('reduce_independent_p_g_buckets_and_remove_grads')
@@ -1292,20 +1279,9 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         # garbage data and `self.average_tensor()` will crash because its params_to_reduce will be
         # empty, while reduction_list will have that garbage data.
         
-        # 表示在合并梯度的中途执行Allreduce操作, Modify by mingzq, 20240824
-        # self.reduce_bucket_size = 500000000
-        # print('self.elements_in_ipg_bucket + param.ds_numel > self.reduce_bucket_size = ', self.elements_in_ipg_bucket + param.ds_numel , self.reduce_bucket_size , self.elements_in_ipg_bucket + param.ds_numel > self.reduce_bucket_size )
-        # print('self.elements_in_ipg_bucket > 0 = ', self.elements_in_ipg_bucket, self.elements_in_ipg_bucket > 0)
         
         
-        # 判断缓冲区是否已经满了, 如果满了则执行Allreduce操作, 
-        # Modify by mingzq, 20240829
-        # 当合并Buffer足够大的时候, 反向传播的梯度全部进入缓冲区, 即在所有梯度反向传播完成后,对缓冲区内的梯度进行Allreduce操作
-        # 这种情况梯度通信和反向传播都没有重叠起来;
-        # Allreduce包含两个操作: 1) 对Buffer内的所有连续梯度执行一次Allreduce操作;
-        # 2) 对Buffer内的梯度按照各自大小划分, 单独地执行Allreduce操作;
-        # 当合并Buffer较小的时候, 在合并完成一部分梯度之后就执行Allreduce操作,
-        # 这种情况可以实现通信和计算的重叠;
+        
         if self.elements_in_ipg_bucket + param.ds_numel > self.reduce_bucket_size and self.elements_in_ipg_bucket > 0:
             self.report_ipg_memory_usage("In ipg_remove_grads before reduce_ipg_grads", param.ds_numel)
 
@@ -1321,14 +1297,14 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         if not get_accelerator().resolves_data_dependency():
             self.reduce_and_partition_stream.wait_stream(get_accelerator().default_stream())
         
-        # self.reduce_bucket_size = 500000000, 
-        # self.elements_in_ipg_bucket 当前Bucket的elements的数量, 
+        
+        
         if self.contiguous_gradients and self.elements_in_ipg_bucket + param.grad.numel() <= self.reduce_bucket_size:
             # move the gradient to a contiguous buffer
-            # 将梯度移动到连续的缓冲区中
+            
             with get_accelerator().stream(self.reduce_and_partition_stream):
                 # move the parameter's gradient to the contiguous flat buffer
-                # 将参数的梯度移动到连续的平面缓冲区中
+                
                 new_grad_tensor = self.__ipg_bucket_flat_buffer.narrow(0, self.elements_in_ipg_bucket,
                                                                        param.grad.numel()).view_as(param.grad)
                 new_grad_tensor.copy_(param.grad, non_blocking=True)
@@ -1357,17 +1333,17 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         # print('self.__ipg_bucket_flat_buffer = ', self.__ipg_bucket_flat_buffer)
 
 
-    # Modify by mingzq, 20240824, 
+    , 
     @instrument_w_nvtx
     @torch.no_grad()
     def __reduce_and_partition_ipg_grads(self, safe_mode: bool = False) -> None:
         
-        # print('__reduce_and_partition_ipg_grads')
-        # params_in_ipg_bucket 表示为空的时候Return不做Allreduce操作
+        
+        
         if not self.params_in_ipg_bucket:
             return
         
-        # params_in_ipg_bucket 不为空判断梯度的元素和参数的元素数量是否一致
+       
         for param in self.params_in_ipg_bucket:
             if param.grad.numel() != param.ds_numel:
                 raise RuntimeError(f"{param.grad.numel()} != {param.ds_numel} Cannot reduce scatter "
@@ -1383,8 +1359,6 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         # 
         # Copy the fragmented checkpoints to the host memory
         def save_ckpt_to_memory(parameter_bucket):
-            # 
-            # 缓冲区的长度跟实际复制梯度的长度不一致,
             # 
             # self.__ipg_parameter_bucket_flat_buffer_cpu = self.__ipg_parameter_bucket_flat_buffer_cpu[:parameter_bucket.numel()]
                 
@@ -1409,70 +1383,30 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
             # self.elements_in_ipg_bucket <= self.reduce_bucket_size =  True
             # not self.reduce_scatter =  False
 
-            # Modify by mingzq, 20240824, 
+            , 
             self.reduce_scatter =  False
 
             if self.contiguous_gradients and self.elements_in_ipg_bucket <= self.reduce_bucket_size and not self.reduce_scatter:
-                # 基于缓冲区的Allreduce, Modify by mingzq, 20240824
+                
                 grad_bucket = self.__ipg_bucket_flat_buffer.narrow(0, 0, self.elements_in_ipg_bucket)
 
-                # 将梯度对应的参数也合并起来, Modify by mingzq, 20240920, 
+                
                 parameter_bucket = self.__ipg_parameter_bucket_flat_buffer.narrow(0, 0, self.elements_in_ipg_bucket)
 
-                # 将模型对应的优化器状态也保存下来, Modify by mingzq, 加载的时候需要将它们还原成原始的梯度状态, 
                 # 
 
-                # Modify by mingzq, 20240923, 
+                
                 # grad_partitions = self.__avg_scatter_contiguous_grads(grad_bucket)
 
                 world_size = dist.get_world_size()
                 rank = dist.get_rank()
 
-                # print('world_size = ', world_size)
-                # print('rank = ', rank)
-
-                # Modify by mingzq, 20240929, 
-                # Reconstruction of Zero-3
-                # if torch.distributed.get_rank() == 0: 
-                if rank == 0 and False:
-                    # print('-----------------------Reconstructe Zero-3--------------------')
-                    parameter_tensor_cpu =  save_ckpt_to_memory(parameter_bucket)                    
-                    parameter_numel = parameter_tensor_cpu.numel()                    
-                    parameter_numpy_cpu =  parameter_tensor_cpu.numpy()       
-                    _name = 'parameter_buffer'                    
-                    existing_shm = shared_memory.SharedMemory(name = _name)                    
-                    shard_buffer = np.ndarray(1024*1024*1024*8, dtype=parameter_numpy_cpu.dtype, buffer=existing_shm.buf)
-
-                    sum_elements_copy = sum(self.elements_copy_to_memory)
-
-                    # Case-1: Copy operation performed by a rank, 20240920, 
-                    # shard_buffer[sum_elements_copy : sum_elements_copy + parameter_numel] = parameter_numpy_cpu
-
-                    # Case-2: Copy operations performed by multiple ranks, 20240920, 
-                    per_rank_copy = int(parameter_numel//world_size)
-                    # while parameter_numel % world_size!=0:
-                    if rank == world_size-1:
-                        shard_buffer[sum_elements_copy + per_rank_copy*rank : sum_elements_copy + parameter_numel] = parameter_numpy_cpu[per_rank_copy*rank:]
-                    else:
-                        # print(parameter_numpy_cpu[per_rank_copy*rank:per_rank_copy*(rank+1)])
-                        shard_buffer[sum_elements_copy + per_rank_copy*rank : sum_elements_copy + per_rank_copy*(rank+1)] = parameter_numpy_cpu[per_rank_copy*rank:per_rank_copy*(rank+1)]
-                    self.elements_copy_to_memory.append(parameter_numel)
-
-                    # print('sum(self.elements_copy_to_memory) = ', sum(self.elements_copy_to_memory))
-
-                    # 拼接张量复制到备份共享CPU内存, 拼接操作耗时得很, 因此可能需要采用直接从内存中Copy或者复制现有的
-                    # 共享内存缓冲区, Modify by mingzq, 20240920, 
-
-                # 
-                # Modify by mingzq, 20240923, 
-                # 在梯度合并完成, 参数分片完成, 合并梯度Allreduce之前进行检查点的从GPU到CPU Memory的Copy_
-                # 这样能够将Copy_操作的开销完全隐藏到流水线当中, 而不会对iteration的训练产生影响, 
-                # 
+                
                 grad_partitions = self.__avg_scatter_contiguous_grads(grad_bucket)
                 
 
             else:
-                # 基于分层的Allreduce, Modify by mingzq, 20240824
+                
                 self.params_in_ipg_bucket.sort(key=lambda p: p.ds_id)
                 
                 grad_partitions = self.__avg_scatter_grads(self.params_in_ipg_bucket)
@@ -1486,81 +1420,10 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
             
 
 
-            # if torch.distributed.get_rank() == 0:                
-            #     # Modify by mingzq, 20270828
-            #     # len(self.__ipg_bucket_flat_buffer) =  10000000, 固定的Buffer大小, 
-            #     # len(grad_bucket) =  9587200, 已经是梯度展平后的结果了, 一维张量, 
-            #     # grad_bucket.size() =  torch.Size([9925608])
-            #     # print('len(self.__ipg_bucket_flat_buffer) = ', len(self.__ipg_bucket_flat_buffer))
-
-            #     # print('len(grad_bucket) = ', len(grad_bucket))
-
-            #     # print('len(parameter_bucket) = ', len(parameter_bucket))
-
-            #     # print('grad_bucket = ', grad_bucket)
-
-            #     # print('parameter_bucket = ', parameter_bucket)
-
-            #     # Copy checkpoints from GPU to CPU memory
-            #     # 
-            #     # Modify by mingzq, 20240920, 
-            #     parameter_tensor_cpu =  save_ckpt_to_memory(parameter_bucket)
-
-            #     parameter_numel = parameter_tensor_cpu.numel()
-
-            #     parameter_numpy_cpu =  parameter_tensor_cpu.numpy()
-
-            #     _name = 'parameter_buffer'
-            #     existing_shm = shared_memory.SharedMemory(name=_name)
-
-            #     shard_buffer = np.ndarray(1024*1024*1024, dtype=parameter_numpy_cpu.dtype, buffer=existing_shm.buf)
-                
-            #     shard_buffer[:parameter_numel] = parameter_numpy_cpu
-                
-            #     # print(shard_buffer)
-
-            #     # print('grad_bucket.size() = ', grad_bucket.size())
-                
-            #     # print('grad_bucket = ', grad_bucket)
-
-            #     # len(self.params_in_ipg_bucket) =  19
-            #     # len(self.params_in_ipg_bucket) =  36
-            #     # len(self.params_in_ipg_bucket) =  106
-
-            #     # print(' self.params_in_ipg_bucket = ', self.params_in_ipg_bucket)
-
-            #     # print('len(self.params_in_ipg_bucket) = ', len(self.params_in_ipg_bucket))
-            #     # print('self.params_in_ipg_bucket[0] = ', self.params_in_ipg_bucket[0])
-            #     # print('self.params_in_ipg_bucket[0].size() = ', self.params_in_ipg_bucket[0].size())
-            #     # print('len(self.params_in_ipg_bucket[0]) = ', len(self.params_in_ipg_bucket[0]))
             
-            #     full_grads_for_rank = [p.grad.data.flatten() for p in self.params_in_ipg_bucket]
-            #     # print('len(full_grads_for_rank) = ', len(full_grads_for_rank))
-                
-            #     # print('full_grads_for_rank = ', full_grads_for_rank)
-                
-            #     # count = 0
-            #     # for g in full_grads_for_rank:
-            #     #     count = count + g.numel()                
-            #     # print('full_grads_for_rank.numel() = ', count)
-                
-            #     # 前期参数一直为空, 训练完多少个Iteration后参数才有
-            #     full_parameter_for_rank = [p.data.flatten() for p in self.params_in_ipg_bucket]
-                
-            #     # print('full_parameter_for_rank = ', full_parameter_for_rank)
-                
-            #     count = 0
-            #     for p in full_parameter_for_rank:
-            #         count = count + p.numel()  
-            #     # print('full_parameter_for_rank.numel() = ', count)
-
-            #     full_names_for_rank = [p.name for p in self.params_in_ipg_bucket]
-            #     # print('len(full_names_for_rank) = ', len(full_names_for_rank))
 
 
-
-
-            # 对梯度进行分区并卸载到本地CPU内存或磁盘, 
+             
             # 
             self.partition_grads(self.params_in_ipg_bucket, grad_partitions)
 
@@ -1571,8 +1434,8 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
                 event.record()
                 self.param_reduce_events.append(event)
                 
-    # 基于梯度合并的Allreduce
-    # Modify by mingzq, 20240824
+    
+    
     @instrument_w_nvtx
     def __avg_scatter_contiguous_grads(self, buffer_to_reduce: Tensor) -> List[Tensor]:
         dtype = buffer_to_reduce.dtype
@@ -1621,7 +1484,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
     
     
     # 基于梯度分层的Allreduce
-    # Modify by mingzq, 20240824
+    
     @instrument_w_nvtx
     def __avg_scatter_grads(self, params_to_reduce: List[Parameter]) -> List[Tensor]:
         """average gradients and scatter partitions across ranks"""
