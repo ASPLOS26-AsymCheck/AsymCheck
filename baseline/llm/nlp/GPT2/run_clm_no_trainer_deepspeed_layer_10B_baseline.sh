@@ -26,8 +26,8 @@ fi
 
 export Save_Checkpoint="./gpt2_checkpoint"
 
-NGPU_PER_NODE=4
-NUM_NODES=1
+NGPU_PER_NODE=2
+NUM_NODES=4
 
 CUDA_VISIBLE_DEVICES=0,1,2,3
 LR=${5:-0.00003}
@@ -39,7 +39,7 @@ echo "seed is $SEED"
 echo "master port is $MASTER_PORT"
 echo "dropout is ${DROPOUT}"
 
-HOSTFILE=/dev/null
+HOSTFILE=hostfile_4.txt
 
 NGPU=$((NGPU_PER_NODE*NUM_NODES))
 EFFECTIVE_BATCH_SIZE=24
@@ -55,10 +55,10 @@ JOB_NAME="deepspeed_${NGPU}GPUs_${EFFECTIVE_BATCH_SIZE}batch_size"
 
 
 # 
-# config_json=../deepspeed_bsz24_config.json
-# config_json=deepspeed_bsz24_z2_config.json
+
+
 config_json=./deepspeed_bsz24_z3_config.json
-# config_json=./deepspeed_bsz24_z3_config_offload.json
+
 # 
 
 
@@ -75,8 +75,7 @@ CMD=" deepspeed --num_nodes ${NUM_NODES} --num_gpus ${NGPU_PER_NODE} \
       "
 
 
-# CMD+=" --dataset_name /data/dataset/nlp/openai-community/wikitext-103-raw-v1 --dataset_config_name default  "
-CMD+=" --dataset_name /data/dataset/nlp/openai-community/wikitext-2-raw-v1 --dataset_config_name default "
+CMD+=" --dataset_name /data/dataset/nlp/openai-community/wikitext-103-raw-v1 --dataset_config_name default  "
 CMD+=" --model_name_or_path /data/dataset/nlp/openai-community/gpt2 "
 CMD+=" --output_dir  ./gpt2_checkpoint/ "
 CMD+=" --num_train_epochs=$epochs  "
@@ -85,7 +84,6 @@ CMD+=" --density=$density --compressor=$compressor --memory=$memory --percent=$p
 CMD+=" --per_device_train_batch_size=$train_batch_size "
 CMD+=" --per_device_eval_batch_size=$val_batch_size "
 # 
-# 表示从检查点恢复
 # CMD+=" --resume_from_checkpoint  $Save_Checkpoint "
 CMD+=" --bert_model  bert-base-uncased "
 

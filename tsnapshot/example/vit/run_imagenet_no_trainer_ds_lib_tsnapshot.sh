@@ -40,7 +40,7 @@ export save_checkpoint_path="./vit_checkpoint"
 
 
 NGPU_PER_NODE=2
-NUM_NODES=1
+NUM_NODES=4
 
 CUDA_VISIBLE_DEVICES=0,1
 LR=${5:-0.00003}
@@ -52,7 +52,7 @@ echo "seed is $SEED"
 echo "master port is $MASTER_PORT"
 echo "dropout is ${DROPOUT}"
 
-HOSTFILE=/dev/null
+HOSTFILE=hostfile_4.txt
 
 NGPU=$((NGPU_PER_NODE*NUM_NODES))
 EFFECTIVE_BATCH_SIZE=24

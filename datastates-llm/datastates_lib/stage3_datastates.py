@@ -3234,7 +3234,7 @@ def _handle_overflow(cpu_sum, x, i):
 def estimate_zero3_model_states_mem_needs(total_params,
                                           largest_layer_params,
                                           num_gpus_per_node=1,
-                                          num_nodes=1,
+                                          NUM_NODES=4,
                                           cpu_offload=True,
                                           cpu_offload_params=True,
                                           zero_init=True,
@@ -3285,7 +3285,7 @@ def model_to_params(model):
 
 def estimate_zero3_model_states_mem_needs_all_live(model,
                                                    num_gpus_per_node=1,
-                                                   num_nodes=1,
+                                                   NUM_NODES=4,
                                                    additional_buffer_factor=1.5):
     """
     Print out estimates on memory usage requirements for ZeRO 3 params, optim states and gradients
@@ -3317,7 +3317,7 @@ def estimate_zero3_model_states_mem_needs_all_live(model,
 def estimate_zero3_model_states_mem_needs_all_cold(total_params,
                                                    largest_layer_params,
                                                    num_gpus_per_node=1,
-                                                   num_nodes=1,
+                                                   NUM_NODES=4,
                                                    additional_buffer_factor=1.5):
     """
     Print out estimates on memory usage requirements for ZeRO 3 params, optim states and gradients

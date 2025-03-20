@@ -20,7 +20,7 @@ echo "master port is $MASTER_PORT"
 echo "dropout is ${DROPOUT}"
 
 
-NUM_NODES=1
+NUM_NODES=4
 
 
 

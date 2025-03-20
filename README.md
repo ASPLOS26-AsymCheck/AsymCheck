@@ -5,7 +5,7 @@
 # Implementation
 
 ## The system architecture of DelayCheck
-**DelayCheck** employs a decoupled and hierarchical storage design for checkpointing and consists of three modules:   
+**DelayCheck** employs a decoupled and hierarchical storage design for checkpointing and consists of three modules:
 
 1. an in-memory checkpoint creation module
 2. an on-disk checkpoint creation module 
@@ -29,6 +29,7 @@ The system architecture of **DelayCheck** is as follows:
 - NCCL-2.20.5 
 - Hadoop-3.3.6
 - Huggingface-0.24.6
+
 
 ## **Get the code**
 ```shell

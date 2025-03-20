@@ -70,15 +70,15 @@ else
 fi
 
 
-# Force deepspeed to run with only local node
-NUM_NODES=1
-NGPU_PER_NODE=4
-# NGPU_PER_NODE=1
+NUM_NODES=4
+NGPU_PER_NODE=2
 
 
 MASTER_PORT="${1:-10086}"
 
-HOSTFILE=/dev/null
+HOSTFILE=hostfile_4.txt
+HOSTFILE=hostfile_4.txt
+
 
 NGPU=$((NGPU_PER_NODE*NUM_NODES))
 EFFECTIVE_BATCH_SIZE=24

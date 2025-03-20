@@ -22,8 +22,8 @@ fi
 
 export Save_Checkpoint="./gpt2_checkpoint"
 
-NGPU_PER_NODE=4
-NUM_NODES=1
+NGPU_PER_NODE=2
+NUM_NODES=4
 
 CUDA_VISIBLE_DEVICES=0,1,2,3
 LR=${5:-0.00003}
@@ -35,7 +35,7 @@ echo "seed is $SEED"
 echo "master port is $MASTER_PORT"
 echo "dropout is ${DROPOUT}"
 
-HOSTFILE=/dev/null
+HOSTFILE=hostfile_4.txt
 
 NGPU=$((NGPU_PER_NODE*NUM_NODES))
 EFFECTIVE_BATCH_SIZE=24
@@ -49,8 +49,8 @@ fi
 JOB_NAME="deepspeed_${NGPU}GPUs_${EFFECTIVE_BATCH_SIZE}batch_size"
 
 
-# config_json=../deepspeed_bsz24_config.json
-# config_json=deepspeed_bsz24_z2_config.json
+
+
 # config_json=../deepspeed_bsz24_z3_config.json
 # config_json=../deepspeed_bsz24_z3_config_no_offload.json
 config_json=../deepspeed_bsz24_z3_config_0310.json
@@ -81,7 +81,6 @@ CMD+=" --per_device_train_batch_size=$train_batch_size "
 CMD+=" --per_device_eval_batch_size=$val_batch_size "
 # 
 # 
-# 表示从检查点恢复
 # CMD+=" --resume_from_checkpoint  $Save_Checkpoint "
 # 
 CMD+=" --bert_model  bert-base-uncased "
