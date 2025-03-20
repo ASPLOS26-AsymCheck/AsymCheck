@@ -943,7 +943,7 @@ def full_train():
 
 
 
-# 清空文件夹内容
+
 def delete_folder_contents(folder):
     for filename in os.listdir(folder):
         file_path = os.path.join(folder, filename)
@@ -958,7 +958,7 @@ def delete_folder_contents(folder):
 
 
 # 
-# 计算In-Memory Checkpoint时间, 
+
 # 
 def calculate_in_memory_ckpt_time(model , optimizer,  idx):
 
@@ -1067,12 +1067,12 @@ def save_checkpoint_in_memory(epoch):
 
 
 def save_checkpoint_in_disk_snapshot(checkpoint_save_work_dir):
-    # 首先清空Checkpoint文件夹
+    
     if 0==0:
         # delete_folder_contents(checkpoint_save_work_dir)
 
         print('delete_folder_contents')
-        # 快照先写入CPU内存再写入本地磁盘
+        
         # torchsnapshot: take snapshot
         progress["current_epoch"] += 1
         snapshot = torchsnapshot.Snapshot.take(
@@ -1089,10 +1089,10 @@ def save_checkpoint_in_disk_snapshot(checkpoint_save_work_dir):
 
 
 def save_checkpoint_in_disk_snapshot_para(app_state, checkpoint_save_work_dir):
-    # 首先清空Checkpoint文件夹
+    
     if dist.get_rank()==0:
         delete_folder_contents(checkpoint_save_work_dir)
-        # 快照先写入CPU内存再写入本地磁盘
+        
         # torchsnapshot: take snapshot
         progress["current_epoch"] += 1
         snapshot = torchsnapshot.Snapshot.take(

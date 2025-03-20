@@ -1468,38 +1468,7 @@ if __name__ == '__main__':
             print('load_optimizer_time = ', time.time() - load_optimizer_time)
         
         init_hvd_time = time.time()
-    
 
-    
-    
-    # if dist.get_rank() == 0:
-    # if (dist.get_rank()) == 0:
-    #     # 
-    
-    #     _name_parameter = 'parameter_buffer'
-    #     _parameter_shm = shared_memory.SharedMemory(create = True, size = 1024*1024*1024*100, name = _name_parameter)
-
-    #     _name_parameter_backup = 'parameter_buffer_backup'
-    #     _parameter_shm_backup = shared_memory.SharedMemory(create = True, size = 1024*1024*1024*100, name = _name_parameter_backup)
-
-    #     # 
-    #     # 
-    #     _name_optimizer = 'optimizer_buffer'
-    #     _optimizer_shm = shared_memory.SharedMemory(create = True, size = 1024*1024*1024*100, name = _name_optimizer)
-
-    #     _name_optimizer_backup = 'optimizer_buffer_backup'
-    #     _optimizer_shm_backup = shared_memory.SharedMemory(create = True, size = 1024*1024*1024*100, name = _name_optimizer_backup)
-
-
-
-        
-        # array = np.ndarray((10,), dtype=np.float32, buffer=shm.buf)
-        # array[:] = np.arange(10)
-
-        # resource_tracker.unregister(shm.name, 'shared_memory')
-        # resource_tracker.register(shm.name, 'shared_memory')
-        # print(array)
-    
     
     import deepfreeze_lib as deepfreeze_lib
     model, optimizer, _, _ = deepfreeze_lib.initialize(
@@ -1520,17 +1489,12 @@ if __name__ == '__main__':
     from multiprocessing import shared_memory
 
     
-    # if dist.get_rank()==1:
-    #     _name = 'yyb-old_dataM'
-    #     shm = shared_memory.SharedMemory(create=True, size=1024*1024*100, name =_name)
+
 
     
-    #     array = np.ndarray((10,), dtype=np.float32, buffer=shm.buf)
-    #     array[:] = np.arange(10)
 
-    #     # resource_tracker.unregister(shm.name, 'shared_memory')
-    #     # resource_tracker.register(shm.name, 'shared_memory')
-    #     # print(array)
+
+    
         
     
     # if True:

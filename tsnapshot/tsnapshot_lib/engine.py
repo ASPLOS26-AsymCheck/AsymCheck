@@ -1965,7 +1965,7 @@ class DeepSpeedEngine(Module):
     
     # 
     
-    # 前向传播计算激活值, 也需要参数的通信, 
+     
     @instrument_w_nvtx
     def forward(self, *inputs, **kwargs):
         r"""Execute forward propagation
@@ -2691,11 +2691,6 @@ class DeepSpeedEngine(Module):
                                          dp_group=dp_group,
                                          numel_per_bucket=elements_per_buffer,
                                          dp_world_size=dp_world_size)
-        
-    
-    
-    
-    
     
     def _reduce_expert_gradients(self, expert_grads, elements_per_buffer):
 

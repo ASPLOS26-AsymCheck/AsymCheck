@@ -1466,15 +1466,10 @@ if __name__ == '__main__':
     # share_memory_count = torch.tensor(0).share_memory_()
     from multiprocessing import shared_memory
 
-    # if dist.get_rank()==1:
-    #     _name = 'yyb-old_dataM'
-    #     shm = shared_memory.SharedMemory(create=True, size=1024*1024*100, name =_name)
-    #     array = np.ndarray((10,), dtype=np.float32, buffer=shm.buf)
-    #     array[:] = np.arange(10)
 
-    #     # resource_tracker.unregister(shm.name, 'shared_memory')
-    #     # resource_tracker.register(shm.name, 'shared_memory')
-    #     # print(array)
+
+
+    
         
     
     # if True:

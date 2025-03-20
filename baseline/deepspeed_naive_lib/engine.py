@@ -2669,11 +2669,6 @@ class DeepSpeedEngine(Module):
                                          dp_group=dp_group,
                                          numel_per_bucket=elements_per_buffer,
                                          dp_world_size=dp_world_size)
-        
-    
-    
-    
-    
     def _reduce_expert_gradients(self, expert_grads, elements_per_buffer):
 
 

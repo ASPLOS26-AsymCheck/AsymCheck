@@ -682,12 +682,7 @@ def full_train():
                 lr_scheduler.step()
                 optimizer.zero_grad()
                 
-                # if args.ckpt_mode == 1:
-                #     save_checkpoint_in_disk_snapshot()
-                # elif args.ckpt_mode == 2:
-                #     save_checkpoint_c(epoch)
-                # elif args.ckpt_mode == 3:
-                #     save_checkpoint_in_disk(epoch, step)
+                
                     
                 
                 t.update(1)
@@ -786,29 +781,12 @@ def full_train():
                         if args.output_dir is not None:
                             output_dir = os.path.join(args.output_dir, output_dir)
 
-                        # save checkpoint, 0708
-                        # accelerator.save_state(output_dir)                        
-                        # save_checkpoint(epoch, completed_steps, output_dir)
                         
-                        # Save checkpoint Snapshot
-                        # save_checkpoint_in_disk_snapshot()
 
                         print('save_checkpoint_time = ', time.time() - save_checkpoint_time)
 
 
-                # if isinstance(checkpointing_steps, int):
-                #     if completed_steps % checkpointing_steps == 0:
-                #         save_checkpoint(epoch, completed_steps)
-                        # output_dir = f"step_{completed_steps}"
-                        # if args.output_dir is not None:
-                        #     output_dir = os.path.join(args.output_dir, output_dir)
-                        # accelerator.save_state(output_dir)                        
-                        # output_dir = os.path.join(output_dir, f"checkpoint_{save_iteration}")
-                        # if os.path.exists(output_dir):
-                        #     raise ValueError(
-                        #         f"Checkpoint directory {output_dir} ({completed_steps}) already exists. Please manually override `self.save_iteration` with what iteration to start with.")
-                        # else:
-                        #     os.makedirs(output_dir, exist_ok=True)
+                
 
 
                 if completed_steps >= args.max_train_steps:
@@ -840,33 +818,9 @@ def full_train():
 
         logger.info(f"epoch {epoch}: perplexity: {perplexity} eval_loss: {eval_loss}")
         
-        # if args.with_tracking:
-        #     accelerator.log(
-        #         {
-        #             "perplexity": perplexity,
-        #             "eval_loss": eval_loss,
-        #             "train_loss": total_loss.item() / len(train_dataloader),
-        #             "epoch": epoch,
-        #             "step": completed_steps,
-        #         },
-        #         step=completed_steps,
-        #     )
+        
 
-        # if args.push_to_hub and epoch < args.num_train_epochs - 1:
-        #     accelerator.wait_for_everyone()
-        #     unwrapped_model = accelerator.unwrap_model(model)
-        #     unwrapped_model.save_pretrained(
-        #         args.output_dir, is_main_process=accelerator.is_main_process, save_function=accelerator.save
-        #     )
-        #     if accelerator.is_main_process:
-        #         tokenizer.save_pretrained(args.output_dir)
-        #         api.upload_folder(
-        #             commit_message=f"Training in progress epoch {epoch}",
-        #             folder_path=args.output_dir,
-        #             repo_id=repo_id,
-        #             repo_type="model",
-        #             token=args.hub_token,
-        #         )
+        
         
     if torch.distributed.get_rank() == 0:
         print("Final_Iteration_Time = ", iteration_time.avg)
@@ -943,56 +897,9 @@ def end_epoch(state):
     state.commit()
 
 
-# def save_checkpoint_in_disk_snapshot():
-#     if torch.distributed.get_rank() == 0:
-#         delete_folder_contents(checkpoint_save_work_dir)
-#         # torchsnapshot: take snapshot
-#         progress["current_epoch"] += 1
-#         snapshot = torchsnapshot.Snapshot.take(
-#             # f"{checkpoint_save_work_dir}/run-{uuid.uuid4()}-epoch-{progress['current_epoch']}-model",
-#             # f"{checkpoint_save_work_dir}/run-{uuid.uuid4()}-epoch-{progress['current_epoch']}-optimizer",
-#             f"{checkpoint_save_work_dir}/run-{uuid.uuid4()}-epoch-{progress['current_epoch']}-model-optimizer",
-#             app_state,
-#             replicated=["**"],
-#             # this pattern treats all states as replicated
-#         )
-#     return
-
-
-# def save_checkpoint_in_memory(epoch):
-#     if torch.distributed.get_rank() == 0:
-#         # _state_dict_cpu = {}
-
-#         # filepath = args.checkpoint_format.format(epoch=epoch + 1)
-#         # state = {
-#         #     'model': model.state_dict(),
-#         #     'optimizer': optimizer.state_dict(),
-#         # }
-#         # torch.save(state, filepath)
-
-#         for key, value in model.state_dict().items():
-#             # 0.4139289855957031
-#             # _state_dict_cpu[key]=value.cpu()
-
-#             # 0.24108409881591797
-#             _state_dict_cpu[key].copy_(value.view(value.numel()), non_blocking=True)
-
-#     return
-
-
-# def save_checkpoint_in_disk(epoch):
-#     if torch.distributed.get_rank() == 0:
-#         filepath = args.checkpoint_format.format(epoch=epoch + 1)
-#         state = {
-#             'model': model.state_dict(),
-#             'optimizer': optimizer.state_dict(),
-#         }
-#         torch.save(state, filepath)
-
 
 ckpt_path = []
 
-# def main():
 if __name__ == "__main__":
 
     print('-----------------args------------------')
@@ -1012,19 +919,6 @@ if __name__ == "__main__":
     
     check_early_exit_warning(args)
 
-    # if args.local_rank == -1 or args.no_cuda:
-    #     device = torch.device("cuda" if torch.cuda.is_available()
-    #                           and not args.no_cuda else "cpu")
-    #     n_gpu = torch.cuda.device_count()
-    # else:
-    #     torch.cuda.set_device(args.local_rank)
-    #     device = torch.device("cuda", args.local_rank)
-    #     n_gpu = 1
-    #     # Initializes the distributed backend which will take care of sychronizing nodes/GPUs
-    #     torch.distributed.init_process_group(backend='nccl')
-    # logger.info(
-    #     "device: {} n_gpu: {}, distributed training: {}, 16-bits training: {}".
-    #     format(device, n_gpu, bool(args.local_rank != -1), args.fp16))
 
     if args.gradient_accumulation_steps < 1:
         raise ValueError(
@@ -1038,10 +932,7 @@ if __name__ == "__main__":
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
 
-    # if n_gpu > 0:
-    #     torch.cuda.manual_seed_all(args.seed)
-    # if n_gpu > 0:
-    #     torch.cuda.manual_seed_all(args.seed)
+
 
     if not args.do_train and not args.do_predict:
         raise ValueError(
@@ -1070,55 +961,7 @@ if __name__ == "__main__":
         accelerator_log_kwargs["project_dir"] = args.output_dir
 
 
-    # accelerator = Accelerator(gradient_accumulation_steps=args.gradient_accumulation_steps, **accelerator_log_kwargs)
-
-    # Make one log on every process with the configuration for debugging.
-    # logging.basicConfig(
-    #     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
-    #     datefmt="%m/%d/%Y %H:%M:%S",
-    #     level=logging.INFO,
-    # )
-    # logger.info(accelerator.state, main_process_only=False)
-    # if accelerator.is_local_main_process:
-    #     datasets.utils.logging.set_verbosity_warning()
-    #     transformers.utils.logging.set_verbosity_info()
-    # else:
-    #     datasets.utils.logging.set_verbosity_error()
-    #     transformers.utils.logging.set_verbosity_error()
-
-    # If passed along, set the training seed now.
-    # if args.seed is not None:
-    #     set_seed(args.seed)
-
-    # Handle the repository creation
-    # if accelerator.is_main_process:
-    #     if args.push_to_hub:
-    #         # Retrieve of infer repo_name
-    #         repo_name = args.hub_model_id
-    #         if repo_name is None:
-    #             repo_name = Path(args.output_dir).absolute().name
-    #         # Create repo and retrieve repo_id
-    #         api = HfApi()
-    #         repo_id = api.create_repo(repo_name, exist_ok=True, token=args.hub_token).repo_id
-
-    #         with open(os.path.join(args.output_dir, ".gitignore"), "w+") as gitignore:
-    #             if "step_*" not in gitignore:
-    #                 gitignore.write("step_*\n")
-    #             if "epoch_*" not in gitignore:
-    #                 gitignore.write("epoch_*\n")
-    #     elif args.output_dir is not None:
-    #         os.makedirs(args.output_dir, exist_ok=True)
-    # accelerator.wait_for_everyone()
-
-    # Get the datasets: you can either provide your own CSV/JSON/TXT training and evaluation files (see below)
-    # or just provide the name of one of the public datasets available on the hub at https://huggingface.co/datasets/
-    # (the dataset will be downloaded automatically from the datasets Hub).
-    #
-    # For CSV/JSON files, this script will use the column called 'text' or the first column if no column called
-    # 'text' is found. You can easily tweak this behavior (see below).
-    #
-    # In distributed training, the load_dataset function guarantee that only one local process can concurrently
-    # download the dataset.
+   
     
     download_load_dataset_time = time.time()
     if args.dataset_name is not None:
@@ -1407,26 +1250,6 @@ if __name__ == "__main__":
     #     model=model,
     #     model_parameters=optimizer_grouped_parameters,
     #     dist_init_required=True)
-    
-    # Create a shared memory buffer to save the checkpoint in CPU 
-    # if dist.get_rank() == 0:
-    if (dist.get_rank()) % torch.cuda.device_count() == 0 and False:
-        # 
-        _name_parameter = 'parameter_buffer'
-        _parameter_shm = shared_memory.SharedMemory(create = True, size = 1024*1024*1024*100, name = _name_parameter)
-
-        _name_parameter_backup = 'parameter_buffer_backup'
-        _parameter_shm_backup = shared_memory.SharedMemory(create = True, size = 1024*1024*1024*100, name = _name_parameter_backup)
-
-        # 
-        # 
-        _name_optimizer = 'optimizer_buffer'
-        _optimizer_shm = shared_memory.SharedMemory(create = True, size = 1024*1024*1024*100, name = _name_optimizer)
-
-        _name_optimizer_backup = 'optimizer_buffer_backup'
-        _optimizer_shm_backup = shared_memory.SharedMemory(create = True, size = 1024*1024*1024*100, name = _name_optimizer_backup)
-
-
 
     
     model, optimizer, _, _ = tsnapshot_lib.initialize(

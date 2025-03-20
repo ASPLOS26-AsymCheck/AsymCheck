@@ -684,12 +684,7 @@ def full_train():
                 lr_scheduler.step()
                 optimizer.zero_grad()
                 
-                # if args.ckpt_mode == 1:
-                #     save_checkpoint_in_disk_snapshot()
-                # elif args.ckpt_mode == 2:
-                #     save_checkpoint_c(epoch)
-                # elif args.ckpt_mode == 3:
-                #     save_checkpoint_in_disk(epoch, step)
+                
                     
                 
                 t.update(1)
@@ -775,29 +770,12 @@ def full_train():
                         if args.output_dir is not None:
                             output_dir = os.path.join(args.output_dir, output_dir)
 
-                        # save checkpoint, 0708
-                        # accelerator.save_state(output_dir)                        
-                        # save_checkpoint(epoch, completed_steps, output_dir)
                         
-                        # Save checkpoint Snapshot
-                        # save_checkpoint_in_disk_snapshot()
 
                         print('save_checkpoint_time = ', time.time() - save_checkpoint_time)
 
 
-                # if isinstance(checkpointing_steps, int):
-                #     if completed_steps % checkpointing_steps == 0:
-                #         save_checkpoint(epoch, completed_steps)
-                        # output_dir = f"step_{completed_steps}"
-                        # if args.output_dir is not None:
-                        #     output_dir = os.path.join(args.output_dir, output_dir)
-                        # accelerator.save_state(output_dir)                        
-                        # output_dir = os.path.join(output_dir, f"checkpoint_{save_iteration}")
-                        # if os.path.exists(output_dir):
-                        #     raise ValueError(
-                        #         f"Checkpoint directory {output_dir} ({completed_steps}) already exists. Please manually override `self.save_iteration` with what iteration to start with.")
-                        # else:
-                        #     os.makedirs(output_dir, exist_ok=True)
+                
 
 
                 if completed_steps >= args.max_train_steps:
@@ -829,33 +807,9 @@ def full_train():
 
         logger.info(f"epoch {epoch}: perplexity: {perplexity} eval_loss: {eval_loss}")
         
-        # if args.with_tracking:
-        #     accelerator.log(
-        #         {
-        #             "perplexity": perplexity,
-        #             "eval_loss": eval_loss,
-        #             "train_loss": total_loss.item() / len(train_dataloader),
-        #             "epoch": epoch,
-        #             "step": completed_steps,
-        #         },
-        #         step=completed_steps,
-        #     )
+        
 
-        # if args.push_to_hub and epoch < args.num_train_epochs - 1:
-        #     accelerator.wait_for_everyone()
-        #     unwrapped_model = accelerator.unwrap_model(model)
-        #     unwrapped_model.save_pretrained(
-        #         args.output_dir, is_main_process=accelerator.is_main_process, save_function=accelerator.save
-        #     )
-        #     if accelerator.is_main_process:
-        #         tokenizer.save_pretrained(args.output_dir)
-        #         api.upload_folder(
-        #             commit_message=f"Training in progress epoch {epoch}",
-        #             folder_path=args.output_dir,
-        #             repo_id=repo_id,
-        #             repo_type="model",
-        #             token=args.hub_token,
-        #         )
+        
         
     if torch.distributed.get_rank() == 0:
         print("Final_Iteration_Time = ", iteration_time.avg)
@@ -1301,26 +1255,7 @@ if __name__ == "__main__":
     #     model_parameters=optimizer_grouped_parameters,
     #     dist_init_required=True)
     
-
-    # if dist.get_rank() == 0:
-    if (dist.get_rank()) % torch.cuda.device_count() == 0 and False:
-        # 
-        _name_parameter = 'parameter_buffer'
-        _parameter_shm = shared_memory.SharedMemory(create = True, size = 1024*1024*1024*100, name = _name_parameter)
-
-        _name_parameter_backup = 'parameter_buffer_backup'
-        _parameter_shm_backup = shared_memory.SharedMemory(create = True, size = 1024*1024*1024*100, name = _name_parameter_backup)
-
-        # 
-        # 
-        _name_optimizer = 'optimizer_buffer'
-        _optimizer_shm = shared_memory.SharedMemory(create = True, size = 1024*1024*1024*100, name = _name_optimizer)
-
-        _name_optimizer_backup = 'optimizer_buffer_backup'
-        _optimizer_shm_backup = shared_memory.SharedMemory(create = True, size = 1024*1024*1024*100, name = _name_optimizer_backup)
-
-
-    
+   
     
     model, optimizer, _, _ = deepspeed_naive_lib.initialize(
         args=args,

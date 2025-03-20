@@ -953,33 +953,9 @@ def main():
 
         logger.info(f"epoch {epoch}: perplexity: {perplexity} eval_loss: {eval_loss}")
 
-        # if args.with_tracking:
-        #     accelerator.log(
-        #         {
-        #             "perplexity": perplexity,
-        #             "eval_loss": eval_loss,
-        #             "train_loss": total_loss.item() / len(train_dataloader),
-        #             "epoch": epoch,
-        #             "step": completed_steps,
-        #         },
-        #         step=completed_steps,
-        #     )
+        
 
-        # if args.push_to_hub and epoch < args.num_train_epochs - 1:
-        #     accelerator.wait_for_everyone()
-        #     unwrapped_model = accelerator.unwrap_model(model)
-        #     unwrapped_model.save_pretrained(
-        #         args.output_dir, is_main_process=accelerator.is_main_process, save_function=accelerator.save
-        #     )
-        #     if accelerator.is_main_process:
-        #         tokenizer.save_pretrained(args.output_dir)
-        #         api.upload_folder(
-        #             commit_message=f"Training in progress epoch {epoch}",
-        #             folder_path=args.output_dir,
-        #             repo_id=repo_id,
-        #             repo_type="model",
-        #             token=args.hub_token,
-        #         )
+        
 
     #     if args.checkpointing_steps == "epoch":
     #         output_dir = f"epoch_{epoch}"

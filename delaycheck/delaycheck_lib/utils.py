@@ -6,6 +6,50 @@ import torch.distributed as dist
 import torchsnapshot
 
 
+def initialize_cpu_shared_memory():
+ 
+    if dist.get_rank() == 0:
+        
+        shape = (4, 1024*1024*1024*10) 
+        dtype = np.float16  
+        size = np.prod(shape) * np.dtype(dtype).itemsize
+
+
+        model_name = 'model_buffer'
+        try:
+            shm_model = shared_memory.SharedMemory(name =model_name)
+            # shm_model.unlink() 
+        except FileNotFoundError:
+            shm_model = shared_memory.SharedMemory(create=True, size=size, name =model_name)
+            pass
+        array_model = np.ndarray(shape, dtype=dtype, buffer=shm_model.buf)
+
+
+        optimizer_name_1 = 'optimizer_buffer_1'
+        try:
+            shm_optimizer_1 = shared_memory.SharedMemory(name =optimizer_name_1)
+            
+            # shm_optimizer.unlink() 
+        except FileNotFoundError:
+            shm_optimizer_1 = shared_memory.SharedMemory(create=True, size=size, name =optimizer_name_1)
+            pass
+        array_optimizer_1 = np.ndarray(shape, dtype=dtype, buffer=shm_optimizer_1.buf)
+
+
+        optimizer_name_2 = 'optimizer_buffer_2'
+        try:
+            shm_optimizer_2 = shared_memory.SharedMemory(name =optimizer_name_2)
+
+            # shm_parameter.unlink() 
+        except FileNotFoundError:
+            shm_optimizer_2 = shared_memory.SharedMemory(create=True, size=size, name =optimizer_name_2)
+            pass
+        array_optimizer_2 = np.ndarray(shape, dtype=dtype, buffer=shm_optimizer_2.buf)
+
+    pass
+
+
+
 
 def save_checkpoint_iteration(state, epoch,  iteration, save_dir='./checkpoint'):
     

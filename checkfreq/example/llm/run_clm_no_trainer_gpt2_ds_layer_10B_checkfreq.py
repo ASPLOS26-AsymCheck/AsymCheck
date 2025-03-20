@@ -380,17 +380,8 @@ def parse_args():
 
 
 def initialize_cpu_shared_memory():
-    # if dist.get_rank()==0:
-    #     shared_mem_name = 'abc'
     
-    
-    
-    
-    #     array = np.ndarray(shape, dtype=dtype, buffer=shm.buf)
-    
-    #     print("Initial array:\n", array)
-    #     pass
-    
+
     
     if dist.get_rank() == 0:
         
