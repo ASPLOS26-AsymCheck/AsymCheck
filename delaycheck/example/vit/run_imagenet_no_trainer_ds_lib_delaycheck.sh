@@ -6,8 +6,7 @@ density="${density:-0.01}"
 compressor="${compressor:-topkef}"
 
 memory="${memory:-residual}"
-threshold="${threshold:-8192}"
-percent="${percent:-0}"
+
 
 per_device_train_batch_size="${per_device_train_batch_size:-32}"
 per_device_eval_batch_size="${per_device_eval_batch_size:-32}"

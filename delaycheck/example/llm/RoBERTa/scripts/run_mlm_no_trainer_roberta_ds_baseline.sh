@@ -3,8 +3,7 @@ OUT_DIR=${OUT_DIR:-"../log"}
 epochs="${epochs:-30}"
 density="${density:-0.1}"
 compressor="${compressor:-topk}"
-threshold="${threshold:-8192}"
-percent="${percent:-0}"
+
 train_batch_size="${train_batch_size:-2}"
 val_batch_size="${val_batch_size:-2}"
 

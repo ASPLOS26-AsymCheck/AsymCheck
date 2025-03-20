@@ -6,8 +6,7 @@ density="${density:-0.1}"
 
 compressor="${compressor:-topk}"
 
-threshold="${threshold:-8192}"
-percent="${percent:-0}"
+
 
 per_device_train_batch_size="${per_device_train_batch_size:-2}"
 per_device_eval_batch_size="${per_device_eval_batch_size:-8}"
