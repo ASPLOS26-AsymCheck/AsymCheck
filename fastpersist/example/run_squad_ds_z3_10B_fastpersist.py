@@ -1021,33 +1021,13 @@ def calculate_in_memory_ckpt_time(model , optimizer,  idx):
     
     return
 
-    if dist.get_rank() == 0 and idx>100 and True:
-        
+    
 
-
-        # optimizer.state_dict() =  dict_keys(['state', 'param_groups'])
-        print('optimizer.state_dict().keys() = ', optimizer.state_dict().keys())
-        print('optimizer.state_dict().optimizer_state_dict = ', optimizer.state_dict()['optimizer_state_dict'].keys())
-
-        print('optimizer.state_dict().optimizer_state_dict[state] = ', optimizer.state_dict()['optimizer_state_dict']['state'])
-
-        if optimizer.state_dict()['optimizer_state_dict']['state']!={} and True:
-            print('optimizer.state_dict().optimizer_state_dict[state][0] = ', optimizer.state_dict()['optimizer_state_dict']['state'][0])
-            print('optimizer.state_dict().optimizer_state_dict[state][0][exp_avg].numel() = ', optimizer.state_dict()['optimizer_state_dict']['state'][0]['exp_avg'].numel())
-            print('optimizer.state_dict().optimizer_state_dict[state][0][exp_avg_sq].numel() = ', optimizer.state_dict()['optimizer_state_dict']['state'][0]['exp_avg_sq'].numel())
-
-
-            # print('optimizer.state_dict().optimizer_state_dict[state][1] = ', optimizer.state_dict()['optimizer_state_dict']['state'][1])
-            # print('optimizer.state_dict().optimizer_state_dict[state][1][exp_avg].numel() = ', optimizer.state_dict()['optimizer_state_dict']['state'][1]['exp_avg'].numel())
-            # print('optimizer.state_dict().optimizer_state_dict[state][1][exp_avg_sq].numel() = ', optimizer.state_dict()['optimizer_state_dict']['state'][1]['exp_avg_sq'].numel())
-
+            
             # 
             
             # 
-            # print('optimizer.state_dict().fp32_flat_groups = ', optimizer.state_dict()['fp32_flat_groups'])
-            # print('optimizer.state_dict().fp32_flat_groups[0].numel() = ', optimizer.state_dict()['fp32_flat_groups'][0].numel())
-            # print('optimizer.state_dict().fp32_flat_groups[1].numel() = ', optimizer.state_dict()['fp32_flat_groups'][1].numel())
-
+            
     pass
 
 

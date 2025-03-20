@@ -105,10 +105,9 @@ import torch.distributed as dist
 from tqdm import tqdm
 from multiprocessing import shared_memory
 
-import sys
-sys.path.append("../../") 
-import delaycheck_lib as delaycheck_lib
-import delaycheck_lib.utils
+
+import tsnapshot_lib as tsnapshot_lib
+import tsnapshot_lib.utils
 
 try:
     mp.set_start_method('spawn')
@@ -524,33 +523,13 @@ def calculate_in_memory_ckpt_time(model , optimizer,  idx):
     
     return
 
-    if dist.get_rank() == 0 and idx>100 and True:
-        
+    
 
-
-        # optimizer.state_dict() =  dict_keys(['state', 'param_groups'])
-        print('optimizer.state_dict().keys() = ', optimizer.state_dict().keys())
-        print('optimizer.state_dict().optimizer_state_dict = ', optimizer.state_dict()['optimizer_state_dict'].keys())
-
-        print('optimizer.state_dict().optimizer_state_dict[state] = ', optimizer.state_dict()['optimizer_state_dict']['state'])
-
-        if optimizer.state_dict()['optimizer_state_dict']['state']!={} and True:
-            print('optimizer.state_dict().optimizer_state_dict[state][0] = ', optimizer.state_dict()['optimizer_state_dict']['state'][0])
-            print('optimizer.state_dict().optimizer_state_dict[state][0][exp_avg].numel() = ', optimizer.state_dict()['optimizer_state_dict']['state'][0]['exp_avg'].numel())
-            print('optimizer.state_dict().optimizer_state_dict[state][0][exp_avg_sq].numel() = ', optimizer.state_dict()['optimizer_state_dict']['state'][0]['exp_avg_sq'].numel())
-
-
-            # print('optimizer.state_dict().optimizer_state_dict[state][1] = ', optimizer.state_dict()['optimizer_state_dict']['state'][1])
-            # print('optimizer.state_dict().optimizer_state_dict[state][1][exp_avg].numel() = ', optimizer.state_dict()['optimizer_state_dict']['state'][1]['exp_avg'].numel())
-            # print('optimizer.state_dict().optimizer_state_dict[state][1][exp_avg_sq].numel() = ', optimizer.state_dict()['optimizer_state_dict']['state'][1]['exp_avg_sq'].numel())
-
+            
             # 
              
             # 
-            # print('optimizer.state_dict().fp32_flat_groups = ', optimizer.state_dict()['fp32_flat_groups'])
-            # print('optimizer.state_dict().fp32_flat_groups[0].numel() = ', optimizer.state_dict()['fp32_flat_groups'][0].numel())
-            # print('optimizer.state_dict().fp32_flat_groups[1].numel() = ', optimizer.state_dict()['fp32_flat_groups'][1].numel())
-
+            
     pass
 
 
@@ -738,7 +717,7 @@ def full_train():
                     }
                     
                     checkpoint_save_work_dir = 'gpt2_checkpoint'
-                    delaycheck_lib.utils.save_checkpoint_in_disk_snapshot(progress_save, app_state, checkpoint_save_work_dir)
+                    tsnapshot_lib.utils.save_checkpoint_in_disk_snapshot(progress_save, app_state, checkpoint_save_work_dir)
                     
                 print_steps = 10
                 
@@ -1454,16 +1433,8 @@ if __name__ == "__main__":
 
 
 
-        # Create a NumPy array and store it in shared memory
-        # array = np.ndarray((10,), dtype=np.float32, buffer=shm.buf)
-        # array[:] = np.arange(10)
-
-        # resource_tracker.unregister(shm.name, 'shared_memory')
-        # resource_tracker.register(shm.name, 'shared_memory')
-        # print(array)
     
-    
-    model, optimizer, _, _ = delaycheck_lib.initialize(
+    model, optimizer, _, _ = tsnapshot_lib.initialize(
         args=args,
         model=model,
         model_parameters=optimizer_grouped_parameters,
@@ -1480,17 +1451,7 @@ if __name__ == "__main__":
     if torch.distributed.get_rank() == 0:
         print('state_time = ', time.time() - state_time)
     
-    
-    
-    # state = hvd.elastic.TorchState(model=model,
-    #                                optimizer=optimizer,
-    #                                train_sampler=train_sampler,
-    #                                # val_sampler=val_sampler,
-    #                                epoch=resume_from_epoch,
-    #                                batch=0)
 
-    
-    # optimizer._state = state
     
     
     if torch.distributed.get_rank()==0:

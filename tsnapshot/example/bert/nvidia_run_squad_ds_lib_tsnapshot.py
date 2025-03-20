@@ -57,7 +57,7 @@ import uuid
 from typing import Dict, Optional
 
 
-import tsnapshot_lib as delaycheck_lib
+import tsnapshot_lib as tsnapshot_lib
 import tsnapshot_lib.utils
 
 
@@ -924,26 +924,11 @@ def main():
         0.0
     }]
     
-    
-    # 
-    # Create a shared memory buffer to save the checkpoint in CPU
-    # if dist.get_rank() == 0:
-    
-        
-        
-        
-    
-    # return_items = [engine, engine.optimizer, engine.training_dataloader, engine.lr_scheduler]
-    # model = engine
-    
-    # model, optimizer, _, _ = deepspeed.initialize(
-    #     args=args,
-    #     model=model,
-    #     model_parameters=optimizer_grouped_parameters,
-    #     dist_init_required=True)
+
+   
     
     
-    model, optimizer, _, _ = delaycheck_lib.initialize(
+    model, optimizer, _, _ = tsnapshot_lib.initialize(
         args=args,
         model=model,
         model_parameters=optimizer_grouped_parameters,
@@ -1222,7 +1207,7 @@ def main():
                     }
                 
                     checkpoint_save_work_dir = 'checkpoints'
-                    delaycheck_lib.utils.save_checkpoint_in_disk_snapshot(progress_save, app_state, checkpoint_save_work_dir)
+                    tsnapshot_lib.utils.save_checkpoint_in_disk_snapshot(progress_save, app_state, checkpoint_save_work_dir)
 
                 if (step + 1) % (
                         ave_rounds) == 0 and torch.distributed.get_rank() == 0:
