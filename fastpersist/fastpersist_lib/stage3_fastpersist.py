@@ -698,8 +698,8 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         
         self.module_state_backup = {}
         # self.cuda_stream_module_dict = {}
-        # self.cuda_stream_optimizer_dict_1={}
-        # self.cuda_stream_optimizer_dict_2={}
+        # self.cuda_stream_optimizer_dict_avg={}
+        # self.cuda_stream_optimizer_dict_avg_sq={}
         
         # if dist.get_rank() % 2 == 0:
         #     self.event = mp.Event()
@@ -712,13 +712,13 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         
         if module_state_dict == {}:
             return
-        # if self.cuda_stream_module_dict == {} or self.cuda_stream_optimizer_dict_1=={} or self.cuda_stream_optimizer_dict_2=={}:
+        # if self.cuda_stream_module_dict == {} or self.cuda_stream_optimizer_dict_avg=={} or self.cuda_stream_optimizer_dict_avg_sq=={}:
         #     for key, value in module_state_dict.items():
         #         self.cuda_stream_module_dict[key]=torch.cuda.Stream()
 
         #     for tensor, momentum in optimizer_state_dict.items():
-        #         self.cuda_stream_optimizer_dict_1[tensor] =torch.cuda.Stream()
-        #         self.cuda_stream_optimizer_dict_2[tensor] =torch.cuda.Stream()
+        #         self.cuda_stream_optimizer_dict_avg[tensor] =torch.cuda.Stream()
+        #         self.cuda_stream_optimizer_dict_avg_sq[tensor] =torch.cuda.Stream()
 
         cpu_tensor_array_module = deque()
         cpu_tensor_array_optimzier =deque()
@@ -773,7 +773,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         with torch.cuda.stream(stream):
             for tensor, momentum in optimizer_state_dict.items():
             
-                # self.cuda_stream_optimizer_dict_1[tensor].synchronize()
+                # self.cuda_stream_optimizer_dict_avg[tensor].synchronize()
             
                 cpu_tensor = momentum['exp_avg'].to('cpu', non_blocking=True)
             
@@ -2431,9 +2431,9 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
             
             # for module_stream in self.cuda_stream_module_dict.values():
             #     module_stream.synchronize()
-            # for optimizer_stream in self.cuda_stream_optimizer_dict_1.values():
+            # for optimizer_stream in self.cuda_stream_optimizer_dict_avg.values():
             #     optimizer_stream.synchronize()
-            # for optimizer_stream in self.cuda_stream_optimizer_dict_2.values():
+            # for optimizer_stream in self.cuda_stream_optimizer_dict_avg_sq.values():
             #     optimizer_stream.synchronize()
                 
             if self.step_count == 40 and dist.get_rank() % 2 == 0:

@@ -384,16 +384,7 @@ def parse_args():
 
 
 def initialize_cpu_shared_memory():
-    # if dist.get_rank()==0:
-    #     shared_mem_name = 'abc'
-    #     shape = (4, 4)  # 共享数组形状
-    #     dtype = np.float32  # 数据类型
-    #     size = np.prod(shape) * np.dtype(dtype).itemsize  # 计算共享内存大小
-    #     shm = shared_memory.SharedMemory(create=True, size=size, name=shared_mem_name)  # 创建共享内存
-    #     array = np.ndarray(shape, dtype=dtype, buffer=shm.buf)
-    #     # array[:] = np.arange(np.prod(shape)).reshape(shape)  # 初始化数据
-    #     print("Initial array:\n", array)
-    #     pass
+    
     
     
     if dist.get_rank() == 0:
@@ -413,7 +404,7 @@ def initialize_cpu_shared_memory():
         array_model = np.ndarray(shape, dtype=dtype, buffer=shm_model.buf)
 
 
-        optimizer_name_1 = 'optimizer_buffer_1'
+        optimizer_name_1 = 'optimizer_buffer_avg'
         try:
             shm_optimizer_1 = shared_memory.SharedMemory(name =optimizer_name_1)
             
@@ -424,7 +415,7 @@ def initialize_cpu_shared_memory():
         array_optimizer_1 = np.ndarray(shape, dtype=dtype, buffer=shm_optimizer_1.buf)
 
 
-        optimizer_name_2 = 'optimizer_buffer_2'
+        optimizer_name_2 = 'optimizer_buffer_avg_sq'
         try:
             shm_optimizer_2 = shared_memory.SharedMemory(name =optimizer_name_2)
 
@@ -616,19 +607,16 @@ def main():
         model = AutoModelForCausalLM.from_config(config, trust_remote_code=args.trust_remote_code)
                
     # 
-    # Modify by mingzq, 20250209, 
+     
     config = GPT2Config(
         vocab_size=50257,
-        # n_positions=1024,
-        # n_ctx=1024,
-        # n_embd=1024,
         n_positions=1024,
         n_ctx=1024,
         n_embd=2048,
-        # n_layer=24,
+        
         n_layer=64,
         n_head=32,
-        # n_head=16,
+        
         n_inner=8192,
         activation_function="gelu",   # used to be "gelu_new" in earlier versions
         resid_pdrop=0.1,
@@ -649,7 +637,7 @@ def main():
     )
 
     # # 
-    # Modify by mingzq, 20250218, 
+    
     # config = RobertaConfig()
     model = AutoModelForCausalLM.from_config(config, trust_remote_code=args.trust_remote_code)
 
@@ -883,7 +871,6 @@ def main():
 
     # We need to initialize the trackers we use, and also store our configuration.
     # The trackers initializes automatically on the main process.
-    # 初始化跟踪器, Modify by mingzq, 20240822
     if args.with_tracking:
         experiment_config = vars(args)
         # TensorBoard cannot log Enums, need the raw value
@@ -1012,7 +999,7 @@ def main():
                     ckpt_obj = {
                         "ckpt": optimizer.cpu_tensor_dict,
                     }
-                    ckpt_path = "/data/lzy/datastates/" + "ckpt_rank" +  str(dist.get_rank()) + ".pt"
+                    ckpt_path = "/data/ckpt/datastates/" + "ckpt_rank" +  str(dist.get_rank()) + ".pt"
                 
                     ckpt_engine.save(state_dict=ckpt_obj, path=ckpt_path)
                     ckpt_engine.wait()
@@ -1091,25 +1078,25 @@ def first_second_copy_optimizer_async(optimizer):
         
     if optimizer.state == {}:
         return
-    elif cuda_stream_optimizer_dict_1=={} or cuda_stream_optimizer_dict_2=={}:
+    elif cuda_stream_optimizer_dict_avg=={} or cuda_stream_optimizer_dict_avg_sq=={}:
         for tensor, momentum in optimizer.state.items():
-            cuda_stream_optimizer_dict_1[tensor] =torch.cuda.Stream()
-            cuda_stream_optimizer_dict_2[tensor] =torch.cuda.Stream()
+            cuda_stream_optimizer_dict_avg[tensor] =torch.cuda.Stream()
+            cuda_stream_optimizer_dict_avg_sq[tensor] =torch.cuda.Stream()
     
     numel = 0
     for tensor, momentum in optimizer.state.items():
         
-        cuda_stream_optimizer_dict_1[tensor].synchronize()
+        cuda_stream_optimizer_dict_avg[tensor].synchronize()
         
-        with torch.cuda.stream(cuda_stream_optimizer_dict_1[tensor]):
+        with torch.cuda.stream(cuda_stream_optimizer_dict_avg[tensor]):
             exp_avg_numel = momentum['exp_avg'].numel()
             numel+=exp_avg_numel
             parameter_tensor_cpu = momentum['exp_avg'].to('cpu', non_blocking=True)
             cpu_optimizer_array_avg.append(parameter_tensor_cpu)
 
-        # self.cuda_stream_optimizer_dict_2[tensor].synchronize()
+        # self.cuda_stream_optimizer_dict_avg_sq[tensor].synchronize()
         # with torch.cuda.stream(self.optimizer_stream_2):
-        with torch.cuda.stream(cuda_stream_optimizer_dict_2[tensor]): 
+        with torch.cuda.stream(cuda_stream_optimizer_dict_avg_sq[tensor]): 
             exp_avg_sq_numel = momentum['exp_avg_sq'].numel()
             numel+=exp_avg_sq_numel
             parameter_tensor_cpu = momentum['exp_avg_sq'].to('cpu', non_blocking=True)
@@ -1123,8 +1110,8 @@ def first_second_copy_optimizer_async(optimizer):
 
 if __name__ == "__main__":
     cuda_stream_model_dict ={}
-    cuda_stream_optimizer_dict_1 ={}
-    cuda_stream_optimizer_dict_2 ={}
+    cuda_stream_optimizer_dict_avg ={}
+    cuda_stream_optimizer_dict_avg_sq ={}
     
     model_clone = {}
     from collections import deque

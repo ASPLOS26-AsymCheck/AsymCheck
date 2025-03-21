@@ -74,7 +74,7 @@ import torch
 from torch.utils.data import TensorDataset, DataLoader, RandomSampler, SequentialSampler
 from torch.utils.data.distributed import DistributedSampler
 
-# Modify by mingzq, 20240929
+
 import shutil
 import uuid
 import torchsnapshot
@@ -912,7 +912,7 @@ def full_train():
                 ckpt_obj = {
                     "ckpt": optimizer.cpu_tensor_dict,
                 }
-                ckpt_path = "/data/lzy/datastates/" + "ckpt_rank" +  str(dist.get_rank()) + ".pt"
+                ckpt_path = "/data/ckpt/datastates/" + "ckpt_rank" +  str(dist.get_rank()) + ".pt"
              
                 ckpt_engine.save(state_dict=ckpt_obj, path=ckpt_path)
                 ckpt_engine.wait()

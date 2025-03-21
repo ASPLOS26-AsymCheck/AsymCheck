@@ -374,8 +374,8 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
             # stream_.synchronize()
             self.cuda_stream_model_dict[key]=torch.cuda.Stream()
         
-        self.cuda_stream_optimizer_dict_1={}
-        self.cuda_stream_optimizer_dict_2={}
+        self.cuda_stream_optimizer_dict_avg={}
+        self.cuda_stream_optimizer_dict_avg_sq={}
         
         self.threading_is_start=False
         
@@ -2438,25 +2438,25 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         
         if optimizer.state == {}:
             return
-        elif self.cuda_stream_optimizer_dict_1=={} or self.cuda_stream_optimizer_dict_2=={}:
+        elif self.cuda_stream_optimizer_dict_avg=={} or self.cuda_stream_optimizer_dict_avg_sq=={}:
             for tensor, momentum in optimizer.state.items():
-                self.cuda_stream_optimizer_dict_1[tensor] =torch.cuda.Stream()
-                self.cuda_stream_optimizer_dict_2[tensor] =torch.cuda.Stream()
+                self.cuda_stream_optimizer_dict_avg[tensor] =torch.cuda.Stream()
+                self.cuda_stream_optimizer_dict_avg_sq[tensor] =torch.cuda.Stream()
                 
             
         
         for tensor, momentum in optimizer.state.items():
-            self.cuda_stream_optimizer_dict_1[tensor].synchronize()
+            self.cuda_stream_optimizer_dict_avg[tensor].synchronize()
             
             
-            with torch.cuda.stream(self.cuda_stream_optimizer_dict_1[tensor]):
+            with torch.cuda.stream(self.cuda_stream_optimizer_dict_avg[tensor]):
    
                 exp_avg_numel = momentum['exp_avg_sq'].numel()
                 parameter_tensor_cpu = momentum['exp_avg'].to('cpu', non_blocking=True)
             
-            self.cuda_stream_optimizer_dict_2[tensor].synchronize()
+            self.cuda_stream_optimizer_dict_avg_sq[tensor].synchronize()
             # with torch.cuda.stream(self.optimizer_stream_2):
-            with torch.cuda.stream(self.cuda_stream_optimizer_dict_2[tensor]): 
+            with torch.cuda.stream(self.cuda_stream_optimizer_dict_avg_sq[tensor]): 
  
                 parameter_tensor_cpu = momentum['exp_avg'].to('cpu', non_blocking=True)
 
@@ -2474,7 +2474,7 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
             # stream_.synchronize()
             self.cuda_stream_model_dict[key].synchronize()
             
-            # self.cuda_stream_optimizer_dict_1 = []
+            # self.cuda_stream_optimizer_dict_avg = []
             
             
             with torch.cuda.stream(self.cuda_stream_model_dict[key]):

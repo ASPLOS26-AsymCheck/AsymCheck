@@ -936,25 +936,25 @@ def first_second_copy_optimizer_async(optimizer):
         
     if optimizer.state == {}:
         return
-    elif cuda_stream_optimizer_dict_1=={} or cuda_stream_optimizer_dict_2=={}:
+    elif cuda_stream_optimizer_dict_avg=={} or cuda_stream_optimizer_dict_avg_sq=={}:
         for tensor, momentum in optimizer.state.items():
-            cuda_stream_optimizer_dict_1[tensor] =torch.cuda.Stream()
-            cuda_stream_optimizer_dict_2[tensor] =torch.cuda.Stream()
+            cuda_stream_optimizer_dict_avg[tensor] =torch.cuda.Stream()
+            cuda_stream_optimizer_dict_avg_sq[tensor] =torch.cuda.Stream()
     
     numel = 0
     for tensor, momentum in optimizer.state.items():
         
-        cuda_stream_optimizer_dict_1[tensor].synchronize()
+        cuda_stream_optimizer_dict_avg[tensor].synchronize()
         
-        with torch.cuda.stream(cuda_stream_optimizer_dict_1[tensor]):
+        with torch.cuda.stream(cuda_stream_optimizer_dict_avg[tensor]):
             exp_avg_numel = momentum['exp_avg'].numel()
             numel+=exp_avg_numel
             parameter_tensor_cpu = momentum['exp_avg'].to('cpu', non_blocking=True)
             cpu_optimizer_array_avg.append(parameter_tensor_cpu)
 
-        # self.cuda_stream_optimizer_dict_2[tensor].synchronize()
+        # self.cuda_stream_optimizer_dict_avg_sq[tensor].synchronize()
         # with torch.cuda.stream(self.optimizer_stream_2):
-        with torch.cuda.stream(cuda_stream_optimizer_dict_2[tensor]): 
+        with torch.cuda.stream(cuda_stream_optimizer_dict_avg_sq[tensor]): 
             exp_avg_sq_numel = momentum['exp_avg_sq'].numel()
             numel+=exp_avg_sq_numel
             parameter_tensor_cpu = momentum['exp_avg_sq'].to('cpu', non_blocking=True)
@@ -966,8 +966,8 @@ def first_second_copy_optimizer_async(optimizer):
 
 if __name__ == "__main__":
     cuda_stream_model_dict ={}
-    cuda_stream_optimizer_dict_1 ={}
-    cuda_stream_optimizer_dict_2 ={}
+    cuda_stream_optimizer_dict_avg ={}
+    cuda_stream_optimizer_dict_avg_sq ={}
     
     model_clone = {}
     from collections import deque

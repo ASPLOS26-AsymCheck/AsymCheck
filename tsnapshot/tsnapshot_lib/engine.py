@@ -170,7 +170,7 @@ def _save_checkpoint_in_memory(queue):
             
             
             
-            checkpoint_save_work_dir = '/data/lzy/'
+            checkpoint_save_work_dir = '/data/ckpt/'
             output_model_file = os.path.join(checkpoint_save_work_dir, f"run-{uuid.uuid4()}-epoch-{epoch}-iteration-{idx}")
             save_data={"Model":_model_state_dict_gpu,
                        "Optimizer":_optimizer_state_dict_gpu,

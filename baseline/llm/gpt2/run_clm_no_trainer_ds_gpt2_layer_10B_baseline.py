@@ -912,7 +912,7 @@ def main():
                 if step == 40:
                     ckpt_time = time.time()
                     model.save_checkpoint(save_dir="/mnt/model/")
-                    # model.save_checkpoint(save_dir="/data/lzy/")
+                    # model.save_checkpoint(save_dir="/data/ckpt/")
 
                     
                     if dist.get_rank() == 0:

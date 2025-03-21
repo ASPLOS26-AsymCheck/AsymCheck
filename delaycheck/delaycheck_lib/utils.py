@@ -25,7 +25,7 @@ def initialize_cpu_shared_memory():
         array_model = np.ndarray(shape, dtype=dtype, buffer=shm_model.buf)
 
 
-        optimizer_name_1 = 'optimizer_buffer_1'
+        optimizer_name_1 = 'optimizer_buffer_avg'
         try:
             shm_optimizer_1 = shared_memory.SharedMemory(name =optimizer_name_1)
             
@@ -36,7 +36,7 @@ def initialize_cpu_shared_memory():
         array_optimizer_1 = np.ndarray(shape, dtype=dtype, buffer=shm_optimizer_1.buf)
 
 
-        optimizer_name_2 = 'optimizer_buffer_2'
+        optimizer_name_2 = 'optimizer_buffer_avg_sq'
         try:
             shm_optimizer_2 = shared_memory.SharedMemory(name =optimizer_name_2)
 
