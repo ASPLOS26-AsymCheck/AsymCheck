@@ -867,11 +867,6 @@ def main():
                 # accelerator.backward(loss)
                 # loss.backward()
                 
-                # # 
-                
-                    
-                
-                
                 model.backward(loss)
                 backworad_time_array.append(time.time() - backworad_time)
                 
@@ -900,11 +895,6 @@ def main():
                 optimizer.model_data.clear()
                 optimizer.optimizer_avg_data.clear()
                 optimizer.optimizer_avg_sq_data.clear()
-                # # 
-                
-                
-                    
-                
                 
             
                 # print('stream.synchronize()')
@@ -917,9 +907,6 @@ def main():
 
                         print('Average Iteration Time = ', (time.time() -s_time)/10)
                     
-                        
-                        
-                        
 
                         s_time = time.time()
 
@@ -948,6 +935,7 @@ def main():
             perplexity = float("inf")
 
         logger.info(f"epoch {epoch}: perplexity: {perplexity} eval_loss: {eval_loss}")
+
 
 def first_second_copy_optimizer_async(optimizer):
     torch.cuda.set_device(dist.get_rank())
@@ -981,6 +969,22 @@ def first_second_copy_optimizer_async(optimizer):
     
     if dist.get_rank()==0:
         print('Optimizer Numel = ',  numel)        
+
+
+def flush_to_disk(idx, freq, ranks_per_node):
+    if idx == freq and dist.get_rank() % ranks_per_node == 0 :
+        optimizer.process_model.join()
+        process_optimizer.join()
+        optimizer.save_ckpt_to_disk_sync(optimizer.model_data_flush, optimizer.optimizer_avg_data, optimizer.optimizer_avg_sq_data, dist.get_rank())
+        # 
+        # optimizer.start_queue.put((0))
+        # optimizer.module_queue.put((optimizer.model_data, optimizer.model_data))
+        # optimizer.optimizer_queue.put((cpu_optimizer_array_avg, cpu_optimizer_array_avg, cpu_optimizer_array_avg_sq, cpu_optimizer_array_avg_sq))
+
+    return
+
+
+
 
 if __name__ == "__main__":
     cuda_stream_model_dict ={}

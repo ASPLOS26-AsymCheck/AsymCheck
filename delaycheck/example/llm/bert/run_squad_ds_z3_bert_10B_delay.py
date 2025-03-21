@@ -928,8 +928,6 @@ def full_train():
             optimizer.model_data.clear()
             optimizer.optimizer_avg_data.clear()
             optimizer.optimizer_avg_sq_data.clear()
-
-            # 
             
             if idx % step == 0 and dist.get_rank()==0:
             
@@ -973,7 +971,19 @@ def delete_folder_contents(folder):
 
 
 
-# 
+def flush_to_disk(idx, freq, ranks_per_node):
+    if idx == freq and dist.get_rank() % ranks_per_node == 0 :
+        optimizer.process_model.join()
+        process_optimizer.join()
+        optimizer.save_ckpt_to_disk_sync(optimizer.model_data_flush, optimizer.optimizer_avg_data, optimizer.optimizer_avg_sq_data, dist.get_rank())
+        # 
+        # optimizer.start_queue.put((0))
+        # optimizer.module_queue.put((optimizer.model_data, optimizer.model_data))
+        # optimizer.optimizer_queue.put((cpu_optimizer_array_avg, cpu_optimizer_array_avg, cpu_optimizer_array_avg_sq, cpu_optimizer_array_avg_sq))
+
+    return
+
+
 
 # 
 def calculate_in_memory_ckpt_time(model , optimizer,  idx):
@@ -1013,11 +1023,6 @@ def calculate_in_memory_ckpt_time(model , optimizer,  idx):
         exp_avg_sq_cpu = torch.zeros(exp_avg_sq_0_numel, device='cpu', dtype=exp_avg_sq.dtype, requires_grad=False)
         exp_avg_sq_cpu.copy_(exp_avg_sq.view(exp_avg_sq_0_numel), non_blocking=True)
 
-        
-                    
-        
-        
-        
 
         fp32_flat_groups_0 = optimizer.state_dict()['fp32_flat_groups'][0]
         fp32_flat_groups_0_numel =fp32_flat_groups_0.numel()
@@ -1027,15 +1032,6 @@ def calculate_in_memory_ckpt_time(model , optimizer,  idx):
     print('optimizer_state_in_memory_time = ', time.time()- in_memory_time)
     
     return
-
-    
-
-            
-            # 
-            
-            # 
-            
-    pass
 
 
 

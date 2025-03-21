@@ -800,12 +800,6 @@ def main():
     
 
 
-    
-    
-    
-    
-
-
     array_numel = []
     layers = 0
     if torch.distributed.get_rank() == 0:
@@ -838,14 +832,14 @@ def main():
 
     # We need to initialize the trackers we use, and also store our configuration.
     # The trackers initializes automatically on the main process.
-    
+
     if args.with_tracking:
         experiment_config = vars(args)
         # TensorBoard cannot log Enums, need the raw value
         experiment_config["lr_scheduler_type"] = experiment_config["lr_scheduler_type"].value
         # accelerator.init_trackers("clm_no_trainer", experiment_config)
 
-
+    # 
     # Train!
     # total_batch_size = args.per_device_train_batch_size * accelerator.num_processes * args.gradient_accumulation_steps
     total_batch_size = args.per_device_train_batch_size * torch.distributed.get_world_size() * args.gradient_accumulation_steps
@@ -957,7 +951,6 @@ def main():
                 # first_second_copy_optimizer_async(optimizer)
                 # 
 
-                
 
                 model.backward(loss)
 
@@ -990,10 +983,6 @@ def main():
 
 
                 if dist.get_rank() ==0 and step % 10==0:
-                    
-
-                    
-                    
                     print('Average Forward Time = ', ft)
                     print('Average Backward Time = ', bt)
                     print('Average Step Time = ', st)
@@ -1029,6 +1018,20 @@ def main():
             perplexity = float("inf")
 
         logger.info(f"epoch {epoch}: perplexity: {perplexity} eval_loss: {eval_loss}")
+
+
+def flush_to_disk(idx, freq, ranks_per_node):
+    if idx == freq and dist.get_rank() % ranks_per_node == 0 :
+        optimizer.process_model.join()
+        process_optimizer.join()
+        optimizer.save_ckpt_to_disk_sync(optimizer.model_data_flush, optimizer.optimizer_avg_data, optimizer.optimizer_avg_sq_data, dist.get_rank())
+        # 
+        # optimizer.start_queue.put((0))
+        # optimizer.module_queue.put((optimizer.model_data, optimizer.model_data))
+        # optimizer.optimizer_queue.put((cpu_optimizer_array_avg, cpu_optimizer_array_avg, cpu_optimizer_array_avg_sq, cpu_optimizer_array_avg_sq))
+
+    return
+
 
 
 

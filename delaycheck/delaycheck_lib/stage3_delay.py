@@ -352,8 +352,8 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         self.gpu_optimizer_exp_avg_elements_array =[]
         self.gpu_optimizer_exp_avg_sq_elements_array =[]
 
-        self.gpu_optimizer_buffer_1 =None
-        self.gpu_optimizer_buffer_2 =None
+        self.gpu_optimizer_buffer_avg =None
+        self.gpu_optimizer_buffer_avg_sq =None
         
         self.cpu_model_array=[]
 
@@ -390,9 +390,8 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         self.model_data_flush = None
         self.optimizer_avg_data_flush = None
         self.optimizer_avg_sq_data_flush = None
-
-
-        # 
+        
+        self.flush_frequency = 10
         # self.start_queue =  mp.Queue()
         # self.module_queue = mp.Queue()
         # self.optimizer_queue = mp.Queue()
@@ -1430,6 +1429,9 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
 
                 self.model_data.append(parameter_tensor_cpu)
                 # parameter_tensor_cpu = self.gpu_model_buffer.copy_(parameter_bucket, non_blocking=True).to('cpu', non_blocking=True)
+    
+                if self.iteration % self.flush_frequency==0:
+                    self.model_data_flush(parameter_tensor_cpu)
         pass
     
     
@@ -2454,21 +2456,29 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
             
 
         for tensor, momentum in optimizer.state.items():
-            self.cuda_stream_optimizer_dict_avg[tensor].synchronize()
-
-
-            with torch.cuda.stream(self.cuda_stream_optimizer_dict_avg[tensor]):
-   
+            self.cuda_stream_optimizer_dict_1[tensor].synchronize()
+            
+            with torch.cuda.stream(self.cuda_stream_optimizer_dict_1[tensor]):
                 exp_avg_numel = momentum['exp_avg_sq'].numel()
                 parameter_tensor_cpu = momentum['exp_avg'].to('cpu', non_blocking=True)
-
-
-
-            self.cuda_stream_optimizer_dict_avg_sq[tensor].synchronize()
+                self.optimizer_avg_data.append(parameter_tensor_cpu)
+                
+                if self.iteration % self.flush_frequency==0:
+                    self.optimizer_avg_data_flush(parameter_tensor_cpu)
+        
+        # self.module_queue.put((optimizer.model_data, ))
+        # self.optimizer_queue.put((cpu_optimizer_array_avg, cpu_optimizer_array_avg, cpu_optimizer_array_avg_sq, cpu_optimizer_array_avg_sq))
+ 
+            self.cuda_stream_optimizer_dict_2[tensor].synchronize()
             # with torch.cuda.stream(self.optimizer_stream_2):
-            with torch.cuda.stream(self.cuda_stream_optimizer_dict_avg_sq[tensor]): 
+            with torch.cuda.stream(self.cuda_stream_optimizer_dict_2[tensor]): 
  
                 parameter_tensor_cpu = momentum['exp_avg'].to('cpu', non_blocking=True)
+                self.optimizer_avg_sq_data.append(parameter_tensor_cpu)
+
+                if self.iteration % self.flush_frequency==0:
+                    self.optimizer_avg_sq_data_flush(parameter_tensor_cpu)
+
                 
     
     # Copying optimizer state to CPU shared memory
@@ -2485,11 +2495,10 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
                     self.exp_avg_numel+=exp_avg_numel
                     self.exp_avg_sq_numel +=exp_avg_sq_numel
 
-
         # 
         # Allocate GPU buffer
-        # self.gpu_optimizer_buffer_1 = torch.empty(self.exp_avg_numel, dtype=torch.float16, device=self.device)
-        # self.gpu_optimizer_buffer_2 = torch.empty(self.exp_avg_sq_numel, dtype=torch.float16, device=self.device)
+        # self.gpu_optimizer_buffer_avg = torch.empty(self.exp_avg_numel, dtype=torch.float16, device=self.device)
+        # self.gpu_optimizer_buffer_avg_sq = torch.empty(self.exp_avg_sq_numel, dtype=torch.float16, device=self.device)
         # 
         optimizer_buffer_name_avg = 'optimizer_buffer_avg'
         existing_optimizer_shm_avg = shared_memory.SharedMemory(name = optimizer_buffer_name_avg)

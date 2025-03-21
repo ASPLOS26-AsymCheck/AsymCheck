@@ -353,8 +353,8 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         self.gpu_optimizer_exp_avg_elements_array =[]
         self.gpu_optimizer_exp_avg_sq_elements_array =[]
 
-        self.gpu_optimizer_buffer_1 =None
-        self.gpu_optimizer_buffer_2 =None
+        self.gpu_optimizer_buffer_avg =None
+        self.gpu_optimizer_buffer_avg_sq =None
         
         self.cpu_model_array=[]
 
