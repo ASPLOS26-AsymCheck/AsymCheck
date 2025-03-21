@@ -42,7 +42,7 @@ python setup.py
 
 ## **Quick start**
 
-We provide codes for seven types of checkpointing solutions. They are DataStates-LLM, FastPersist, Gemini, DeepFreeze, CheckFreq, TorchSnapshot and DelayCheck. For each methods, there are codes for six models, which are GPT2, BERT, RoBERT, BLOOM, ResNet and VIT.
+We provide codes for seven types of checkpointing solutions. They are DataStates-LLM, FastPersist, Gemini, DeepFreeze, CheckFreq, TorchSnapshot and DelayCheck. For each methods, there are codes for six models, which are GPT2, BERT, RoBERT, BLOOM, ResNet and ViT.
 
 For example, to run gpt2-10B with DelayCheck:
 

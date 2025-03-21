@@ -373,25 +373,28 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         for key, value in self.module.state_dict().items():
             # stream_.synchronize()
             self.cuda_stream_model_dict[key]=torch.cuda.Stream()
-        
+
         self.cuda_stream_optimizer_dict_avg={}
         self.cuda_stream_optimizer_dict_avg_sq={}
-        
+
         self.threading_is_start=False
-        
+
         from collections import deque
-        
+
         self.model_data = deque()
+
         self.shared_memory_shape = (4, 1024*1024*1024*10)
         self.optimizer_avg_data = deque()
         self.optimizer_avg_sq_data = deque()
-        
+
+        # 
         # self.start_queue =  mp.Queue()
         # self.module_queue = mp.Queue()
         # self.optimizer_queue = mp.Queue()
         # if dist.get_rank() % 2 == 0:
         #     self.save_ckpt_to_disk_process = mp.Process(target=save_ckpt_to_disk, args=(self.start_queue, self.module_queue, self.optimizer_queue, dist.get_rank(),))
         #     self.save_ckpt_to_disk_process.start()
+        # 
 
         if self.all2all_process_group is not None:
             assert self.all2all_process_group is not None and self.reduce_scatter == True, "when enable all_to_all_reduce, reduce_scatter should also be enabled for data type checks."

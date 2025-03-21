@@ -378,7 +378,6 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         
         self.cuda_stream_optimizer_dict_avg={}
         self.cuda_stream_optimizer_dict_avg_sq={}
-        self.shared_memory_shape = (4, 1024*1024*1024*10)
         
         self.threading_is_start=False
         
