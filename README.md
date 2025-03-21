@@ -48,7 +48,7 @@ For example, to run gpt2-10B with DelayCheck:
 
 
 ```shell
-cd DelayCheck/delaycheck/example/llm/gpt2
+cd delaycheck/example/llm/gpt2
 bash run_clm_no_trainer_ds_gpt2_layer_10B_delay.sh
 ```
 
