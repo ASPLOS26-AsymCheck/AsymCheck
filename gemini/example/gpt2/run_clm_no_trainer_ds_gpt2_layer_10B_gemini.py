@@ -399,26 +399,26 @@ def initialize_cpu_shared_memory():
         array_model = np.ndarray(shape, dtype=dtype, buffer=shm_model.buf)
 
 
-        optimizer_name_1 = 'optimizer_buffer_avg'
+        optimizer_name_avg = 'optimizer_buffer_avg'
         try:
-            shm_optimizer_1 = shared_memory.SharedMemory(name =optimizer_name_1)
+            shm_optimizer_avg = shared_memory.SharedMemory(name =optimizer_name_avg)
             
             # shm_optimizer.unlink() 
         except FileNotFoundError:
-            shm_optimizer_1 = shared_memory.SharedMemory(create=True, size=size, name =optimizer_name_1)
+            shm_optimizer_avg = shared_memory.SharedMemory(create=True, size=size, name =optimizer_name_avg)
             pass
-        array_optimizer_1 = np.ndarray(shape, dtype=dtype, buffer=shm_optimizer_1.buf)
+        array_optimizer_avg = np.ndarray(shape, dtype=dtype, buffer=shm_optimizer_avg.buf)
 
 
-        optimizer_name_2 = 'optimizer_buffer_avg_sq'
+        optimizer_name_avg_sq = 'optimizer_buffer_avg_sq'
         try:
-            shm_optimizer_2 = shared_memory.SharedMemory(name =optimizer_name_2)
+            shm_optimizer_avg = shared_memory.SharedMemory(name =optimizer_name_avg_sq)
 
             # shm_parameter.unlink() 
         except FileNotFoundError:
-            shm_optimizer_2 = shared_memory.SharedMemory(create=True, size=size, name =optimizer_name_2)
+            shm_optimizer_avg = shared_memory.SharedMemory(create=True, size=size, name =optimizer_name_avg_sq)
             pass
-        array_optimizer_2 = np.ndarray(shape, dtype=dtype, buffer=shm_optimizer_2.buf)
+        array_optimizer_avg_sq = np.ndarray(shape, dtype=dtype, buffer=shm_optimizer_avg.buf)
 
     pass
 

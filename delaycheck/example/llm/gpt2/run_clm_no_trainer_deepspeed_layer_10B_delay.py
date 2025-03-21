@@ -951,7 +951,6 @@ def main():
                 # first_second_copy_optimizer_async(optimizer)
                 # 
 
-
                 model.backward(loss)
 
                 bt = time.time() - backworad_time
@@ -970,17 +969,15 @@ def main():
 
                 if completed_steps >= args.max_train_steps:
                     break
-                
+
                 st=time.time() - step_time
                 step_time_array.append(time.time() - st)
 
-                
                 cpu_optimizer_array_avg.clear()
                 cpu_optimizer_array_avg_sq.clear()
                 optimizer.model_data.clear()
                 optimizer.optimizer_avg_data.clear()
                 optimizer.optimizer_avg_sq_data.clear()
-
 
                 if dist.get_rank() ==0 and step % 10==0:
                     print('Average Forward Time = ', ft)
