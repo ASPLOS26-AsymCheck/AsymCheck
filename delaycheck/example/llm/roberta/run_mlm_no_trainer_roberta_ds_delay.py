@@ -948,7 +948,7 @@ def main():
                 if step == 40 and dist.get_rank() % 2 == 0 :
                     optimizer.process_model.join()
                     process_optimizer.join()
-                    optimizer.save_ckpt_to_disk_sync(optimizer.model_data, cpu_optimizer_array_1, cpu_optimizer_array_2, dist.get_rank())
+                    optimizer.save_ckpt_to_disk_sync(optimizer.model_data, cpu_optimizer_array_avg, cpu_optimizer_array_avg_sq, dist.get_rank())
                 
                 step_time = time.time()
                 model.step()
@@ -967,10 +967,11 @@ def main():
                 
                 step_time_array.append(time.time() - step_time)
                 
-                cpu_optimizer_array_1.clear()
-                cpu_optimizer_array_2.clear()
+                cpu_optimizer_array_avg.clear()
+                cpu_optimizer_array_avg_sq.clear()
                 optimizer.model_data.clear()
-                
+                optimizer.optimizer_avg_data.clear()
+                optimizer.optimizer_avg_sq_data.clear()
                 # # 
                 
 
@@ -1039,7 +1040,7 @@ def first_second_copy_optimizer_async(optimizer):
             exp_avg_numel = momentum['exp_avg'].numel()
             numel+=exp_avg_numel
             parameter_tensor_cpu = momentum['exp_avg'].to('cpu', non_blocking=True)
-            cpu_optimizer_array_1.append(parameter_tensor_cpu)
+            cpu_optimizer_array_avg.append(parameter_tensor_cpu)
 
         # self.cuda_stream_optimizer_dict_2[tensor].synchronize()
         # with torch.cuda.stream(self.optimizer_stream_2):
@@ -1048,7 +1049,7 @@ def first_second_copy_optimizer_async(optimizer):
             numel+=exp_avg_sq_numel
             parameter_tensor_cpu = momentum['exp_avg_sq'].to('cpu', non_blocking=True)
             
-            cpu_optimizer_array_2.append(parameter_tensor_cpu)
+            cpu_optimizer_array_avg_sq.append(parameter_tensor_cpu)
     
     if dist.get_rank()==0:
         print('Optimizer Numel = ',  numel)
@@ -1062,8 +1063,8 @@ if __name__ == "__main__":
     model_clone = {}
     from collections import deque
 
-    cpu_optimizer_array_1 = deque()
-    cpu_optimizer_array_2 = deque()
+    cpu_optimizer_array_avg = deque()
+    cpu_optimizer_array_avg_sq = deque()
     cpu_model_array = deque()
         
     is_clone = False

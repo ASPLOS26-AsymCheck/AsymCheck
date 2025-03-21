@@ -378,12 +378,15 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         
         self.cuda_stream_optimizer_dict_1={}
         self.cuda_stream_optimizer_dict_2={}
+        self.shared_memory_shape = (4, 1024*1024*1024*10)
         
         self.threading_is_start=False
         
         from collections import deque
         
         self.model_data = deque()
+        self.optimizer_avg_data = deque()
+        self.optimizer_avg_sq_data = deque()
         
         
         

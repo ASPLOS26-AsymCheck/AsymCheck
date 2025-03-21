@@ -382,6 +382,10 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         from collections import deque
         
         self.model_data = deque()
+        self.shared_memory_shape = (4, 1024*1024*1024*10)
+        self.optimizer_avg_data = deque()
+        self.optimizer_avg_sq_data = deque()
+        
         # self.start_queue =  mp.Queue()
         # self.module_queue = mp.Queue()
         # self.optimizer_queue = mp.Queue()
