@@ -2467,8 +2467,28 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         # for tensor, momentum in self.optimizer.state.items():
 
         # pass
-
-
+    
+    
+    # 
+    # 
+    def model_copy_to_shared_memory(self, rank):
+        if self.model_data==None:
+            return
+        # dq2 = dq1.copy() 
+        model_buffer_name = 'model_buffer'
+        existing_model_shm = shared_memory.SharedMemory(name = model_buffer_name) 
+        model_shard_buffer = np.ndarray(self.shape, dtype=np.float16, buffer=existing_model_shm.buf)
+        
+        # 
+        # Saving sub-checkpoints to shared CPU memory
+        partition_numel_sum = 0
+        for i in self.model_data:
+            partition = self.model_data.numel()
+            partition_numel = partition.numel()
+            model_shard_buffer[rank, partition_numel_sum : partition_numel_sum + partition_numel] = partition.numpy()
+            partition_numel_sum += partition_numel
+    
+    
     def copy_model_async(self, model):
         torch.cuda.set_device(dist.get_rank())
         
