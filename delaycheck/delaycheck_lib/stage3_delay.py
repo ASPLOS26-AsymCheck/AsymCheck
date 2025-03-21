@@ -386,6 +386,11 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
         self.shared_memory_shape = (4, 1024*1024*1024*10)
         self.optimizer_avg_data = deque()
         self.optimizer_avg_sq_data = deque()
+        
+        self.model_data_flush = None
+        self.optimizer_avg_data_flush = None
+        self.optimizer_avg_sq_data_flush = None
+
 
         # 
         # self.start_queue =  mp.Queue()
@@ -2447,29 +2452,73 @@ class DeepSpeedZeroOptimizer_Stage3(ZeROOptimizer):
                 self.cuda_stream_optimizer_dict_avg_sq[tensor] =torch.cuda.Stream()
                 
             
-        
+
         for tensor, momentum in optimizer.state.items():
             self.cuda_stream_optimizer_dict_avg[tensor].synchronize()
-            
-            
+
+
             with torch.cuda.stream(self.cuda_stream_optimizer_dict_avg[tensor]):
    
                 exp_avg_numel = momentum['exp_avg_sq'].numel()
                 parameter_tensor_cpu = momentum['exp_avg'].to('cpu', non_blocking=True)
-            
+
+
+
             self.cuda_stream_optimizer_dict_avg_sq[tensor].synchronize()
             # with torch.cuda.stream(self.optimizer_stream_2):
             with torch.cuda.stream(self.cuda_stream_optimizer_dict_avg_sq[tensor]): 
  
                 parameter_tensor_cpu = momentum['exp_avg'].to('cpu', non_blocking=True)
-
-        # self.optimizer_stream_2.synchronize()
-        # for tensor, momentum in self.optimizer.state.items():
-
-        # pass
+                
     
-    
+    # Copying optimizer state to CPU shared memory
     # 
+    def first_second_optimizer_copy_to_shared_memory(self, rank):
+        if self.optimizer_avg_data == None or self.optimizer_avg_sq_data == None:
+            
+            return
+
+        if self.exp_avg_numel == None or self.exp_avg_sq_numel == None:
+                for tensor, momentum in self.optimizer.state.items():
+                    exp_avg_numel = momentum['exp_avg'].numel()
+                    exp_avg_sq_numel = momentum['exp_avg_sq'].numel()
+                    self.exp_avg_numel+=exp_avg_numel
+                    self.exp_avg_sq_numel +=exp_avg_sq_numel
+
+
+        # 
+        # Allocate GPU buffer
+        # self.gpu_optimizer_buffer_1 = torch.empty(self.exp_avg_numel, dtype=torch.float16, device=self.device)
+        # self.gpu_optimizer_buffer_2 = torch.empty(self.exp_avg_sq_numel, dtype=torch.float16, device=self.device)
+        # 
+        optimizer_buffer_name_avg = 'optimizer_buffer_avg'
+        existing_optimizer_shm_avg = shared_memory.SharedMemory(name = optimizer_buffer_name_avg)
+        optimizer_shard_buffer_avg = np.ndarray(self.shared_memory_shape, dtype=np.float16, buffer=existing_optimizer_shm_avg.buf)
+
+        partition_numel_sum = 0
+        for i in self.optimizer_avg_data():
+            partition =  self.optimizer_avg_data[i]
+            partition_numel = partition.numel()
+
+            optimizer_shard_buffer_avg[rank, partition_numel_sum : partition_numel_sum + partition_numel] = partition.numpy()
+            partition_numel_sum = partition.numel()
+
+
+        optimizer_buffer_name_avg_sq = 'optimizer_buffer_avg_sq'
+        existing_optimizer_shm_avg_sq = shared_memory.SharedMemory(name = optimizer_buffer_name_avg_sq)
+        optimizer_shard_buffer_avg_sq = np.ndarray(self.shared_memory_shape, dtype=np.float16, buffer=existing_optimizer_shm_avg_sq.buf)
+
+        partition_numel_sum = 0
+        for tensor, momentum in self.optimizer.state.items():
+            partition =  self.optimizer_avg_data[i]
+            partition_numel = partition.numel()
+
+            optimizer_shard_buffer_avg_sq[rank, partition_numel_sum : partition_numel_sum + partition_numel] = partition.numpy()
+            partition_numel_sum = partition.numel()
+
+
+    # 
+    #  Copying sub-checkpoints to shared CPU memory
     # 
     def model_copy_to_shared_memory(self, rank):
         if self.model_data==None:
