@@ -17,7 +17,7 @@ Further, **AsymCheck** also proposes a fine-grained compression scheme to enhanc
 The system architecture of **AsymCheck** is as follows: 
 
 <center class ='img'>
-<img src="checkpoint_workflow_.jpg" width="600px" />
+<img src="checkpoint_workflow_.png" width="600px" />
 </center>
 
 
