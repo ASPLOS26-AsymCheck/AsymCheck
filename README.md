@@ -1,19 +1,20 @@
-# DelayCheck: Delaying Checkpointing for Efficient Modern Distributed Training
+# AsymCheck: Delaying Checkpointing for Efficient Modern Distributed Training
 
-**DelayCheck** is a new checkpointing mechanism for efficient modern distributed training,
-which delays and partitions the checkpointing operation until the forward pass ends and the backward pass begins,so as to reduce the training stalls.
-Further, **DelayCheck** also proposes an optimized on-disk checkpointing scheme and a fast failure recovery scheme to enhance the performance of **DelayCheck**.
+**AsymCheck** is an asymmetric partitioned checkpointing mechanism that adjusts partition sizes—employing smaller partitions during forward passes and larger ones during backward passes, in contrast to existing fixed-size approaches.
+Further, **AsymCheck** also proposes a fine-grained compression scheme to enhance checkpoint efficiency, and a batched flushing mechanism to reduce persistence latency.
 
 # Implementation
 
-## The system architecture of DelayCheck
-**DelayCheck** employs a decoupled and hierarchical storage design for checkpointing and consists of three modules:
+## The system architecture of AsymCheck
+**AsymCheck** employs a decoupled and hierarchical storage design for checkpointing and consists of four modules:
 
-1. an in-memory checkpoint creation module
-2. an on-disk checkpoint creation module 
-3. a failure recovery module
+1. an asymmetric partitioning and snapshot module
+2. a fine-grained checkpoint compression module
+3. an optimal batch flushing and persistence module
+4. a failure recovery module
 
-The system architecture of **DelayCheck** is as follows: 
+
+The system architecture of **AsymCheck** is as follows: 
 
 <center class ='img'>
 <img src="checkpoint_workflow_.jpg" width="600px" />
@@ -34,22 +35,22 @@ The system architecture of **DelayCheck** is as follows:
 
 ## **Get the code**
 ```shell
-git clone https://github.com/FAST26-DelayCheck/DelayCheck
-cd DelayCheck
+git clone https://github.com/FAST26-AsymCheck/AsymCheck
+cd AsymCheck
 pip install -r requirements.txt
 python setup.py
 ```
 
 ## **Quick start**
 
-We provide codes for seven types of checkpointing solutions. They are DataStates-LLM, FastPersist, Gemini, DeepFreeze, CheckFreq, TorchSnapshot and DelayCheck. For each methods, there are codes for six models, which are GPT2, BERT, RoBERT, BLOOM, ResNet and ViT.
+We provide codes for seven types of checkpointing solutions. They are ExCP, DataStates-LLM, FastPersist, Gemini, DeepFreeze, CheckFreq, TorchSnapshot and AsymCheck. For each methods, there are codes for six models, which are GPT2, BERT, RoBERT, BLOOM, ResNet and ViT.
 
-For example, to run gpt2-10B with DelayCheck:
+For example, to run gpt2-10B with AsymCheck:
 
 
 ```shell
-cd delaycheck/example/llm/gpt2
-bash run_clm_no_trainer_ds_gpt2_layer_10B_delay.sh
+cd AsymCheck/example/llm/gpt2
+bash run_clm_no_trainer_ds_gpt2_layer_10B_asym.sh
 ```
 
 
