@@ -1,4 +1,4 @@
-# AsymCheck: Delaying Checkpointing for Efficient Modern Distributed Training
+# AsymCheck: Asymmetric Checkpointing for Efficient Large Language Model Training
 
 **AsymCheck** is an asymmetric partitioned checkpointing mechanism that adjusts partition sizes—employing smaller partitions during forward passes and larger ones during backward passes, in contrast to existing fixed-size approaches.
 Further, **AsymCheck** also proposes a fine-grained compression scheme to enhance checkpoint efficiency, and a batched flushing mechanism to reduce persistence latency.
