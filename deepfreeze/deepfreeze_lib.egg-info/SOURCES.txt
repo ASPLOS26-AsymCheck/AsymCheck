@@ -1,8 +1,0 @@
-setup.py
-deepfreeze_lib/__init__.py
-deepfreeze_lib/engine_deepfreeze.py
-deepfreeze_lib/stage3_deepfreeze.py
-deepfreeze_lib.egg-info/PKG-INFO
-deepfreeze_lib.egg-info/SOURCES.txt
-deepfreeze_lib.egg-info/dependency_links.txt
-deepfreeze_lib.egg-info/top_level.txt

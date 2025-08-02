@@ -43,7 +43,7 @@ python setup.py
 
 ## **Quick start**
 
-We provide codes for seven types of checkpointing solutions. They are ExCP, DataStates-LLM, FastPersist, Gemini, DeepFreeze, CheckFreq, TorchSnapshot and AsymCheck. For each methods, there are codes for six models, which are GPT2, BERT, RoBERT, BLOOM, ResNet and ViT.
+We provide codes for seven types of checkpointing solutions. They are ExCP, DataStates-LLM, PCcheck, Gemini, CheckFreq and AsymCheck. For each methods, there are codes for six models, which are GPT2, BERT, RoBERT, BLOOM, ResNet and ViT.
 
 For example, to run gpt2-10B with AsymCheck:
 
