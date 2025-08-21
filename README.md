@@ -17,7 +17,7 @@ Further, **AsymCheck** incorporates two key techniques: (i) a selective partitio
 The system architecture of **AsymCheck** is as follows: 
 
 <center class ='img'>
-<img src="checkpoint_workflow_.png" width="600px" />
+<img src="checkpoint_workflow_.png" width="700px" />
 </center>
 
 
