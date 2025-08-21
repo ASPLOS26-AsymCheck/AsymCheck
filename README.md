@@ -1,16 +1,16 @@
-# AsymCheck: Asymmetric Checkpointing for Efficient Large Language Model Training
+# AsymCheck: Asymmetric Partitioned Checkpointing for Efficient Large Language Model Training
 
-**AsymCheck** is an asymmetric partitioned checkpointing mechanism that adjusts partition sizes—employing smaller partitions during forward passes and larger ones during backward passes, in contrast to existing fixed-size approaches.
-Further, **AsymCheck** also proposes a fine-grained compression scheme to enhance checkpoint efficiency, and a batched flushing mechanism to reduce persistence latency.
+**AsymCheck** is an asymmetric partitioned checkpointing mechanism that adjusts partition sizes for efficient LLM training, using smaller partitions for forward passes and larger partitions for backward passes.
+Further, **AsymCheck** incorporates two key techniques: (i) a selective partition compression scheme to reduce checkpoint size with low compression overhead and (ii) a batched flushing mechanism to minimize persistence latency.
 
 # Implementation
 
 ## The system architecture of AsymCheck
 **AsymCheck** employs a decoupled and hierarchical storage design for checkpointing and consists of four modules:
 
-1. an asymmetric partitioning and snapshot module
-2. a fine-grained checkpoint compression module
-3. an optimal batch flushing and persistence module
+1. an asymmetric partitioned snapshotting module
+2. a selective partition compression module
+3. an optimal batched flushing module
 4. a failure recovery module
 
 
