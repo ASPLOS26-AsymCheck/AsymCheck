@@ -34,8 +34,8 @@ The system architecture of **AsymCheck** is as follows:
 
 
 ## **Get the code**
-```shell
-git clone https://github.com/FAST26-AsymCheck/AsymCheck
+``` shell
+git clone https://github.com/ASPLOS26-AsymCheck/AsymCheck
 cd AsymCheck
 pip install -r requirements.txt
 python setup.py
@@ -43,12 +43,12 @@ python setup.py
 
 ## **Quick start**
 
-We provide codes for seven types of checkpointing solutions. They are ExCP, DataStates-LLM, PCcheck, Gemini, CheckFreq and AsymCheck. For each methods, there are codes for six models, which are GPT2, BERT, RoBERT, BLOOM, ResNet and ViT.
+We provide codes for seven types of checkpointing solutions. They are ExCP, DataStates-LLM, PCcheck, Gemini, CheckFreq, and AsymCheck. For each method, there are codes for six models, which are GPT2, BERT, RoBERT, BLOOM, ResNet, and ViT.
 
 For example, to run gpt2-10B with AsymCheck:
 
 
-```shell
+``` shell
 cd AsymCheck/example/llm/gpt2
 bash run_clm_no_trainer_ds_gpt2_layer_10B_asym.sh
 ```
