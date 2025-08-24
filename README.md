@@ -15,7 +15,7 @@ This code repository covers:
 
 - [PCcheck](https://github.com/eth-easl/pccheck)
 - [DataStates-LLM](https://github.com/DataStates/datastates-llm)
-- [Gemini](https://github.com/zhuangwang93/Cupcake)
+- [Gemini](https://github.com/ASPLOS26-AsymCheck/AsymCheck/tree/main/gemini)
 - [CheckFreq](https://github.com/msr-fiddle/CheckFreq)
 - [EXcp](https://github.com/Gaffey/ExCP)
 
@@ -56,7 +56,7 @@ cd AsymCheck
 pip install -r requirements.txt
 python setup.py
 ```
-if pip installation fails, please try to upgrade pip via `pip install --upgrade pip`. If [DeepSpeed](https://github.com/deepspeedai/DeepSpeed) installation with NCCL failed, please check the installation [guide](https://www.deepspeed.ai/).
+If pip installation fails, please try to upgrade pip via `pip install --upgrade pip`. If [DeepSpeed](https://github.com/deepspeedai/DeepSpeed) installation with NCCL failed, please check the installation [guide](https://www.deepspeed.ai/).
 
 
 ## **Quick start**
@@ -66,7 +66,7 @@ We provide codes for seven types of checkpointing solutions. They are ExCP, Data
 For example, to run GPT2 10B with AsymCheck:
 
 
-**To run GPT2 10B training job:**
+**To run GPT2 10B, BERT 10B, RoBERT 10B, BLOOM 10B training job:**
 ``` shell
 cd AsymCheck/example/llm/gpt2
 bash run_clm_no_trainer_ds_gpt2_layer_10B_asym.sh
