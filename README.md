@@ -7,9 +7,9 @@ Further, **AsymCheck** incorporates two key techniques: (i) a selective partitio
 This code repository covers:
 
 ### __SAFusion Framework__
-- AsymCheck(Naive): Sparsification-ahead tensor fusion
-- AsymCheck-S: Aligned inter-worker gradient tensor fusion
-- AsymCheck-(S+O): Adaptive intra-worker buffer sizing
+- AsymCheck(Naive): Asymmetric Partitioned Snapshotting
+- AsymCheck-S: Selective Partition Compression
+- AsymCheck-(S+O): Optimal Batched Flushing
 
 ### __State-of-the-art tensor fusion schemes__
 
