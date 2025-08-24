@@ -103,14 +103,6 @@ from transformers import GPT2Config
 from datastates.llm import Checkpointing
 
 
-# 
-# 环境变量HOROVOD_FUSION_THRESHOLD实际上以字节为单位.
-# 然而, 当使用horovodrun时, 有一个--fusion-threshold-mb以MB为单位的参数.
-# os.environ['HOROVOD_FUSION_THRESHOLD'] = '0'
-# os.environ['HOROVOD_CYCLE_TIME']       = '0'
-# os.environ['HOROVOD_CACHE_CAPACITY']   = '0'
-
-
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
 check_min_version("4.39.0.dev0")
 
@@ -385,8 +377,6 @@ def parse_args():
 
 def initialize_cpu_shared_memory():
     
-    
-    
     if dist.get_rank() == 0:
         
         shape = (4, 1024*1024*1024*10) 
@@ -657,9 +647,6 @@ def main():
     def tokenize_function(examples):
         return tokenizer(examples[text_column_name])
 
-
-    
-    # 生成Token的过程非常耗时, 在弹性GPU中恢复单个, 很耗时！！！
     tokenized_datasets = raw_datasets.map(
             tokenize_function,
             batched=True,
@@ -710,8 +697,7 @@ def main():
     # To speed up this part, we use multiprocessing. See the documentation of the map method for more information:
     # https://huggingface.co/docs/datasets/process#map
 
-    
-    # 将文本分组为块, 很耗时
+
     lm_datasets = tokenized_datasets.map(
             group_texts,
             batched=True,

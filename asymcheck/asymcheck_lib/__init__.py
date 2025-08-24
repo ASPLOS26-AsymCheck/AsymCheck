@@ -220,7 +220,7 @@ def initialize(args=None,
         if config_class.hybrid_engine.enabled:
             
             print('DeepSpeedHybridEngine')
-            # 混合并行引擎
+            # Hybrid Parallel Engine
             engine = DeepSpeedHybridEngine(args=args,
                                            model=model,
                                            optimizer=optimizer,
@@ -236,7 +236,7 @@ def initialize(args=None,
         else:
             
             print('------------------DeepSpeedEngine----------------------')
-            # 数据并行引擎
+            # Data Parallel Engine
             engine = DeepSpeedEngine(args=args,
                                      model=model,
                                      optimizer=optimizer,
@@ -255,7 +255,7 @@ def initialize(args=None,
         config_class = DeepSpeedConfig(config, mpu)
         
         print('PipelineEngine')
-        # 流水线并行引擎
+        # Pipeline Parallel Engine
         engine = PipelineEngine(args=args,
                                 model=model,
                                 optimizer=optimizer,
@@ -270,7 +270,6 @@ def initialize(args=None,
 
     # Restore zero.Init context if necessary
     zero.partition_parameters.restore_init_context()
-    
     
 
     return_items = [engine, engine.optimizer, engine.training_dataloader, engine.lr_scheduler]

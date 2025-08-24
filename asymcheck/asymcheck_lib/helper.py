@@ -1,5 +1,5 @@
 import sys
-from .deepspeed.helper import parse_ds_config, get_ds_checkpoint_version
+from helper import parse_ds_config, get_ds_checkpoint_version
 
 HOST_CACHE_SIZE="host_cache_size"
 HOST_CACHE_SIZE_DEFAULT=0

@@ -33,27 +33,18 @@ def calculate_in_memory_ckpt_time(model , optimizer,  idx):
     in_memory_time = time.time()
     _model_state_dict_cpu = {}
     numel_count = 0
-    # 构建参数状态In-Memory Checkpoint方案, 
-    # Modify by mingzq, 20240930, 
     for key, value in model.state_dict().items():
         t_cpu = torch.zeros(value.numel(), device='cpu', dtype=value.dtype, requires_grad=False)
         _model_state_dict_cpu[key] = t_cpu                    
-        # 克隆张量
         value_clone = value.clone()
-        # 基于copy_保存到CPU内存,  
-        _model_state_dict_cpu[key].copy_(value_clone.view(value.numel()), non_blocking=False)
-        # _state_dict_cpu[key] = value_clone.cpu()
-        numel_count += value.numel()
-        # print('value.numel() = ', value.numel())
 
-    # save_checkpoint_in_memory(epoch)
-    # in_memory_time =  0.015248775482177734
-    # print('numel_count = ', numel_count)
+        _model_state_dict_cpu[key].copy_(value_clone.view(value.numel()), non_blocking=False)
+        numel_count += value.numel()
+
     print('model_state_in_memory_time = ', time.time()- in_memory_time)
 
 
     in_memory_time = time.time()
-    # 构建优化器状态In-Memory Checkpoint方案, 
     if optimizer.state_dict()['optimizer_state_dict']['state']!={} and True:
         exp_avg_0_numel = optimizer.state_dict()['optimizer_state_dict']['state'][0]['exp_avg'].numel()
         exp_avg_sq_0_numel = optimizer.state_dict()['optimizer_state_dict']['state'][0]['exp_avg_sq'].numel()
@@ -67,14 +58,6 @@ def calculate_in_memory_ckpt_time(model , optimizer,  idx):
         exp_avg_sq_cpu = torch.zeros(exp_avg_sq_0_numel, device='cpu', dtype=exp_avg_sq.dtype, requires_grad=False)
         exp_avg_sq_cpu.copy_(exp_avg_sq.view(exp_avg_sq_0_numel), non_blocking=False)
 
-        # _optimizer_state_dict_exp_avg_cpu = 
-        # _optimizer_state_dict_exp_avg_sq_cpu = 
-                    
-        
-        # # Zero-3的fp32_flat_groups也需要写入CPU内存
-        # if 'zero-3' is True:
-        #     fp32_flat_groups_0_numel = optimizer.state_dict()['fp32_flat_groups'][0].numel()
-
         fp32_flat_groups_0 = optimizer.state_dict()['fp32_flat_groups'][0]
         fp32_flat_groups_0_numel =fp32_flat_groups_0.numel()
         fp32_flat_groups_0_cpu = torch.zeros(fp32_flat_groups_0_numel, device='cpu', dtype=fp32_flat_groups_0.dtype, requires_grad=False)
@@ -84,36 +67,6 @@ def calculate_in_memory_ckpt_time(model , optimizer,  idx):
     
     return
 
-    if dist.get_rank() == 0 and idx>100 and True:
-        # print(model.state_dict().items())
-        # print('model.state_dict() = ', model.state_dict())
-        # print('model.state_dict().keys() = ', model.state_dict().keys())
-
-
-        # optimizer.state_dict() =  dict_keys(['state', 'param_groups'])
-        print('optimizer.state_dict().keys() = ', optimizer.state_dict().keys())
-        print('optimizer.state_dict().optimizer_state_dict = ', optimizer.state_dict()['optimizer_state_dict'].keys())
-
-        print('optimizer.state_dict().optimizer_state_dict[state] = ', optimizer.state_dict()['optimizer_state_dict']['state'])
-
-        if optimizer.state_dict()['optimizer_state_dict']['state']!={} and True:
-            print('optimizer.state_dict().optimizer_state_dict[state][0] = ', optimizer.state_dict()['optimizer_state_dict']['state'][0])
-            print('optimizer.state_dict().optimizer_state_dict[state][0][exp_avg].numel() = ', optimizer.state_dict()['optimizer_state_dict']['state'][0]['exp_avg'].numel())
-            print('optimizer.state_dict().optimizer_state_dict[state][0][exp_avg_sq].numel() = ', optimizer.state_dict()['optimizer_state_dict']['state'][0]['exp_avg_sq'].numel())
-
-
-            # print('optimizer.state_dict().optimizer_state_dict[state][1] = ', optimizer.state_dict()['optimizer_state_dict']['state'][1])
-            # print('optimizer.state_dict().optimizer_state_dict[state][1][exp_avg].numel() = ', optimizer.state_dict()['optimizer_state_dict']['state'][1]['exp_avg'].numel())
-            # print('optimizer.state_dict().optimizer_state_dict[state][1][exp_avg_sq].numel() = ', optimizer.state_dict()['optimizer_state_dict']['state'][1]['exp_avg_sq'].numel())
-
-            # 
-            # fp32_flat_groups只有Zero-3才会出现, Zero-0只包含['state', 'param_groups'], 
-            # 
-            # print('optimizer.state_dict().fp32_flat_groups = ', optimizer.state_dict()['fp32_flat_groups'])
-            # print('optimizer.state_dict().fp32_flat_groups[0].numel() = ', optimizer.state_dict()['fp32_flat_groups'][0].numel())
-            # print('optimizer.state_dict().fp32_flat_groups[1].numel() = ', optimizer.state_dict()['fp32_flat_groups'][1].numel())
-
-    pass
 
 def ei_sort_key(s):
     parts = s.split('-')

@@ -26,7 +26,17 @@ import logging
 
 import time
 
-
+from sklearn.linear_model import LinearRegression
+import logging
+import uuid
+import shutil
+from typing import Dict, Optional
+import torchsnapshot
+from torchsnapshot import Snapshot, Stateful
+import copy
+import multiprocessing
+# import torch.multiprocessing as tmp
+import torch.multiprocessing as mp
 
 
 
@@ -66,6 +76,7 @@ class InflightParamRegistry(UserDict):
         if param.ds_status != ZeroParamStatus.INFLIGHT:
             raise RuntimeError(f"attempted to add non-inflight parameter to registry {param.ds_summary()}")
         self.data[param] = handle
+
 
 
 class PartitionedParameterCoordinator:
@@ -145,12 +156,20 @@ class PartitionedParameterCoordinator:
         # 
         # self.forward_idle_periods = []
         # self.backward_idle_periods = []
-        # 
-        
         self.ckpt_tensor = None
         self.partitions_cpu = None
         self.ckpt_numel = None
+        self.optimal_batch_vals = []
+        self.optimal_batch_idxs = []
         
+        
+        self.queue = multiprocessing.Queue()
+        self.save_process = multiprocessing.Process(target=_save_ckpt_persistence, args=(self.queue,))
+        self.save_process.start()  
+        print('Start checkpoint flushing!')
+        
+        
+
 
 
     """Tracing and Tracking
@@ -161,6 +180,7 @@ class PartitionedParameterCoordinator:
 
     Bookkeeping operations used to track where we are in the forward/backward pass
     """
+
 
     def _clear_trace_structures(self) -> None:
         self.__submodule_order = []
@@ -282,7 +302,6 @@ class PartitionedParameterCoordinator:
     
     # 
     # Modify by authors
-    # 20250822
     @compiler.disable
     @instrument_w_nvtx
     @torch.no_grad()
@@ -291,10 +310,6 @@ class PartitionedParameterCoordinator:
         1. kick off fetch for parameters in immediately required sub module;
         2. kick off fetch for next few parameters we will need later (prefetch);
         3. block on parameters in immediately required sub module;
-        该方法执行以下操作（按顺序）：
-        1. 启动对立即需要的子模块参数的获取；
-        2. 启动对后续将需要的前几个参数的获取（预取）；
-        3. 阻塞在立即需要的子模块参数上；
         """
         if logger.isEnabledFor(logging.DEBUG):
             debug_rank0(
@@ -316,7 +331,6 @@ class PartitionedParameterCoordinator:
             self._dump_param_ids(event_name, current_submodule.id,
                                  [p.ds_id for p in params_to_fetch if p.ds_status == ZeroParamStatus.NOT_AVAILABLE])
             self.__profiler.start_event(event_name)
-            # 启动所有子模块，获取立即需要的参数；
             # kick off all gather for params in the immediately required submodule
             # for param in params_to_fetch:
             if logger.isEnabledFor(logging.DEBUG):
@@ -325,7 +339,6 @@ class PartitionedParameterCoordinator:
             
             # 
             # Modify by authors
-            # 20250822
             self.__all_gather_params(params_to_fetch, forward)
             self.__profiler.stop_event(event_name, fetch_numel)
             
@@ -338,7 +351,6 @@ class PartitionedParameterCoordinator:
         wait_event_name = __class__.FORWARD_FETCH_WAIT if forward else __class__.BACKWARD_FETCH_WAIT
         self.__profiler.start_event(wait_event_name)
         # 
-        # 等待立即需要的子模块中的参数可用
         # wait for parameters in the immediately needed submodule to become available
         for param in params_to_fetch:
             param.ds_active_sub_modules.add(current_submodule.id)
@@ -366,16 +378,10 @@ class PartitionedParameterCoordinator:
         
         
         # 
-        # 启动即将使用的模块的参数预取
-        # 如果没有完整的模型跟踪，则不进行预取
         # kick off parameter prefetches for upcoming modules
         # don't prefetch if we dont have a completed model trace
         if self.is_complete_trace():
             # 
-            # 遍历当前模块所需的参数并将其从获取队列中移除，
-            # 以避免它们在后续操作中被预先获取。
-            # 如果这些参数已被之前的预先获取操作从获取队列中移除，
-            # 则在此处不再进行查找。
             # go through the parameters we need for the current module and pop them
             # off the fetch queue so that they aren't prefetched later.
             # if params have already been popped off the fetch queue by earlier
@@ -406,7 +412,6 @@ class PartitionedParameterCoordinator:
             
             
             # 
-            # 在接下来的几个子模块中，先获取所有参数（预取）
             # kick off all gather for params in the next few submodules (prefetch)
             if self.__prefetch_bucket_sz > 0:
                 max_params_to_prefetch = min(self.__max_n_available_params - self.__n_available_params,
@@ -417,7 +422,6 @@ class PartitionedParameterCoordinator:
                     param_in_trace: __class__.__ParamInTrace = self.__param_queue.popleft()
 
                     if _is_currently_on_nvme(param_in_trace.param):
-                        # NVMe预取操作在其他地方处理, 需要在此处中断以保持取数据顺序。
                         # nvme prefetch is handled elsewhere. Need to break here to preserve fetch order
                         self.__param_queue.appendleft(param_in_trace)
                         break
@@ -462,31 +466,48 @@ class PartitionedParameterCoordinator:
         
     
     # 
-    # 20250823
-    # Snapshotting
     def copying_snapshot_ckpt(self, idle_time_ratio):
         partition_length =  idle_time_ratio * self.ckpt_numel
 
         partition_tensor = self.ckpt_tensor.narrow(0, self.partition_start, partition_length)
-                    
         self.partition_start = self.partition_start +partition_length
-        # 
         stream = torch.cuda.Stream()
-        # 
         with torch.cuda.stream(stream):
             self.partitions_cpu[index].copy_(partition_tensor, non_blocking=True)
+        
+        selective_process = mp.Process(target=selective_partitions, args=(self.partitions_cpu[index], 0.014, self.queue))
+        selective_process.start()
+        
+    
+    def selective_partitions(self, partition, density = 0.014):
         if index == len(self.partitions_cpu) -1:
             index = 0
-            # Asynchronous multi-threaded parallel compression
-            # 
+            compression_time = self.calculation_compression_time(partition.numel())
+            write_time = self.calculation_write_time(partition.numel())
+            compression_write_time = self.calculation_write_time(partition.numel()*density)
             
+            if compression_write_time + compression_time < write_time:
+                optimal_batch_size = self.optimal_batch_compute()
+                final_vals, final_idxs = self.chunkwise_topk(partition)
+                
+                self.optimal_batch_vals = torch.cat((self.optimal_batch_vals, final_vals), dim=0)
+                self.optimal_batch_idxs = torch.cat((self.optimal_batch_idxs, final_idxs), dim=0)
+                
+                if len(self.optimal_batch_vals) + len(self.optimal_batch_idxs) >optimal_batch_size:
+                    optimal_batch = [self.optimal_batch_vals, self.optimal_batch_idxs]
+                    self.queue.put(self.optimal_batch)
+                    self.optimal_batch_vals = []
+                    self.optimal_batch_idxs = []
+            else:
+                # Asynchronous multi-threaded parallel compression
+                self.queue.put(partition)
             
         else:
             index = index +1
-        
-        pass
     
-    def chunk_topk_worker(chunk, local_k):
+    
+
+    def chunk_topk_worker(self, chunk, local_k):
         # Compression
         vals, idxs = torch.topk(chunk, local_k)
         
@@ -509,7 +530,7 @@ class PartitionedParameterCoordinator:
             for i in range(num_chunks):
                 start_idx = i * elems_per_chunk
                 end_idx = min((i + 1) * elems_per_chunk, len(large_partition))
-                futures.append(ex.submit(chunk_topk_worker, large_partition[start_idx:end_idx], local_k))
+                futures.append(ex.submit(self.chunk_topk_worker, large_partition[start_idx:end_idx], local_k))
             for fut in futures:
                 chunk_results.append(fut.result())
         # 
@@ -522,6 +543,78 @@ class PartitionedParameterCoordinator:
         final_idxs = all_idxs[final_rel_idxs]
 
         return final_vals, final_idxs
+    
+    
+    def optimal_batch_compute(self):
+        """
+        Calculate the value of B when the first derivative of T_flush with respect to B is 0
+    
+        Parameters:
+        R         -- Data volume coefficient
+        Td        -- Disk latency (seconds)
+        Tc        -- Compression time (seconds)
+        Ci_tilde  -- Effective compression capacity or bandwidth
+    
+        Returns:
+        B         -- Optimal batch size
+        """
+        C_tilde = 204.8*2
+        # Write latency
+        Td = 0.01417
+        # Average compression time
+        Tc = 0.0010859
+        Ci_tilde = 204.8/512*2
+        if Tc <= 0 or Ci_tilde <= 0 or R <= 0 or Td <= 0:
+            raise ValueError("All parameters must be positive numbers.")
+        
+        optimal_size = math.sqrt((C_tilde * Td * Ci_tilde) / Tc)
+        # Number of bytes for each element
+        elem_size = torch.tensor([], dtype=torch.float16).element_size()
+        # MB to bytes
+        size_bytes = optimal_size * 1024 * 1024
+        # Calculate the number of elements
+        return size_bytes // elem_size
+         
+    
+    def calculation_write_time(self, tensor_size, density):
+        # Implementing piecewise functions
+        from scipy.interpolate import interp1d
+        x_size =int(tensor_size*4/1024)
+    
+        x = [0.1, 1, 10, 100, 1000, 10000, 100000, 150000]
+        y = [0.005115201187133789, 0.005463216590881347, 0.0055778751373291016, 0.005975676536560059, 0.019652485847473145, 0.11236395835876464, 1.005709457397461, 1.5160596132278443]
+    
+        if x_size< x[0]:
+            return y[0]
+        elif x_size> x[-1]:
+            return y[-1]
+
+        f = interp1d(x, y)
+
+        result = f(x_size)     
+        return result
+
+
+    def calculation_compression_time(self, tensor_size):
+        # Implementing piecewise functions
+        from scipy.interpolate import interp1d
+
+        x_size =max(1, int(tensor_size*1.0*4/1024)) 
+    
+        x = [10, 100, 1000, 10000, 100000, 1000000]
+        topk_array_time_y =  [ 7.677078247070312e-05, 0.0001761913299560547, 0.0003170967102050781, 0.00024127960205078125, 0.0003452301025390625, 0.0015995502471923828]
+
+        if x_size< x[0]:
+            return topk_array_time_y[0]
+        
+        # 
+        # Create a piecewise interpolation function
+        f = interp1d(x, topk_array_time_y)
+        # Specify new points for interpolation
+        # Generate new points with equal spacing
+                
+        result = f(x_size) 
+        return result
     
 
     @instrument_w_nvtx
@@ -679,5 +772,18 @@ class PartitionedParameterCoordinator:
 
         if swap_in_params:
             swap_in_params[0].nvme_swapper.swap_in(swap_in_params, async_op=True)
+
+
+def _save_ckpt_persistence(queue):
+    while True:
+        batch = queue.get()
+        checkpoint_save_work_dir = './save_path/'
+        output_model_file = os.path.join(checkpoint_save_work_dir, f"run-{uuid.uuid4()}-epoch-{epoch}-iteration-{idx}")
+            
+        save_data={
+            "State":batch,
+        }
+        torch.save(save_data, output_model_file)
+
 
 
